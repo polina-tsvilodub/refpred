@@ -38,22 +38,29 @@ const intro = magpieViews.view_generator("intro", {
 const instructions = magpieViews.view_generator("instructions", {
   trials: 1,
   name: 'instructions',
-  title: 'General Instructions',
-  text: `This is a sample instructions view.
+  title: 'Instructions',
+  text: `Please read the instructions carefully before starting the experiment and
+            make sure you can concentrate on the task without disturbance.
             <br />
             <br />
-            Tell your participants what they are to do here.`,
+            The experiment consists of six trials.
+            <br/>
+            <br/>
+            You and your friend watch parades of objects as they go by and talk about them.
+            <br />
+            <br />
+            Please press the button 'Got to trials' to begin the experiment.`,
   buttonText: 'go to trials'
 });
 
 
 // In the post test questionnaire you can ask your participants addtional questions
-const post_test = magpieViews.view_generator("post_test", {
-  trials: 1,
-  name: 'post_test',
-  title: 'Additional information',
-  text: 'Answering the following questions is optional, but your answers will help us analyze our results.'
-
+// const post_test = magpieViews.view_generator("post_test", {
+//   trials: 1,
+//   name: 'post_test',
+//   title: 'Additional information',
+//   text: 'Answering the following questions is optional, but your answers will help us analyze our results.'
+//
   // You can change much of what appears here, e.g., to present it in a different language, as follows:
   // buttonText: 'Weiter',
   // age_question: 'Alter',
@@ -68,7 +75,7 @@ const post_test = magpieViews.view_generator("post_test", {
   // languages_question: 'Muttersprache',
   // languages_more: '(in der Regel die Sprache, die Sie als Kind zu Hause gesprochen haben)',
   // comments_question: 'Weitere Kommentare'
-});
+
 
 // The 'thanks' view is crucial; never delete it; it submits the results!
 const thanks = magpieViews.view_generator("thanks", {
@@ -103,17 +110,50 @@ const thanks = magpieViews.view_generator("thanks", {
 
 
 // Here, we initialize a normal forced_choice view
-const forced_choice_2A = magpieViews.view_generator("forced_choice", {
+const custom_forced_choice_2A = custom_forced_choice({
   // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
   trials: trial_info.forced_choice.length,
   // name should be identical to the variable name
   name: 'forced_choice_2A',
-  data: trial_info.forced_choice,
+  data: _.shuffle(trial_info.forced_choice),
   // you can add custom functions at different stages through a view's life cycle
   // hook: {
   //     after_response_enabled: check_response
   // }
 });
+
+var speaker = _.sample(["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles"]);
+var listener = _.sample(["Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Margaret"]);
+
+
+const botcaptcha = custom_botcaptcha({
+  name: 'botcaptcha',
+  trials: 1,
+  story: speaker + ' says to ' + listener + ': "It\'s a beautiful day, isn\'t it?"',
+  question: "Who is " + speaker + " talking to?",
+  speaker: speaker,
+  listener: listener
+
+});
+
+const custom_post_test = custom_post_test_view({
+  name: 'post_test',
+  title: 'Additional information',
+  text: `Please enter your native languages.
+  <br />
+    Answering the other questions is optional, but your answers will help us analyze our results.`,
+  trials: 1
+});
+const custom_intro = custom_intro_view({
+  name: 'Intro',
+  title: 'Welcome!',
+  picture1: 'images/cpl.png',
+  trials: 1
+
+});
+// The 'thanks' view is crucial; never delete it; it submits the results!
+
+
 
 // There are many more templates available:
 // forced_choice, slider_rating, dropdown_choice, testbox_input, rating_scale, image_selection, sentence_choice,

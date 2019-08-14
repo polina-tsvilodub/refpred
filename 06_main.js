@@ -15,10 +15,11 @@ $("document").ready(function() {
     window.magpie_monitor = magpieInit({
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
-            intro,
+            custom_intro,
+            botcaptcha,
             instructions,
-            forced_choice_2A,
-            post_test,
+            custom_forced_choice_2A,
+            custom_post_test,
             thanks,
         ],
         // Here, you can specify all information for the deployment
@@ -29,15 +30,18 @@ $("document").ready(function() {
             // "debug" and "directLink"
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
             deployMethod: "debug",
-            contact_email: "YOUREMAIL@wherelifeisgreat.you",
+            contact_email: "polinats@mit.edu",
             prolificURL: "https://app.prolific.ac/submissions/complete?cc=SAMPLE1234"
         },
+
+        uniqueTurkerID:  '388c80fe8862c2bc0a46388c8777db4e',
         // Here, you can specify how the progress bar should look like
         progress_bar: {
             in: [
                 // list the view-names of the views for which you want a progress bar
-                forced_choice_2A.name,
+                custom_forced_choice_2A.name,
             ],
+
              // Possible styles are "default", "separate" and "chunks"
             style: "separate",
             width: 100
