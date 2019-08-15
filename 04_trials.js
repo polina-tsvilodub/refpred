@@ -88,7 +88,7 @@ const items = {
   utterance2: utterance.utterance2s,
   picture: ["images/flower-parade-basic.png", "images/flower-parade-dandelion.png"],
   adj: "small",
-  option1: "dandelia"
+  option1: "dandelions"
  }],
   trees: [
     {referent: ["redwood", "one"],
@@ -103,7 +103,7 @@ const items = {
     utterance2: utterance.utterance2s,
     picture: ["images/tree-parade-basic.png", "images/tree-parade-bonsai.png"],
     adj: "small",
-    option1: "bonsais"
+    option1: "bonsai"
    }
   ]
 }
@@ -117,67 +117,87 @@ const trial_info = {
         {
             context: "You and your friend see a parade of animals.",
             context_picture: items.dogs1[target_size[0]].picture[picture[0]],
+            pic_spec: picture[0],
             text: "Your friend points to another member of the parade which you cannot see and says: " + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + ".",
+            ref_spec: referent[0],
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.dogs1[target_size[0]].adj + " relative to other ",
             option1: items.dogs1[target_size[0]].option1,
             option2: 'dogs',
-            item: "dogs1"
+            item: "dogs1",
+            // if 0: big, if 1 small
+            target_size: items.dogs1[target_size[0]].adj
+
 
         },
         {
             context: "You and your friend see a parade of animals.",
             context_picture: items.dogs2[target_size[1]].picture[picture[1]],
+            pic_spec: picture[1],
             text: "Your friend points to another member of the parade which you cannot see and says: " + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + ".",
+            ref_spec: referent[1],
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.dogs2[target_size[1]].adj + " relative to other ",
             option1: items.dogs2[target_size[1]].option1,
             option2: 'dogs',
-            item: "dogs2"
+            item: "dogs2",
+            target_size: items.dogs2[target_size[1]].adj
 
         },
         {
             context: "You and your friend see a parade of animals.",
             context_picture: items.birds[target_size[2]].picture[picture[2]],
+            pic_spec: picture[2],
             text: "Your friend points to another member of the parade which you cannot see and says: " + items.birds[target_size[2]].utterance1 + items.birds[target_size[2]].referent[referent[2]] + items.birds[target_size[2]].utterance2 + ".",
+            ref_spec: referent[2],
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.birds[target_size[2]].adj + " relative to other ",
             option1: items.birds[target_size[2]].option1,
             option2: 'birds',
-            item: "birds"
+            item: "birds",
+            target_size: items.birds[target_size[2]].adj
 
         },
         {
             context: "You and your friend see a parade of animals.",
             context_picture: items.fish[target_size[3]].picture[picture[3]],
+            pic_spec: picture[3],
             text: "Your friend points to another member of the parade which you cannot see and says: " + items.fish[target_size[3]].utterance1 + items.fish[target_size[3]].referent[referent[3]] + items.fish[target_size[3]].utterance2 + ".",
+            ref_spec: referent[3],
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.fish[target_size[3]].adj + " relative to other ",
             option1: items.fish[target_size[3]].option1,
             option2: 'fish',
-            item: "fish"
+            item: "fish",
+            target_size: items.fish[target_size[3]].adj
 
         },
         {
             context: "You and your friend see a collection of plants.",
             context_picture: items.flowers[target_size[4]].picture[picture[4]],
+            pic_spec: picture[4],
             text: "Your friend points to another member of the collection which you cannot see and says: " + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + ".",
+            ref_spec: referent[4],
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.flowers[target_size[4]].adj + " relative to other ",
             option1: items.flowers[target_size[4]].option1,
             option2: 'flowers',
-            item: "flowers"
+            item: "flowers",
+            target_size: items.flowers[target_size[4]].adj
 
         },
         {
             context: "You and your friend see a collection of plants.",
             context_picture: items.trees[target_size[5]].picture[picture[5]],
+            pic_spec: picture[5],
             text: "Your friend points to another member of the collection which you cannot see and says: " + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + ".",
+            ref_spec: referent[5],
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.trees[target_size[5]].adj + " relative to other ",
             option1: items.trees[target_size[5]].option1,
             option2: 'trees',
-            item: "trees"
+            item: "trees",
+            target_size: items.trees[target_size[5]].adj
 
         }
 
