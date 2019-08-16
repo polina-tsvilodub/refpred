@@ -18,28 +18,36 @@ $("document").ready(function() {
             custom_intro,
             botcaptcha,
             instructions,
-            custom_forced_choice_2A,
+            warmup1,
+            context1,
+            custom_main_text1,
+            context2,
+            warmup2,
+            custom_main_text2,
             custom_post_test,
             thanks,
         ],
         // Here, you can specify all information for the deployment
         deploy: {
-            experimentID: "INSERT_A_NUMBER",
-            serverAppURL: "https://magpie-demo.herokuapp.com/api/submit_experiment/",
+            experimentID: "9",
+            serverAppURL: "https://pragmatics-ptb.herokuapp.com/api/submit_experiment/",
             // Possible deployment methods are:
             // "debug" and "directLink"
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
-            deployMethod: "debug",
+            deployMethod: "MTurkSandbox",
             contact_email: "polinats@mit.edu",
             prolificURL: "https://app.prolific.ac/submissions/complete?cc=SAMPLE1234"
         },
 
-        uniqueTurkerID:  '388c80fe8862c2bc0a46388c8777db4e',
+        uniqueTurkerID:  '0e8b1d8dfda437c9dfeff65c57c17e40',
         // Here, you can specify how the progress bar should look like
         progress_bar: {
             in: [
                 // list the view-names of the views for which you want a progress bar
-                custom_forced_choice_2A.name,
+                warmup1.name,
+                warmup2.name,
+                custom_main_text1.name,
+                custom_main_text2.name
             ],
 
              // Possible styles are "default", "separate" and "chunks"

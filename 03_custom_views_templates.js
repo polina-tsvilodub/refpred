@@ -105,26 +105,29 @@ const custom_forced_choice = function(config, startingTime) {
       </section>
       <div class='magpie-view-answer-container'>
       ${config.data[CT].sentence_left}
-            <select id='response' name='answer'>
-                  <option disabled selected></option>
-                  <option value=${config.data[CT].option1}>${config.data[CT].option1}</option>
-                  <option value=${config.data[CT].option2}>${config.data[CT].option2}</option>
-            </select>
+            <textarea name='textbox-input' rows=1 cols=15 class='textbox-input'/>
 
       </div>
           <button id='next' class='magpie-view-button magpie-nodisplay'>next</button>
       </div>`);
 
         let next;
-        let response;
+        let textInput;
 
 
         next = $("#next");
-        response = $("#response");
+        textInput = $("textarea");
+        const minChars = config.data[CT].min_chars === undefined ? 2 : config.data[CT].min_chars;
 
         // attaches an event listener to the textbox input
-        response.on("change", function() {
-            $("#next").removeClass("magpie-nodisplay");
+        textInput.on("keyup", function() {
+            // if the text is longer than (in this case) 10 characters without the spaces
+            // the 'next' button appears
+            if (textInput.val().trim().length > minChars) {
+                next.removeClass("magpie-nodisplay");
+            } else {
+                next.addClass("magpie-nodisplay");
+            }
         });
 
 
@@ -134,7 +137,7 @@ const custom_forced_choice = function(config, startingTime) {
                 trial_name: config.name,
                 trial_number: CT + 1,
                 question: config.data[CT].sentence_left.concat("..."),
-                response: response.val(),
+                response: textInput.val().trim(),
                 RT: RT
             };
 
@@ -150,6 +153,193 @@ const custom_forced_choice = function(config, startingTime) {
 };
 return view;
 };
+
+
+const custom_textfield_warmup = function(config, startingTime) {
+  const view = {
+    name: config.name,
+    CT: 0,
+    trials: config.trials,
+    render: function(CT, magpie, startingTime) {
+      $("main").html(`<div class='magpie-view'>
+      <h1 class='magpie-view-title'>Warm-up trials</h1>
+      <section class="magpie-text-container">
+        <p class="magpie-view-question">${config.data[CT].text}</p>
+      </section>
+
+
+    <div style="width:100%;">
+     <div style="width:50%;height:400px;float:left;position:relative;align:center;">
+        <div style="position:absolute;bottom:0;right:20px;">
+          <div class="picture"  align="center" >
+            <img src="${config.data[CT].picture1}">
+          </div>
+          <div  class='magpie-view-answer-container'>
+            <p id='1' class='magpie-view-text'>${config.data[CT].question1}
+              <textarea id='textbox-input1' rows=1 cols=15 class='textbox-input'/>
+            </p>
+            <p class = 'correct-answer1 magpie-nodisplay'>Possible correct labels: ${config.data[CT].correct1}</p>
+          </div>
+        </div>
+    </div>
+    <div style="width:50%;height:400px;float:right; position:relative;align:center;">
+      <div style="position:absolute;bottom:0;left:20px;">
+          <div  class="picture" align="center" >
+            <img src="${config.data[CT].picture2}">
+          </div>
+          <div class='magpie-view-answer-container' >
+            <p id='2' class='magpie-view-text'>${config.data[CT].question3}
+              <textarea id='textbox-input2' rows=1 cols=15 class='textbox-input'/>
+            </p>
+            <p class = 'correct-answer2 magpie-nodisplay'>Possible correct labels: ${config.data[CT].correct2}</p>
+          </div>
+      </div>
+      </div>
+    </div>
+
+    <div  class='magpie-view-answer-container'>
+      <p id='3' class='magpie-view-text'>${config.data[CT].question2}
+        <textarea id='textbox-input3' rows=1 cols=15 class='textbox-input'/>
+      <p id='4'></p>
+      <p class = 'correct-answer3 magpie-nodisplay'>Possible correct labels: ${config.data[CT].correct3}</p>
+      </p>
+      <br />
+      <p class = 'correct-answer4 magpie-nodisplay'>Please enter the correct labels to proceed</p>
+    </div>
+
+          <button id='next' class='magpie-view-button magpie-nodisplay'>next</button>
+    </div>  `);
+
+        let next;
+        let textInput1;
+        let textInput2;
+        let textInput3;
+
+
+        const minChars = config.data[CT].min_chars === undefined ? 2 : config.data[CT].min_chars;
+
+        next = $("#next");
+        textInput1 = $("#textbox-input1")
+        textInput2 = $("#textbox-input2")
+        textInput3 = $("#textbox-input3")
+
+        textInput1.on("keyup", function() {
+            // if the text is longer than (in this case) 10 characters without the spaces
+            // the 'next' button appears
+            if (textInput1.val().trim().length > minChars)  {
+              textInput2.on("keyup", function() {
+                if (textInput2.val().trim().length > minChars) {
+                  textInput3.on("keyup", function() {
+                    if (textInput3.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                    }
+                  });
+                } else if (textInput3.val().trim().length > minChars) {
+                    textInput2.on("keyup", function() {
+                      if (textInput2.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                       }
+                    })
+                };
+              });
+            } else if (textInput2.val().trim().length > minChars) {
+              textInput1.on("keyup", function() {
+                if (textInput1.val().trim().length > minChars) {
+                  textInput3.on("keyup", function() {
+                    if (textInput3.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                    }
+                  });
+                } else if (textInput3.val().trim().length > minChars) {
+                    textInput1.on("keyup", function() {
+                      if (textInput1.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                       }
+                    })
+                };
+              });
+            } else if (textInput3.val().trim().length > minChars) {
+              textInput1.on("keyup", function() {
+                if (textInput1.val().trim().length > minChars) {
+                  textInput2.on("keyup", function() {
+                    if (textInput2.val().trim().length > minChars) {
+
+                        next.removeClass("magpie-nodisplay");
+
+                    }
+                  });
+                } else if (textInput2.val().trim().length > minChars) {
+                    textInput1.on("keyup", function() {
+                      if (textInput1.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                       }
+                    })
+                };
+              });
+
+            } else {
+                next.addClass("magpie-nodisplay");
+            }
+        });
+
+        var attempts = 0;
+        // the trial data gets added to the trial object
+        next.on("click", function(startingTime) {
+          attempts = attempts + 1;
+          let trial_data = {
+              trial_name: config.name,
+              trial_number: CT + 1,
+              attempts: attempts,
+              response1: textInput1.val().trim(),
+              response2: textInput2.val().trim(),
+              response3: textInput3.val().trim()
+          //    RT: RT
+          };
+          trial_data = magpieUtils.view.save_config_trial_data(config.data[CT], trial_data);
+          magpie.trial_data.push(trial_data);
+
+          var flag = true;
+
+          if (config.data[CT].correct1.includes(textInput1.val().trim().toLowerCase()) == false) {
+            flag = false;
+            $(".correct-answer1").removeClass("magpie-nodisplay")
+            $(".correct-answer4").removeClass("magpie-nodisplay")
+          } else {
+            $(".correct-answer1").addClass("magpie-nodisplay")
+          }
+
+
+          if (config.data[CT].correct2.includes(textInput2.val().trim().toLowerCase()) == false) {
+            flag = false;
+            $(".correct-answer2").removeClass("magpie-nodisplay")
+            $(".correct-answer4").removeClass("magpie-nodisplay")
+          } else {
+            $(".correct-answer2").addClass("magpie-nodisplay")
+          }
+
+          if (config.data[CT].correct3.includes(textInput3.val().trim().toLowerCase()) == false) {
+            flag = false;
+            $(".correct-answer3").removeClass("magpie-nodisplay")
+            $(".correct-answer4").removeClass("magpie-nodisplay")
+          } else {
+            $(".correct-answer3").addClass("magpie-nodisplay")
+          }
+
+          if (flag) {
+
+            magpie.findNextView();
+           }
+
+        });
+
+        $('#next').on("click");
+    },
+
+};
+return view;
+};
+
+
 
 
 const custom_post_test_view = function(config) {

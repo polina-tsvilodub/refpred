@@ -19,20 +19,6 @@
 */
 
 // Every experiment should start with an intro view. Here you can welcome your participants and tell them what the experiment is about
-const intro = magpieViews.view_generator("intro", {
-  trials: 1,
-  name: 'intro',
-  // If you use JavaScripts Template String `I am a Template String`, you can use HTML <></> and javascript ${} inside
-  text: `This is a sample introduction view.
-            <br />
-            <br />
-            The introduction view welcomes the participant and gives general information
-            about the experiment. You are in the <strong>${coin}</strong> group.
-            <br />
-            <br />
-            This is a minimal experiment with one forced choice view. It can serve as a starting point for programming your own experiment.`,
-  buttonText: 'begin the experiment'
-});
 
 // For most tasks, you need instructions views
 const instructions = magpieViews.view_generator("instructions", {
@@ -43,13 +29,18 @@ const instructions = magpieViews.view_generator("instructions", {
             make sure you can concentrate on the task without disturbance.
             <br />
             <br />
-            The experiment consists of six trials.
-            <br/>
-            <br/>
-            You and your friend watch parades of objects as they go by and talk about them.
+            The experiment consists of two rounds, each having a few warm-up trials before the main trials start.
             <br />
             <br />
-            Please press the button 'Got to trials' to begin the experiment.`,
+            During the warm-up trials, you will see pictures of objects.
+            <br />
+            <br />
+            Please label the objects. You will be given feedback on your labels.
+            <br />
+            <br />
+            By pressing the button 'Go to Trials' you begin the first round.
+
+            `,
   buttonText: 'go to trials'
 });
 
@@ -110,17 +101,49 @@ const thanks = magpieViews.view_generator("thanks", {
 
 
 // Here, we initialize a normal forced_choice view
-const custom_forced_choice_2A = custom_forced_choice({
+const custom_main_text1 = custom_forced_choice({
   // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
-  trials: trial_info.forced_choice.length,
+  trials: trial_info.text_insertion_main1.length,
   // name should be identical to the variable name
-  name: 'forced_choice_2A',
-  data: _.shuffle(trial_info.forced_choice),
+  name: 'custom_main_text1',
+  data: _.shuffle(trial_info.text_insertion_main1),
   // you can add custom functions at different stages through a view's life cycle
   // hook: {
   //     after_response_enabled: check_response
   // }
 });
+
+
+const custom_main_text2 = custom_forced_choice({
+  // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
+  trials: trial_info.text_insertion_main2.length,
+  // name should be identical to the variable name
+  name: 'custom_main_text2',
+  data: _.shuffle(trial_info.text_insertion_main2),
+  // you can add custom functions at different stages through a view's life cycle
+  // hook: {
+  //     after_response_enabled: check_response
+  // }
+});
+
+
+
+const warmup1 = custom_textfield_warmup({
+  name: 'warmup1',
+  title: 'Labeling task',
+  trials: 3,
+  data: trial_info.text_insertion_warmup1,
+});
+
+
+const warmup2 = custom_textfield_warmup({
+  name: 'warmup2',
+  title: 'Labeling task',
+  trials: 3,
+  data: trial_info.text_insertion_warmup2,
+});
+
+
 
 var speaker = _.sample(["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles"]);
 var listener = _.sample(["Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Margaret"]);
@@ -151,6 +174,36 @@ const custom_intro = custom_intro_view({
   trials: 1
 
 });
+
+const context1 = magpieViews.view_generator("instructions",{
+    trials: 1,
+    name: 'instructions',
+    title: 'Instructions',
+    text:  `
+    Next, you will complete the main trials.
+    <br/>
+    <br/>
+    You and your friend watch groups of objects as they pass by and talk about them.
+    <br />
+    <br />
+
+    Press the button 'Go to trials' to begin the main trials.
+            `,
+    buttonText: 'go to trials'
+});
+const context2 = magpieViews.view_generator("instructions",{
+    trials: 1,
+    name: 'instructions',
+    title: 'Instructions',
+    text:  `
+    Now the second round of the experiment starts. You will complete similar trials.
+    <br />
+    </br>
+    Press the button 'Go to trials' to begin the second round.
+            `,
+    buttonText: 'go to trials'
+});
+
 // The 'thanks' view is crucial; never delete it; it submits the results!
 
 
