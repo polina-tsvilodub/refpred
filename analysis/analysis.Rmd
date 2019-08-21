@@ -25,17 +25,20 @@ d %>% distinct(d$languages)# %>% View()
 d_filt <- d %>% 
   filter(grepl("English", languages, ignore.case = T))
 
+# choose main trials 
 d_main <- d_filt %>% filter((trial_name == "custom_main_text1")|(trial_name == "custom_main_text2")) %>% select(submission_id, trial_number, ref_spec, pic_spec, item, response, context, text)
 
 d_main %>% distinct(d_main$response) %>% View()
 ```
 ## Response categorization
 ```{r}
+# remove invalid responses 
 d_main_valid <- subset(d_main, !(response %in% c("Yes", "That one is big", "That chihuahua is small", "That great dane is big"))) 
 
+# categorize responses
 d_main_responseCat <- d_main_valid %>%
   rowwise() %>%
-  mutate( # categorize responses 
+  mutate(  
     response_cat =
       ifelse(
       tolower(response) %in% c("birds", "dogs", "fish", "flowers",  "trees"), "basic", "sub"),
@@ -43,24 +46,42 @@ d_main_responseCat <- d_main_valid %>%
     response_num = ifelse(response_cat == "sub", 1, 0),
     response_label = "sub"
   )
-
+# categorize syntactic condition since I forgot to record it 
 d_main_cat <- d_main_responseCat %>% rowwise() %>% mutate(condition = ifelse((grepl("That's", text)), "prenominal", "predicative"))
 ```
 
 ``` {r}
+# raw reponse counts by syntactic condition (6 participants each)
  d_main_cat %>% ggplot(aes(x=response_cat, fill=ref_spec)) + geom_bar(position=position_dodge()) + facet_wrap(~condition) 
 ```
+## Proportion of sub responses by syntactic condition, picture specificity and NP specificity 
 ``` {r}
 d_main_cat %>% group_by(response_label, ref_spec, pic_spec, condition) %>% tidyboot_mean(column = response_num) %>% ungroup() %>% 
-  mutate(ref_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")),
-         pic_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=pic_spec, fill= ref_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")),
+         context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= NP_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(0.8))+
   geom_linerange(position = position_dodge(0.8)) + facet_wrap(~condition)
 ```
 
 ## Stats
 ``` {r}
+# does not converge due to small amount of data
+
 library(lme4)
 lm.fit <- glmer(response_num ~ condition*ref_spec*pic_spec + (1|submission_id), data =d_main_cat, family = "binomial" )
 summary(lm.fit)
+```
+## Table 
+``` {r}
+d_main_cat %>% group_by(condition, ref_spec, pic_spec) %>% count()
+
+```
+## Sub response proportions by item and syntactic condition
+``` {r}
+d_main_cat %>% group_by(item, condition, response_label, ref_spec, pic_spec) %>% 
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")),
+         context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= NP_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8))+
+  geom_linerange(position = position_dodge(0.8)) + facet_grid(condition~item)
 ```

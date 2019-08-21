@@ -111,7 +111,8 @@ const main_trials = {
             sentence_left: "It is " + items.dogs1[target_size[0]].adj + " relative to other ",
             item: "dogs1",
             // if 0: big, if 1 small
-            target_size: items.dogs1[target_size[0]].adj
+            target_size: items.dogs1[target_size[0]].adj,
+            condition: utterance.condition
 
 
         },
@@ -124,7 +125,8 @@ const main_trials = {
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.dogs2[target_size[1]].adj + " relative to other ",
             item: "dogs2",
-            target_size: items.dogs2[target_size[1]].adj
+            target_size: items.dogs2[target_size[1]].adj,
+            condition: utterance.condition
 
         },
     birds:    {
@@ -136,7 +138,8 @@ const main_trials = {
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.birds[target_size[2]].adj + " relative to other ",
             item: "birds",
-            target_size: items.birds[target_size[2]].adj
+            target_size: items.birds[target_size[2]].adj,
+            condition: utterance.condition
 
         },
   fish:      {
@@ -148,7 +151,8 @@ const main_trials = {
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.fish[target_size[3]].adj + " relative to other ",
             item: "fish",
-            target_size: items.fish[target_size[3]].adj
+            target_size: items.fish[target_size[3]].adj,
+            condition: utterance.condition
 
         },
   flowers:      {
@@ -160,7 +164,8 @@ const main_trials = {
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.flowers[target_size[4]].adj + " relative to other ",
             item: "flowers",
-            target_size: items.flowers[target_size[4]].adj
+            target_size: items.flowers[target_size[4]].adj,
+            condition: utterance.condition
 
         },
     trees:    {
@@ -172,7 +177,8 @@ const main_trials = {
             question: "Please rephrase your friend's comment.",
             sentence_left: "It is " + items.trees[target_size[5]].adj + " relative to other ",
             item: "trees",
-            target_size: items.trees[target_size[5]].adj
+            target_size: items.trees[target_size[5]].adj,
+            condition: utterance.condition
 
         }
 };
