@@ -5,7 +5,7 @@ const size = function () {
   return _.sample([0,1])
 }
 
-const utterance = utt_predicative;
+const utterance = utt_prenominal;
 const target_size = _.shuffle([0,0,0,1,1,1])
 const referent = _.shuffle([0,0,0,1,1,1])
 const picture = _.shuffle([0,0,0,1,1,1])

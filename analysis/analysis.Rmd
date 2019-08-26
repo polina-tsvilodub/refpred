@@ -85,3 +85,13 @@ d_main_cat %>% group_by(item, condition, response_label, ref_spec, pic_spec) %>%
   geom_col(position = position_dodge(0.8))+
   geom_linerange(position = position_dodge(0.8)) + facet_grid(condition~item)
 ```
+## Sub responses proportion per participant
+``` {r}
+d_main_cat %>%
+  group_by(submission_id, condition, response_label) %>%
+  summarize(n_sub_responses = sum(response_num)) %>%
+  ungroup() %>%
+  ggplot(., aes( x = n_sub_responses))+
+  geom_bar(position=position_dodge())+
+  facet_wrap(~condition) + ggtitle("Number of subordinate responses uttered per participant in the 6 trials")
+```
