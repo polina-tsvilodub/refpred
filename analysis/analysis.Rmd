@@ -16,24 +16,34 @@ library(brms)
 ```
 
 ``` {r}
-d <- read_csv("../data/results_9_comp-class-inference-pilot.csv")
+d1 <- read_csv("../data/results_9_comp-class-inference-pred_batch2.csv")
+d2 <- read_csv("../data/results_9_comp-class-inference-prenom_batch2.csv")
+d3 <- read_csv("../data/results_9_comp-class-inference-pilot.csv")
+
+d4 <- rbind(d1, d2)
+
+# add the missing column condition to d3 (pilot data)
+d3["condition"] <-  ifelse(grepl("That's", d3$text), "prenominal", "predicative")
+
+d <- rbind(d4, d3)
 
 glimpse(d)
 ```
 ``` {r}
 d %>% distinct(d$languages)# %>% View()
 d_filt <- d %>% 
-  filter(grepl("English", languages, ignore.case = T))
+  filter(grepl("english", languages, ignore.case = T))
 
 # choose main trials 
-d_main <- d_filt %>% filter((trial_name == "custom_main_text1")|(trial_name == "custom_main_text2")) %>% select(submission_id, trial_number, ref_spec, pic_spec, item, response, context, text)
+d_main <- d_filt %>% filter((trial_name == "custom_main_text1")|(trial_name == "custom_main_text2")) %>% select(submission_id, trial_number, ref_spec, pic_spec, item, response, condition, context, text)
 
 d_main %>% distinct(d_main$response) %>% View()
+d_comments <- d %>% distinct(d$comments) %>% View()
 ```
 ## Response categorization
 ```{r}
 # remove invalid responses 
-d_main_valid <- subset(d_main, !(response %in% c("Yes", "That one is big", "That chihuahua is small", "That great dane is big"))) 
+d_main_valid <- subset(d_main, !(response %in% c("Yes", "That one is big", "That chihuahua is small", "That great dane is big", "those dogs are small", "the swordfish are big", "those eagles are big", "those dandelions are small", "that tree on the far left is big", "that pug on the left is small", "ones", "this is a little pug", "there is a little bonsai", "that's a big dog", "that sunflower is large", "that is a little bird", "that fish is large" ))) 
 
 # categorize responses
 d_main_responseCat <- d_main_valid %>%
@@ -41,22 +51,21 @@ d_main_responseCat <- d_main_valid %>%
   mutate(  
     response_cat =
       ifelse(
-      tolower(response) %in% c("birds", "dogs", "fish", "flowers",  "trees"), "basic", "sub"),
+      tolower(response) %in% c("birds", "dogs", "fish", "flowers", "flower", "large dogs", "dogs in the line", "other birds in the group", "small dogs", "trees"), "basic", ifelse(tolower(response) %in% c("plant", "animal"), "super", "sub")),
     
     response_num = ifelse(response_cat == "sub", 1, 0),
     response_label = "sub"
   )
-# categorize syntactic condition since I forgot to record it 
-d_main_cat <- d_main_responseCat %>% rowwise() %>% mutate(condition = ifelse((grepl("That's", text)), "prenominal", "predicative"))
+
 ```
 
 ``` {r}
 # raw reponse counts by syntactic condition (6 participants each)
- d_main_cat %>% ggplot(aes(x=response_cat, fill=ref_spec)) + geom_bar(position=position_dodge()) + facet_wrap(~condition) 
+ d_main_responseCat %>% ggplot(aes(x=response_cat)) + geom_bar(position=position_dodge()) + facet_wrap(~condition) 
 ```
 ## Proportion of sub responses by syntactic condition, picture specificity and NP specificity 
 ``` {r}
-d_main_cat %>% group_by(response_label, ref_spec, pic_spec, condition) %>% tidyboot_mean(column = response_num) %>% ungroup() %>% 
+d_main_responseCat %>% group_by(response_label, ref_spec, pic_spec, condition) %>% tidyboot_mean(column = response_num) %>% ungroup() %>% 
   mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")),
          context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= NP_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(0.8))+
