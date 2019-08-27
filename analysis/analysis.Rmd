@@ -64,30 +64,40 @@ d_main_responseCat <- d_main_valid %>%
  d_main_responseCat %>% ggplot(aes(x=response_cat)) + geom_bar(position=position_dodge()) + facet_wrap(~condition) 
 ```
 ## Proportion of sub responses by syntactic condition, picture specificity and NP specificity 
+
+Expectations: When the underspecified 'one' is used, participants infer the comparison class froom the perceptual context: subordinate label (comparison class) for the subordinate parade, basic-level label for the basic-level parade. When thue subordinate noun phrase is used, the prenominal syntax sets the comparison class, whereas the predicative syntax allows for stronger context influence: more basic-level labels in the basic-level context are expected than in the subordinate context. 
+
+``` {r}
+#d_main_responseCat %>% group_by(response_label, ref_spec, pic_spec, condition) %>% tidyboot_mean(column = response_num) %>% ungroup() %>%   mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")), condition = factor(condition, levels = c("predicative", "prenominal"), labels = c("That NP is big", "That's a big NP")), context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= NP_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +   geom_col(position = position_dodge(0.8))+   geom_linerange(position = position_dodge(0.8)) + facet_wrap(~condition)
+```
+## Sub responses proportion by noun phrase 
+``` {r}
+ # d_main_responseCat %>% group_by(response_label, ref_spec, pic_spec, condition) %>% tidyboot_mean(column = response_num) %>% ungroup() %>% 
+#  mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("subordinate", "one")), condition = factor(condition, levels = c("predicative", "prenominal"), labels = c("That NP is big", "That's a big NP")), context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= condition, y = mean, ymin = ci_lower, ymax = ci_upper)) + geom_col(position = position_dodge(0.8))+  geom_linerange(position = position_dodge(0.8)) + facet_wrap(~NP_spec)
+```
+## Sub responses proportion by context condition
 ``` {r}
 d_main_responseCat %>% group_by(response_label, ref_spec, pic_spec, condition) %>% tidyboot_mean(column = response_num) %>% ungroup() %>% 
-  mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")),
-         context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= NP_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(0.8))+
-  geom_linerange(position = position_dodge(0.8)) + facet_wrap(~condition)
+  mutate(NP = factor(ref_spec, levels= c(0, 1), labels = c("subordinate", "one")),
+         condition = factor(condition, levels = c("predicative", "prenominal"), labels = c("That NP is big", "That's a big NP")), context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=condition, fill= NP, y = mean, ymin = ci_lower, ymax = ci_upper)) + geom_col(position = position_dodge(0.8))+   geom_linerange(position = position_dodge(0.8)) + facet_wrap(~context_spec)  
 ```
 
 ## Stats
 ``` {r}
-# does not converge due to small amount of data
+
 
 library(lme4)
-lm.fit <- glmer(response_num ~ condition*ref_spec*pic_spec + (1|submission_id), data =d_main_cat, family = "binomial" )
+lm.fit <- glmer(response_num ~ condition*ref_spec*pic_spec + (1|submission_id), data = d_main_responseCat, family = "binomial" )
 summary(lm.fit)
 ```
 ## Table 
 ``` {r}
-d_main_cat %>% group_by(condition, ref_spec, pic_spec) %>% count()
+d_main_responseCat %>% group_by(condition, ref_spec, pic_spec) %>% count()
 
 ```
 ## Sub response proportions by item and syntactic condition
 ``` {r}
-d_main_cat %>% group_by(item, condition, response_label, ref_spec, pic_spec) %>% 
+d_main_responseCat %>% group_by(item, condition, response_label, ref_spec, pic_spec) %>% 
   tidyboot_mean(column = response_num) %>% ungroup() %>% 
   mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")),
          context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>% ggplot(aes(x=context_spec, fill= NP_spec, y = mean, ymin = ci_lower, ymax = ci_upper)) +
@@ -96,11 +106,11 @@ d_main_cat %>% group_by(item, condition, response_label, ref_spec, pic_spec) %>%
 ```
 ## Sub responses proportion per participant
 ``` {r}
-d_main_cat %>%
-  group_by(submission_id, condition, response_label) %>%
+d_main_responseCat %>%
+  group_by(submission_id, condition, response_label, ref_spec, pic_spec) %>%
   summarize(n_sub_responses = sum(response_num)) %>%
-  ungroup() %>%
-  ggplot(., aes( x = n_sub_responses))+
+  ungroup() %>% mutate(NP_spec = factor(ref_spec, levels= c(0, 1), labels = c("sub", "one")), context_spec = factor(pic_spec, levels = c(0, 1), labels = c("basic", "sub"))) %>%
+  ggplot(., aes( x = n_sub_responses, fill=condition))+
   geom_bar(position=position_dodge())+
-  facet_wrap(~condition) + ggtitle("Number of subordinate responses uttered per participant in the 6 trials")
+  facet_grid(NP_spec~context_spec) + ggtitle("Number of subordinate responses uttered per participant in the 6 trials")
 ```
