@@ -1,96 +1,95 @@
 // In this file you can specify the trial data for your experiment
-const utt_prenominal = {utterance1b: "That's a big ", utterance2b: "", utterance1s: "That's a small ", utterance2s: "", condition: "prenominal"}
-const utt_predicative = {utterance1b: "That ", utterance2b: " is big", utterance1s: "That ", utterance2s: " is small", condition:"predicative"}
+const utt_prenominal = {utterance1b: "That's a ", utterance2b: "", utterance1s: "That's a ", utterance2s: "", condition: "prenominal"}
+const utt_predicative = {utterance1b: "That ", utterance2b: " is ", utterance1s: "That ", utterance2s: " is ", condition:"predicative"}
 const size = function () {
-  return _.sample([0,1])
+  return _.sample([1, 2])
 }
 
 const utterance = utt_predicative;
 const target_size = _.shuffle([0,0,0,1,1,1])
 const referent = _.shuffle([0,0,0,1,1,1])
-const picture = _.shuffle([0,0,0,1,1,1])
+const picture = _.shuffle([0,0,0,size(), size(), size()])
 
 const items = {
   dogs1: [
     {referent: ["doberman", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: ["images/dog-parade-basic.png", "images/dog-parade-doberman.png"],
-     adj: "big"
+     picture: [{pic: "images/dog-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/dog-parade-doberman.png", adj: "big", condition: "congr"}, {pic: "images/dog-parade-doberman.png", adj: "small", condition: "incongr"}]
+
    },
    {referent: ["chihuahua", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: ["images/dog-parade-basic.png", "images/dog-parade-chihuahua.png"],
-    adj: "small"
+    picture: [{pic: "images/dog-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/dog-parade-chihuahua.png", adj: "small", condition: "congr"}, {pic: "images/dog-parade-chihuahua.png", adj: "big", condition: "incongr"} ],
+
    }
   ],
   dogs2: [
     {referent: ["great dane", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: ["images/dog-parade-basic2.png", "images/dog-parade-great-dane.png"],
-     adj: "big"
+     picture: [{pic: "images/dog-parade-basic2.png", adj: "big", condition: "basic"}, {pic: "images/dog-parade-great-dane.png", adj: "big", condition: "congr"}, {pic: "images/dog-parade-great-dane.png", adj: "small", condition: "incongr"}],
+
    },
    {referent: ["pug", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: ["images/dog-parade-basic2.png", "images/dog-parade-pug.png"],
-    adj: "small"
+    picture: [{pic: "images/dog-parade-basic2.png", adj: "small", condition: "basic"}, {pic: "images/dog-parade-pug.png", adj: "small", condition: "congr"}, {pic: "images/dog-parade-pug.png", adj: "big", condition: "incongr"}],
+
    }
   ],
   birds: [
     {referent: ["eagle", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: ["images/bird-parade-basic.png", "images/bird-parade-eagle.png"],
-     adj: "big"
+     picture: [{pic: "images/bird-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/bird-parade-eagle.png", adj: "big", condition: "congr"}, {pic: "images/bird-parade-eagle.png", adj: "small", condition: "incongr"}],
+
    },
    {referent: ["hummingbird", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: ["images/bird-parade-basic.png", "images/bird-parade-hummingbird.png"],
-    adj: "small"
+    picture: [{pic: "images/bird-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/bird-parade-hummingbird.png", adj: "small", condition: "congr"}, {pic: "images/bird-parade-hummingbird.png", adj: "big", condition: "incongr"}],
    }
   ],
   fish: [
     {referent: ["swordfish", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: ["images/fish-parade-basic.png", "images/fish-parade-swordfish.png"],
-     adj: "big"
+     picture: [{pic: "images/fish-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/fish-parade-swordfish.png", adj: "big", condition: "congr"}, {pic: "images/fish-parade-swordfish.png", adj: "small", condition: "incongr"}],
+
    },
    {referent: ["goldfish", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: ["images/fish-parade-basic.png", "images/fish-parade-goldfish.png"],
-    adj: "small"
+    picture: [{pic: "images/fish-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/fish-parade-goldfish.png", adj: "small", condition: "congr"}, {pic: "images/fish-parade-goldfish.png", adj: "big", condition: "incongr"}],
+
    }
   ],
   flowers: [
   {referent: ["sunflower", "one"],
    utterance1: utterance.utterance1b,
    utterance2: utterance.utterance2b,
-   picture: ["images/flower-parade-basic.png", "images/flower-parade-sunflower.png"],
-   adj: "big"
+   picture: [{pic: "images/flower-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/flower-parade-sunflower.png", adj: "big", condition: "congr"}, {pic: "images/flower-parade-sunflower.png", adj: "small", condition: "incongr"}],
+
  },
  {referent: ["dandelion", "one"],
   utterance1: utterance.utterance1s,
   utterance2: utterance.utterance2s,
-  picture: ["images/flower-parade-basic.png", "images/flower-parade-dandelion.png"],
+  picture: [{pic: "images/flower-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/flower-parade-dandelion.png", adj: "small", condition: "congr"}, {pic: "images/flower-parade-dandelion.png", adj: "big", condition: "incongr"}],
   adj: "small"
  }],
   trees: [
     {referent: ["redwood", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: ["images/tree-parade-basic.png", "images/tree-parade-redwood.png"],
+     picture: [{pic: "images/tree-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/tree-parade-redwood.png", adj: "big", condition: "congr"}, {pic: "images/tree-parade-redwood.png", adj: "small", condition: "incongr"}],
      adj: "big"
    },
    {referent: ["bonsai", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: ["images/tree-parade-basic.png", "images/tree-parade-bonsai.png"],
+    picture: [{pic: "images/tree-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/tree-parade-bonsai.png", adj: "small", condition: "congr"}, {pic: "images/tree-parade-bonsai.png", adj: "big", condition: "incongr"}],
     adj: "small"
    }
   ]
@@ -103,82 +102,88 @@ const items = {
 const main_trials = {
     dogs1:   {
             context: "You and your friend see the following:",
-            context_picture: items.dogs1[target_size[0]].picture[picture[0]],
+            context_picture: items.dogs1[target_size[0]].picture[picture[0]].pic,
             pic_spec: picture[0],
-            text: "Your friend points to another member of the group which you cannot see and says: <br/><b>" + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + ".</b>",
+            text: "This is what your friend says about another member of the group: <br/><b>" + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + items.dogs1[target_size[0]].picture[picture[0]].adj + ".</b>",
             ref_spec: referent[0],
             question: "Please rephrase your friend's comment.",
-            sentence_left: "It is " + items.dogs1[target_size[0]].adj + " relative to other ",
+            sentence_left: "It is " + items.dogs1[target_size[0]].picture[picture[0]].adj + " relative to other ",
             item: "dogs1",
             // if 0: big, if 1 small
-            target_size: items.dogs1[target_size[0]].adj,
-            condition: utterance.condition
+            target_size: items.dogs1[target_size[0]].picture[picture[0]].adj,
+            condition: utterance.condition,
+            adj_cond: items.dogs1[target_size[0]].picture[picture[0]].condition
 
 
         },
     dogs2:    {
             context: "You and your friend see the following:",
-            context_picture: items.dogs2[target_size[1]].picture[picture[1]],
+            context_picture: items.dogs2[target_size[1]].picture[picture[1]].pic,
             pic_spec: picture[1],
-            text: "Your friend points to another member of the group which you cannot see and says: <br/><b>" + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + ".</b>",
+            text: "This is what your friend says about another member of the group: <br/><b>" + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + items.dogs2[target_size[1]].picture[picture[1]].adj + ".</b>",
             ref_spec: referent[1],
             question: "Please rephrase your friend's comment.",
-            sentence_left: "It is " + items.dogs2[target_size[1]].adj + " relative to other ",
+            sentence_left: "It is " + items.dogs2[target_size[1]].picture[picture[1]].adj + " relative to other ",
             item: "dogs2",
-            target_size: items.dogs2[target_size[1]].adj,
-            condition: utterance.condition
+            target_size: items.dogs2[target_size[1]].picture[picture[1]].adj,
+            condition: utterance.condition,
+            adj_cond: items.dogs2[target_size[1]].picture[picture[1]].condition
 
         },
     birds:    {
             context: "You and your friend see the following:",
-            context_picture: items.birds[target_size[2]].picture[picture[2]],
+            context_picture: items.birds[target_size[2]].picture[picture[2]].pic,
             pic_spec: picture[2],
-            text: "Your friend points to another member of the group which you cannot see and says: <br/><b> " + items.birds[target_size[2]].utterance1 + items.birds[target_size[2]].referent[referent[2]] + items.birds[target_size[2]].utterance2 + ".</b>",
+            text: "This is what your friend says about another member of the group: <br/><b> " + items.birds[target_size[2]].utterance1 + items.birds[target_size[2]].referent[referent[2]] + items.birds[target_size[2]].utterance2 + items.birds[target_size[2]].picture[picture[2]].adj + ".</b>",
             ref_spec: referent[2],
             question: "Please rephrase your friend's comment.",
-            sentence_left: "It is " + items.birds[target_size[2]].adj + " relative to other ",
+            sentence_left: "It is " + items.birds[target_size[2]].picture[picture[2]].adj + " relative to other ",
             item: "birds",
-            target_size: items.birds[target_size[2]].adj,
-            condition: utterance.condition
+            target_size: items.birds[target_size[2]].picture[picture[2]].adj,
+            condition: utterance.condition,
+            adj_cond: items.birds[target_size[2]].picture[picture[2]].condition
 
         },
   fish:      {
             context: "You and your friend see the following:",
-            context_picture: items.fish[target_size[3]].picture[picture[3]],
+            context_picture: items.fish[target_size[3]].picture[picture[3]].pic,
             pic_spec: picture[3],
-            text: "Your friend points to another member of the group which you cannot see and says: <br/><b>" + items.fish[target_size[3]].utterance1 + items.fish[target_size[3]].referent[referent[3]] + items.fish[target_size[3]].utterance2 + ".</b>",
+            text: "This is what your friend says about another member of the group: <br/><b>" + items.fish[target_size[3]].utterance1 + items.fish[target_size[3]].referent[referent[3]] + items.fish[target_size[3]].utterance2 + items.fish[target_size[3]].picture[picture[3]].adj + ".</b>",
             ref_spec: referent[3],
             question: "Please rephrase your friend's comment.",
-            sentence_left: "It is " + items.fish[target_size[3]].adj + " relative to other ",
+            sentence_left: "It is " + items.fish[target_size[3]].picture[picture[3]].adj + " relative to other ",
             item: "fish",
-            target_size: items.fish[target_size[3]].adj,
-            condition: utterance.condition
+            target_size: items.fish[target_size[3]].picture[picture[3]].adj,
+            condition: utterance.condition,
+            adj_cond: items.fish[target_size[3]].picture[picture[3]].condition
 
         },
   flowers:      {
             context: "You and your friend see the following:",
-            context_picture: items.flowers[target_size[4]].picture[picture[4]],
+            context_picture: items.flowers[target_size[4]].picture[picture[4]].pic,
             pic_spec: picture[4],
-            text: "Your friend points to another member of the group which you cannot see and says: <br/><b>" + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + ".</b>",
+            text: "This is what your friend says about another member of the group: <br/><b>" + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + items.flowers[target_size[4]].picture[picture[4]].adj + ".</b>",
             ref_spec: referent[4],
             question: "Please rephrase your friend's comment.",
-            sentence_left: "It is " + items.flowers[target_size[4]].adj + " relative to other ",
+            sentence_left: "It is " + items.flowers[target_size[4]].picture[picture[4]].adj + " relative to other ",
             item: "flowers",
-            target_size: items.flowers[target_size[4]].adj,
-            condition: utterance.condition
+            target_size: items.flowers[target_size[4]].picture[picture[4]].adj,
+            condition: utterance.condition,
+            adj_cond: items.flowers[target_size[4]].picture[picture[4]].condition
 
         },
     trees:    {
             context: "You and your friend see the following:",
-            context_picture: items.trees[target_size[5]].picture[picture[5]],
+            context_picture: items.trees[target_size[5]].picture[picture[5]].pic,
             pic_spec: picture[5],
-            text: "Your friend points to another member of the group which you cannot see and says: <br/><b>" + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + ".</b>",
+            text: "This is what your friend says about another member of the group: <br/><b>" + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + items.trees[target_size[5]].picture[picture[5]].adj + ".</b>",
             ref_spec: referent[5],
             question: "Please rephrase your friend's comment.",
-            sentence_left: "It is " + items.trees[target_size[5]].adj + " relative to other ",
+            sentence_left: "It is " + items.trees[target_size[5]].picture[picture[5]].adj + " relative to other ",
             item: "trees",
-            target_size: items.trees[target_size[5]].adj,
-            condition: utterance.condition
+            target_size: items.trees[target_size[5]].picture[picture[5]].adj,
+            condition: utterance.condition,
+            adj_cond: items.trees[target_size[5]].picture[picture[5]].condition
 
         }
 };

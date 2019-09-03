@@ -18,6 +18,7 @@ $("document").ready(function() {
             custom_intro,
             botcaptcha,
             instructions,
+            comp_class_warmup,
             warmup1,
             context1,
             custom_main_text1,
@@ -34,7 +35,7 @@ $("document").ready(function() {
             // Possible deployment methods are:
             // "debug" and "directLink"
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
-            deployMethod: "MTurk",
+            deployMethod: "debug",
             contact_email: "polinats@mit.edu",
             prolificURL: "https://app.prolific.ac/submissions/complete?cc=SAMPLE1234"
         },

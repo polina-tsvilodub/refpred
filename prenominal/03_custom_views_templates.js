@@ -154,6 +154,95 @@ const custom_forced_choice = function(config, startingTime) {
 return view;
 };
 
+const custom_comp_class_warmup = function(config, startingTime) {
+  const view = {
+    name: config.name,
+    CT: 0,
+    trials: config.trials,
+    render: function(CT, magpie, startingTime) {
+      $("main").html(`<div class='magpie-view'>
+      <h1 class='magpie-view-title'> Instructions</h1>
+      <section class="magpie-text-container">
+        <p class="magpie-view-question">${config.context}</p>
+      </section>
+      <section class="magpie-text-container">
+        <p class="magpie-view-question">${config.sentence}</p>
+      </section>
+      <section class="magpie-text-container">
+        <p class="magpie-view-question">${config.question}</p>
+      </section>
+      <div class='magpie-view-answer-container'>
+        <p class= 'magpie-view-text'> ${config.sentence_left}
+            <textarea name='textbox-input' rows=1 cols=15 class='textbox-input'/>
+        </p>
+        <p class = 'correct-answer magpie-nodisplay'>Possible correct answers: ${config.correct}</p>
+        <p class = 'correct-answer2 magpie-nodisplay'>Please correct your answer before proceeding.</p>
+      </div>
+          <button id='next' class='magpie-view-button magpie-nodisplay'>Continue</button>
+
+    </div>`);
+
+        let next;
+        let textInput;
+
+
+
+       next = $("#next");
+       textInput = $("textarea");
+       const minChars =  4;
+
+        // attaches an event listener to the textbox input
+        textInput.on("keyup", function() {
+            // if the text is longer than (in this case) 10 characters without the spaces
+            // the 'next' button appears
+            if (textInput.val().trim().length > minChars) {
+                next.removeClass("magpie-nodisplay");
+            } else {
+                next.addClass("magpie-nodisplay");
+            }
+        });
+            var attempts = 0;
+            // the trial data gets added to the trial object
+            next.on("click", function(startingTime) {
+              attempts = attempts + 1;
+              let trial_data = {
+                  trial_name: config.name,
+                  trial_number: CT + 1,
+                  attempts: attempts,
+                  response: textInput.val().trim()
+              };
+              trial_data = magpieUtils.view.save_config_trial_data(config, trial_data);
+              magpie.trial_data.push(trial_data);
+
+              var flag = true;
+
+              if (config.correct.includes(textInput.val().trim().toLowerCase()) == false) {
+                flag = false;
+                $(".correct-answer").removeClass("magpie-nodisplay")
+                $(".correct-answer2").removeClass("magpie-nodisplay")
+              } else {
+                $(".correct-answer").addClass("magpie-nodisplay")
+              }
+
+              if (flag) {
+                magpie.findNextView();
+               }
+
+
+        });
+
+
+
+        $('#next').on("click");
+  }
+
+};
+return view;
+};
+
+
+
+
 
 const custom_textfield_warmup = function(config, startingTime) {
   const view = {

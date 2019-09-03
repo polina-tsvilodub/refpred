@@ -32,9 +32,10 @@ const instructions = magpieViews.view_generator("instructions", {
             The experiment consists of two rounds, each having a few warm-up trials before the main trials start.
             <br />
             <br />
-            During the warm-up trials, you will see pictures of objects.
+            In the first warm-up trial, you will have to rephrase a sentence someone says.
             <br />
             <br />
+            In the following warm-up trials, you will see pictures of objects.
             Please label the objects. You will be given feedback on your labels.
             <br />
             <br />
@@ -99,7 +100,18 @@ const thanks = magpieViews.view_generator("thanks", {
 * https://magpie-ea.github.io/magpie-docs/01_designing_experiments/01_template_views/#trial-views
 */
 
+const comp_class_warmup = custom_comp_class_warmup({
+  name: 'comp_class_warmup',
+  trials: 1,
+  context: "In the main trials you will be asked to rephrase something a person said. The utterance will contain a word that is <i>relative</i> and your task is to figure out what it is relative to. <br /> <br /> For example: <br /><br />",
+  sentence: "<b> Speaker A: \"The Empire State Building is tall.\"</b>",
+  question: "<i>What do you think Speaker A meant? </i>",
+  sentence_left: "The Empire State Building is tall relative to other ",
+  correct: ["buildings", "scyscrapers", "houses", "constructions"]
+  // option1: "The Empire State Building is tall relative to people.",
+  // option2: "The Empire State Building is tall relative to buildings."
 
+});
 // Here, we initialize a normal forced_choice view
 const custom_main_text1 = custom_forced_choice({
   // This will use all trials specified in `data`, you can user a smaller value (for testing), but not a larger value
@@ -198,7 +210,7 @@ const context2 = magpieViews.view_generator("instructions",{
     text:  `
     Now the second round of the experiment starts. You will complete similar trials.
     <br />
-    </br>
+    <br />
     Press the button 'Go to trials' to begin the second round.
             `,
     buttonText: 'go to trials'
