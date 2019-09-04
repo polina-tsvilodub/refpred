@@ -175,7 +175,7 @@ const custom_comp_class_warmup = function(config, startingTime) {
         <p class= 'magpie-view-text'> ${config.sentence_left}
             <textarea name='textbox-input' rows=1 cols=15 class='textbox-input'/>
         </p>
-        <p class = 'correct-answer magpie-nodisplay'>Possible correct answers: ${config.correct}</p>
+        <p class = 'correct-answer magpie-nodisplay'>A possible answer: ${config.correct}</p>
         <p class = 'correct-answer2 magpie-nodisplay'>Please correct your answer before proceeding.</p>
       </div>
           <button id='next' class='magpie-view-button magpie-nodisplay'>Continue</button>

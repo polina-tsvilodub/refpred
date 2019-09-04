@@ -195,7 +195,7 @@ const context1 = magpieViews.view_generator("instructions",{
     Next, you will complete the main trials.
     <br/>
     <br/>
-    You and your friend watch groups of objects as they pass by and talk about them.
+    You and your friend watch groups of objects and talk about them.
     <br />
     <br />
 
