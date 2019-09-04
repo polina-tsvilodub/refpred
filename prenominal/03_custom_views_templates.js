@@ -175,7 +175,7 @@ const custom_comp_class_warmup = function(config, startingTime) {
         <p class= 'magpie-view-text'> ${config.sentence_left}
             <textarea name='textbox-input' rows=1 cols=15 class='textbox-input'/>
         </p>
-        <p class = 'correct-answer magpie-nodisplay'>A possible answer: ${config.correct}</p>
+        <p class = 'correct-answer magpie-nodisplay'>A possible answer is: ${config.correct}</p>
         <p class = 'correct-answer2 magpie-nodisplay'>Please correct your answer before proceeding.</p>
       </div>
           <button id='next' class='magpie-view-button magpie-nodisplay'>Continue</button>
@@ -267,7 +267,7 @@ const custom_textfield_warmup = function(config, startingTime) {
             <p id='1' class='magpie-view-text'>${config.data[CT].question1}
               <textarea id='textbox-input1' rows=1 cols=15 class='textbox-input'/>
             </p>
-            <p class = 'correct-answer1 magpie-nodisplay'>Possible correct labels: ${config.data[CT].correct1}</p>
+            <p class = 'correct-answer1 magpie-nodisplay'>A possible answer is: ${config.data[CT].correct1}</p>
           </div>
         </div>
     </div>
@@ -280,7 +280,7 @@ const custom_textfield_warmup = function(config, startingTime) {
             <p id='2' class='magpie-view-text'>${config.data[CT].question3}
               <textarea id='textbox-input2' rows=1 cols=15 class='textbox-input'/>
             </p>
-            <p class = 'correct-answer2 magpie-nodisplay'>Possible correct labels: ${config.data[CT].correct2}</p>
+            <p class = 'correct-answer2 magpie-nodisplay'>A possible answer is: ${config.data[CT].correct2}</p>
           </div>
       </div>
       </div>
@@ -290,7 +290,7 @@ const custom_textfield_warmup = function(config, startingTime) {
       <p id='3' class='magpie-view-text'>${config.data[CT].question2}
         <textarea id='textbox-input3' rows=1 cols=15 class='textbox-input'/>
       <p id='4'></p>
-      <p class = 'correct-answer3 magpie-nodisplay'>Possible correct labels: ${config.data[CT].correct3}</p>
+      <p class = 'correct-answer3 magpie-nodisplay'>A possible answer is: ${config.data[CT].correct3}</p>
       </p>
       <br />
       <p class = 'correct-answer4 magpie-nodisplay'>Please enter the correct labels to proceed</p>
