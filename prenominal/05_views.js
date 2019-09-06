@@ -107,7 +107,7 @@ const comp_class_warmup = custom_comp_class_warmup({
   sentence: "<b> Speaker A: \"The Empire State Building is tall.\"</b>",
   question: "<i>What do you think Speaker A meant? </i>",
   sentence_left: "The Empire State Building is tall relative to other ",
-  correct: ["buildings", "scyscrapers", "houses", "constructions"]
+  correct: "buildings, scyscrapers, houses, constructions (choose one)"
   // option1: "The Empire State Building is tall relative to people.",
   // option2: "The Empire State Building is tall relative to buildings."
 
