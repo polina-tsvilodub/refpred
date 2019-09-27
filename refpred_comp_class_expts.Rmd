@@ -1,0 +1,357 @@
+---
+title: "Comparison class inference via syntactic cues"
+author: "Polina Tsvilodub"
+date: "25 09 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE )
+```
+
+``` {r}
+library(tidyboot)
+library(tidyverse)
+library(lmerTest)
+library(emmeans)
+library(brms)
+```
+# Hypothesis Outline
+
+Syntactic cues like the position of the noun phrase in a sentence might help listeners restrict the possible comparison classes upon hearing a sentence with a gradable adjective like "That great dane is big". We test this hypothesis in three experiments manipulating the syntax of a sentence that is used to describe an object: the syntax is either "That NP is big (small)" (predicative condition) or "That's a big (small) NP" (prenominal condition). 
+__We hypothesis that NPs in the prenominal condition restrict the comparison class and thus, given our experimental design, this syntax is felicitous with a basic-level label of the target object but not with a subordinate label. In contrast, in the predicative condition the comparison class is less restricted, and thus using both the basic-level and the subordinate label of the target as the NP is felicitous.__
+Here, both Bayesian and frequentist analyses of the experimental data are presented.  
+
+## Syntax Rating Experiment
+The goal of the experiment was to obtain ratings of both syntactic conditions in direct comparison as descriptions of a target referent in context. The context picture was followed by a sentence providing the subordinate level label of the traget. Below the sentence, the picture of the target appeared and they were asked: "How well does each of the sentences describe it?"
+__Between-subject:__ order of the syntactic frames on the sliders
+__Within-subject:__ NP (basic-level or subordinate level), target size (big or small), congruence (big great dane or small great dane)
+__Expectation:__ Given sentences with subordinate noun phrases (e. g. great dane), we expect higher mean ratings of the predicative than the prenominal condition. 
+
+### Mean rating in different conditions 
+n = 30 (1 excluded as non-native speaker)
+```{r syntax rating, echo = FALSE}
+d_rating <- read_csv("../data/results_14_syntax-rating_30.csv")
+d_rating_filter <- d_rating %>% filter(grepl("en", languages, ignore.case = T))
+d_rating_warmup <- d_rating_filter %>% filter(trial_name == "custom_warmup")
+d_rating_main <- d_rating_filter %>% filter((trial_name == "custom_slider1") | (trial_name == "custom_slider2"))
+
+d_rating_main <- d_rating_main %>% mutate(np = factor(np, levels= c(0,1), 
+                                                      labels = c("sub", "super")), 
+                 sentence_order = factor(sentence_order, levels= c("0|1", "1|0"),
+                                         labels = c("prenom_pred", "pred_prenom")),
+                 target_size = factor(target_size, levels = c(0,1), 
+                                      labels = c("big", "small")),
+                 congruence = factor(congruence, levels = c(0, 1), 
+                                     labels = c("congr", "incongr")))
+
+# sort responses (due to bad recoding)
+d_main_pred_prenom_pred <- d_rating_main %>% filter(sentence_order == "pred_prenom")  %>%
+  select(submission_id, np, congruence, response1, target_size, trial_number, item) %>% mutate(condition = "pred")
+d_main_pred_prenom_prenom <- d_rating_main %>% filter(sentence_order == "pred_prenom") %>%
+  select(submission_id, np, congruence, response1 = response2, target_size, trial_number, item) %>% 
+  mutate(condition = "prenom")
+d_main_prenom_pred_prenom <- d_rating_main %>% filter(sentence_order == "prenom_pred") %>%
+  select(submission_id, np, congruence, response1, target_size, trial_number, item) %>% mutate(condition = "prenom")
+d_main_prenom_pred_pred <- d_rating_main %>% filter(sentence_order == "prenom_pred") %>%
+  select(submission_id, np, congruence, response1 = response2, target_size, trial_number, item) %>% 
+  mutate(condition = "pred")
+
+# subset data frames
+rating_prenom <- rbind(d_main_pred_prenom_prenom, d_main_prenom_pred_prenom)
+rating_pred <- rbind(d_main_pred_prenom_pred, d_main_prenom_pred_pred)
+d_rating_full <- rbind(rating_pred, rating_prenom)
+
+# plot 
+d_rating_full %>% group_by(np, congruence, condition) %>% 
+  tidyboot_mean(column = response1) %>%  ungroup() %>%
+  mutate(condition = factor(condition, levels = c("pred", "prenom"), 
+                            labels = c("That NP is big", "That's a big NP")),
+         congruence = factor(congruence, levels = c("congr", "incongr"), 
+                             labels = c("big great dane", "small great dane")),
+         np = factor(np, levels = c("sub", "super"), labels = c("great dane", "dog"))) %>% 
+  ggplot(aes(x = condition, y = mean, fill = np, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))+ 
+  facet_wrap(~congruence) +
+  xlab("syntactic condition") + 
+  ylab("mean sentence rating") +
+  ggtitle("Mean ratings by syntactic condition and congruence")
+```
+
+### Stats
+This is a linear model of the rating predicted by the syntactic condition, the noun phrase, the congruence and their interaction with random intercept by-participant and random intercept by-item effects.
+``` {r rating lmer stats}
+
+lm.fit <- glmer(response1 ~ condition * np * congruence + (1 | submission_id) + (1 | item), data = d_rating_full)
+summary(lm.fit)
+confint(lm.fit)
+car::Anova(lm.fit)
+
+emmip(lm.fit, np ~ condition | congruence)
+
+```
+
+### Bayesian Stats
+``` {r rating bayes stats}
+b.lm.fit <- brm(response1 ~ condition * np * congruence + (1 | submission_id) + (1 | item), data = d_rating_full)
+summary(b.lm.fit)
+```
+
+
+## NP Free Production Experiment 
+
+In this experiment we want to see if speakers actually use different labels as noun phrases to describe the target, given different syntactic frames. The participants saw a basic-level context, below the sentence "This one is also in the parade", referring to the target. The target picture (big or small, balanced within-subject) was followed by the prompt "You say to your friend: ". Participants see either "That's a big (small) __ " or "That __ is big (small)" (between-subjects), blank to be filed in. The target size and adjective were always 'congruent'.
+__Expectation:__ We expect a higher proportion of subordinate target labels in the predicative than in the prenominal conidtion.
+
+### Proportions of subordinate responses by syntactic condition
+n = 120 (n = 58 prenominal syntax, n = 60 predicative syntax)
+``` {r production, echo = FALSE}
+d1 <- read_csv('../data/results_8_exp1-post-prereg-pred.csv')
+d2 <- read_csv('../data/results_10_exp1-post-prereg-prenom.csv')
+d3 <- read_csv('../data/results_8_exp1-post-prereg-pred_batch2.csv')
+d4 <- read_csv('../data/results_10_exp1-post-prereg-prenom_batch2.csv')
+x <- rbind(d1, d3)
+y <- rbind(d2, d4)
+d_prod <- rbind(x, y)
+
+d_prod_filt <- d_prod %>% 
+  filter(grepl("eng", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, size, item, botresponse, response,
+         condition,  picture) %>% mutate(size=factor(size), syntax = factor(condition))
+
+d_prod_main <- d_prod_filt %>% filter((trial_name =="main1") | (trial_name== "main2")) %>%
+  select(submission_id, trial_number, response,  size, item, syntax, condition, picture)
+
+d_prod_main_valid <- subset(d_prod_main, !(response %in% c("rose", "duck", "weed", "pigeon", "stingfish", "rat"))) 
+
+d_prod_main_responseCat <- d_prod_main_valid %>%
+  rowwise() %>%
+  mutate( # categorize responses 
+    response_cat =
+      ifelse(
+      tolower(response) %in% c("bird", "birds", "dog", "dogs", "fish","one plant",
+                               "flower", "flowers", "tree", "trees", "animal", "plant"),
+      "super", "sub"),
+    resp_cat = ifelse(response_cat == "sub", 1, 0),
+    response_label = "sub"
+  )
+
+# plot
+d_prod_main_responseCat %>%
+  group_by(syntax, response_label) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of subordinate labels in the different conditions 
+  ungroup() %>%
+  mutate(syntax = factor(syntax, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))
+        ) %>% 
+  ggplot(aes(x = syntax, fill = syntax,
+                           y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) +
+  labs( y = "Proportion subordinate responses") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  ggtitle("The proportion of subordinate responses by syntactic condition")
+
+```
+
+### Stats
+The reponse category (subordinate vs basic-level) is regressed against the syntax and random intercept by-participant and random intercept and syntax-effects by-item. The syntax is contrast coded, predicative syntax being the reference level. 
+``` {r production lmer}
+# predicative syntax is reference level (-1)
+contrasts(d_prod_main_responseCat$syntax)=matrix(c(-1, 1))
+# fit regression model
+prod.lm.fit <- glmer(resp_cat ~  syntax + (1| submission_id) + (1 + syntax|picture), data = d_prod_main_responseCat, family="binomial")
+summary(prod.lm.fit)
+confint(prod.lm.fit)
+```
+
+
+### Bayesian Stats
+
+``` {r production bayes}
+contrasts(d_prod_main_responseCat$syntax)=matrix(c(-1, 1))
+
+get_prior(resp_cat ~ 0 + syntax + (1| submission_id) + (1 + syntax|picture),
+          data=d_prod_main_responseCat, family= "bernoulli")
+# uniform prior 
+Prior <- set_prior("beta(1,1)", class = "b", lb = 0, ub = 1)
+b.lm.w_prior <- brm(resp_cat ~   0 + syntax + (1| submission_id) + (1 + syntax|picture), 
+                  data = d_prod_main_responseCat, family = "bernoulli",
+                  prior = Prior, sample_prior = T)
+
+summary(b.lm.w_prior)
+# nullhypothesis that proportions do not differ
+h1_1 <- hypothesis(b.lm.w_prior, "0 - syntaxpredicative = 0 + syntaxprenominal") 
+
+print(h1_1, digits = 3)
+# probability of alternative hypothesis given the data 
+1/h1_1$hypothesis$Evid.Ratio
+```
+
+## Comparison Class Inference Experiment
+
+The question in this experiment is whether participants' comparison class inference is influenced by the syntactic frame. Participants are asked to paraphrase a sentence in a free production task: They see the context (basic-level or subordinate, balanced within-subject) and are told that they and a friend see another not pictured member of the group. Their friend utters a sentence (one of the two syntactic frames, between-subject), after which the question "What do you think your friend meant?" is presented. The NP of the uttered sentence is either unerspecified ('one') or the subordinate target label (balnced within-subject). The paraphrase template is "It is big (small) relative to other __ ", blank to be filled in. There are congruent and incongruent trials in the basic-level context. 
+__Expectation:__ In the underspecified NP condition ('one'), we expect the perceptual context to set the comparison class, i. e. subordinate paraphrase in subordinate contexts and basic-level paraphrase in basic-level contexts in both congruent and incongruent trials. In the subordinate NP condition, in the congruent condition ('big' with a priori big targets) we expect a syntax effect: The prenominal syntax should elicit less basic-level paraphrases than the predicative syntax.
+
+### Proportion of basic-level responses by congruence and NP condition
+n = 50 (n = 25 in prenominal, n = 25 in predicative condition)
+Superordinate labels are collapsed with the basic labels 
+``` {r inference, echo = FALSE}
+d1_infer <- read_csv("../data/results_12_comp-class-infer-pred.csv")
+d2_infer <- read_csv("../data/results_13_comp-class-infer-prenom.csv")
+d_infer <- rbind(d1_infer, d2_infer)
+
+d_infer <- mutate(d_infer, NP = factor(ref_spec, levels= c(0, 1), 
+                                       labels = c("great dane", "one")), 
+                  context_adj = factor(pic_spec, levels = c(0, 1, 2), 
+                                       labels = c("congruent dog parade", 
+                                                  "congruent great dane parade",
+                                                  "incongruent great dane parade")))
+d_infer_filt <- d_infer %>% 
+  filter(grepl("en", languages, ignore.case = T))
+# choose main trials 
+d_infer_main <- d_infer_filt %>% filter((trial_name == "custom_main_text1")|
+                                          (trial_name == "custom_main_text2")) %>%
+  select(submission_id, trial_number, NP, context, context_adj, item, response, condition,
+         context_picture, adj_cond, target_size)
+
+d_infer_main_responseCat <- d_infer_main %>%
+  rowwise() %>%
+  mutate(  
+    response_cat =
+      ifelse(
+        tolower(response) %in% c("birds", "dogs", "fish", "fishes", "flowers", 
+                                 "flower", "large dogs", "dogs in the line",
+                                 "other birds in the group", "small dogs", "trees",
+                                 "tree's", "bird", "big tree"), "basic", 
+        ifelse(tolower(response) %in% c("plant", "animal", "things", "weeds", "plants"),
+               "super", "sub")),
+    
+    response_num = ifelse(response_cat == "sub", 0, 1),
+    response_label = "basic"
+  )
+
+# include a context condition column
+d_infer_main_responseCat <- d_infer_main_responseCat %>% rowwise() %>%
+  mutate(
+    context_cond = ifelse(context_adj == "congruent dog parade", "basic", "sub" )
+  )
+
+d_infer_main_responseCat$condition <- factor(d_infer_main_responseCat$condition, 
+                                             levels = c("prenominal", "predicative"))
+d_infer_main_responseCat %>%  
+  group_by(response_label, NP, context_adj, condition) %>%
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal", "predicative"), 
+                            labels = c("That's a big NP", "That NP is big"))) %>%
+  ggplot(aes(x=NP, y = mean, fill = condition, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) + 
+  xlab("NP condition") +
+  ylab("proportion of basic-level responses")+
+  facet_grid(~context_adj)  
+
+```
+
+### Stats
+The response category (basic collapsed with superordinate labels vs subordinate) is regressed against the syntactic condition (contrast coded), NP ('one' vs subordinate), the congruence + context condition (context_adj) , their interaction and random intercept by-participant and random intercept and syntax by-context-item (context conditions) effects. NB: model does not converge for separate context and congruence conditions.    
+``` {r inference lmer}
+# prenominal condition is reference level (-1)
+contrasts(d_infer_main_responseCat$condition)=matrix(c(-1, 1))
+lm.infer.fit <- glmer(response_num ~ condition*NP*context_adj + 
+                       (1|submission_id) + (1 + condition | item), 
+                data = d_infer_main_responseCat, family = "binomial" )
+summary(lm.infer.fit)
+# stats on interactions
+car::Anova(lm.infer.fit)
+confint.merMod(lm.infer.fit, method = "Wald")
+```
+
+### Bayesian Stats
+``` {r inference bayes}
+contrasts(d_infer_main_responseCat$condition)=matrix(c(-1, 1))
+b.lm.infer.fit <- brm(response_num ~ condition*NP*context_adj + 
+                       (1|submission_id) + (1 + condition | item), 
+                data = d_infer_main_responseCat, family = "binomial" )
+summary(b.lm.infer.fit)
+
+```
+
+### Stats including label frequency 
+``` {r inference item frequency, echo = FALSE}
+item_freqs <- read_csv('./comp-class-inference/data/item_freqs.csv') 
+# include the pure basic level category string
+d_infer_main_responseCat <- d_infer_main_responseCat %>% rowwise() %>% 
+  mutate(basic_cat = ifelse(item == "dogs1", "dogs",
+                            ifelse(item == "dogs2", "dogs", item)))
+# include the subordinate level category string 
+                                                                                         
+return_item <- function(condition, context_pic, target_size) {
+  if(condition == "incongr") {
+    x = sub("images/.*-parade-", "", context_pic)
+    x = sub(".png", "", x)
+    x = sub("-", " ", x)
+  } else if (condition == "congr") {
+    x = sub("images/.*-parade-", "", context_pic)
+    x = sub(".png", "", x)
+    x = sub("-", " ", x)
+  } else {
+    if (context_pic == "images/bird-parade-basic.png") {
+      if (target_size == "small") {
+        x=  "hummingbird"
+      } else {
+        x= "eagle"
+      }
+    } else if (context_pic == "images/dog-parade-basic.png") {
+      if (target_size == "small") {
+        x= "chihuahua"
+      } else {
+        x= "doberman"
+      }
+    } else if (context_pic == "images/dog-parade-basic2.png") {
+      if (target_size == "small") {
+        x= "pug"
+      } else {
+        x= "great dane"
+      }
+    } else if (context_pic == "images/fish-parade-basic.png") {
+      if (target_size == "small") {
+        x= "goldfish"
+      } else {
+        x= "swordfish"
+      }
+    } else if (context_pic == "images/flower-parade-basic.png") {
+      if (target_size == "small") {
+        x= "dandelion"
+      } else {
+        x= "sunflower"
+      }
+    } else {
+      if (target_size == "small") {
+        x= "bonsai"
+      } else{
+        x= "redwood"
+      }
+    }
+  }
+  return(x) 
+}
+items_vec <- Vectorize(return_item, vectorize.args = c("condition", "context_pic", "target_size"))
+
+exp_sub <- items_vec(d_infer_main_responseCat$adj_cond, d_infer_main_responseCat$context_picture, d_infer_main_responseCat$target_size)
+
+d_infer_main_responseCat <- cbind(d_infer_main_responseCat, exp_sub)
+d_infer_main_responseCat$sub_freq <- item_freqs$log_sub_log_basic[match(d_infer_main_responseCat$exp_sub, item_freqs$np)]
+d_infer_main_responseCat$basic_freq <- log(item_freqs$np_freqs[match(d_infer_main_responseCat$basic_cat, item_freqs$np)])
+```
+
+``` {r inference item frequency lmer}
+# lm with frequency by-item effect
+contrasts(d_infer_main_responseCat$condition)=matrix(c(-1, 1))
+lm.infer.freq.fit <- glmer(response_num ~ condition*NP*context_adj + sub_freq +
+                       (1|submission_id) + (1 + condition | exp_sub), 
+                data = d_infer_main_responseCat, family = "binomial" )
+summary(lm.infer.freq.fit)
+```
