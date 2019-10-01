@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE )
 library(tidyboot)
 library(tidyverse)
 library(lmerTest)
-library(emmeans)
+# library(emmeans)
 library(brms)
 ```
 # Hypothesis Outline
@@ -26,7 +26,7 @@ Here, both Bayesian and frequentist analyses of the experimental data are presen
 The goal of the experiment was to obtain ratings of both syntactic conditions in direct comparison as descriptions of a target referent in context. The context picture was followed by a sentence providing the subordinate level label of the traget. Below the sentence, the picture of the target appeared and they were asked: "How well does each of the sentences describe it?"
 __Between-subject:__ order of the syntactic frames on the sliders
 __Within-subject:__ NP (basic-level or subordinate level), target size (big or small), congruence (big great dane or small great dane)
-__Expectation:__ In the congruent condition, given sentences with subordinate noun phrases (e. g. great dane), we expect higher mean ratings of the predicative than the prenominal condition. Sentences with basic-level noun phrases should elicit similarly high ratings. In the incongruent condition, the prenominal subordinate condition is expected to elicit the highest rating, since it is the only sentence felicitous to describe the target. The endorsement wwill probably be lower than in the congruent condition. Predicative subordinate and both basic-level conditions are expected to elicit the lowest ratings. 
+__Expectation:__ In the congruent condition, given sentences with subordinate noun phrases (e. g. great dane), we expect higher mean ratings of the Subject than the Predicate condition. Sentences with basic-level noun phrases should elicit similarly high ratings, regardless of syntactic condition. In the incongruent condition, the prenominal subordinate condition is expected to elicit the highest rating, since it is the only sentence felicitous to describe the target. The endorsement wwill probably be lower than in the congruent condition. Predicative subordinate and both basic-level conditions are expected to elicit the lowest ratings. 
 
 ### Mean rating in different conditions 
 n = 30 (1 excluded as non-native speaker)
@@ -60,28 +60,47 @@ d_main_prenom_pred_pred <- d_rating_main %>% filter(sentence_order == "prenom_pr
 # subset data frames
 rating_prenom <- rbind(d_main_pred_prenom_prenom, d_main_prenom_pred_prenom)
 rating_pred <- rbind(d_main_pred_prenom_pred, d_main_prenom_pred_pred)
-d_rating_full <- rbind(rating_pred, rating_prenom)
+d_rating_full <- rbind(rating_pred, rating_prenom)  %>%   mutate(condition = factor(condition, 
+                            levels = c("pred", "prenom"), 
+                            labels = c("subject", "predicate")),
+         congruence = factor(congruence, levels = c("congr", "incongr"), 
+                             labels = c("congruent\n ('big' great dane)", "incongruent\n ('small' great dane)")),
+         np = factor(np, levels = c("super", "sub"), labels = c("basic/superordinate", "subordinate"))) 
+
 
 # plot 
-d_rating_full %>% group_by(np, congruence, condition) %>% 
-  tidyboot_mean(column = response1) %>%  ungroup() %>%
-  mutate(condition = factor(condition, levels = c("pred", "prenom"), 
-                            labels = c("That NP is big", "That's a big NP")),
-         congruence = factor(congruence, levels = c("congr", "incongr"), 
-                             labels = c("big great dane", "small great dane")),
-         np = factor(np, levels = c("sub", "super"), labels = c("great dane", "dog"))) %>% 
+bar.width = 0.8
+
+d_rating_full %>%
+  group_by(np, congruence, condition) %>% 
+  tidyboot_mean(column = response1) %>% 
   ggplot(aes(x = condition, y = mean, fill = np, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(0.8)) +
-  geom_linerange(position = position_dodge(0.8))+ 
+  geom_col(position = position_dodge(bar.width), width = bar.width, alpha = 0.3, color = 'black') +
+  geom_point(data = d_rating_full, 
+             position = position_jitterdodge(),
+             inherit.aes = F, aes(x = condition, y = response1, color = np),
+             alpha = 0.25)+
+  geom_linerange(position = position_dodge(bar.width))+ 
   facet_wrap(~congruence) +
-  xlab("syntactic condition") + 
+  xlab("NP position") + 
   ylab("mean sentence rating") +
   ggtitle("Mean ratings by syntactic condition and congruence")
 ```
 
 ### Stats
-This is a linear model of the rating predicted by the syntactic condition, the noun phrase, the congruence and their interaction with random intercept by-participant and random intercept by-item effects.
-``` {r rating lmer stats}
+
+Prediction: 
+
+Basic - Subordinate (looks like this could positive, but we predict it should not be significant)
+Subject - Predicate (looks like this could positive, but we predict it should not be significant)
+
+Basic - Subordinate
+x
+Subject - Predicate
+--> beta < 0
+
+
+``` {r rating lmer stats 2-way}
 # contrast coding of the variables, creating numeric variables
 # NP: 1 sub, -1 super (basic)
 # congruence:1 congruent, -1 incongruent
@@ -89,9 +108,53 @@ This is a linear model of the rating predicted by the syntactic condition, the n
 d_rating_full <- d_rating_full %>% mutate(np = C(factor(np), sum),
                                           congruence = C(factor(congruence), sum),
                                           condition = C(factor(condition), sum))
+contrasts(d_rating_full$np)
+contrasts(d_rating_full$condition)
 
+
+lm.fit <- lmer(response1 ~ condition * np + 
+                  #(1 | submission_id) + 
+                  #(1 | item) +
+                  #(0 + np | submission_id) + 
+                  #(0 + np | item) +
+                  #(0 + condition | submission_id) + 
+                  #(0 + condition | item) +
+                  #(0 + condition:np | submission_id),# + 
+                  (0 + condition:np | item), 
+               data = d_rating_full %>%
+                 filter(congruence == "congruent\n ('big' great dane)"), 
+               REML = F)
+
+summary(lm.fit)
+```
+
+
+```{r}
+lm.fit.2 <- lmer(response1 ~ condition * np + 
+                  #(1 | submission_id) + 
+                  #(1 | item) +
+                  #(0 + np | submission_id) + 
+                  #(0 + np | item) +
+                  #(0 + condition | submission_id) + 
+                  #(0 + condition | item) +
+                  (0 + condition:np | submission_id),# + 
+                  #(0 + condition:np | item), 
+               data = d_rating_full %>%
+                 filter(congruence == "incongruent\n ('small' great dane)"), 
+               REML = F)
+
+summary(lm.fit.2)
+```
+
+
+This is a linear model of the rating predicted by the syntactic condition, the noun phrase, the congruence and their interaction with random intercept by-participant and random intercept by-item effects.
+
+
+```{r rating lmer stats 3-way}
 # linear model
-lm.fit <- glmer(response1 ~ condition * np * congruence + (1 + condition*np*congruence || submission_id) + (1 + condition*np*congruence|| item), data = d_rating_full, REML = F)
+lm.fit <- glmer(response1 ~ condition * np * congruence + 
+                  (1 + condition*np*congruence || submission_id) + 
+                  (1 + condition*np*congruence || item), data = d_rating_full, REML = F)
 summary(lm.fit)
 
 #confint(lm.fit)
@@ -163,6 +226,7 @@ d_prod_main_responseCat %>%
 
 ### Stats
 The reponse category (subordinate vs basic-level) is regressed against the syntax and random intercept by-participant and random intercept and syntax-effects by-item. The syntax is contrast coded, predicative syntax being the reference level. 
+
 ``` {r production lmer}
 
 # predicative syntax is reference level (-1)
@@ -204,17 +268,17 @@ __Expectation:__ In the underspecified NP condition ('one'), we expect the perce
 ### Proportion of basic-level responses by congruence and NP condition
 n = 50 (n = 25 in prenominal, n = 25 in predicative condition)
 Superordinate labels are collapsed with the basic labels 
-``` {r inference, echo = FALSE}
+```{r inference, echo = FALSE}
 d1_infer <- read_csv("./data/results_12_comp-class-infer-pred.csv")
 d2_infer <- read_csv("./data/results_13_comp-class-infer-prenom.csv")
 d_infer <- rbind(d1_infer, d2_infer)
 
 d_infer <- mutate(d_infer, NP = factor(ref_spec, levels= c(0, 1), 
-                                       labels = c("great dane", "one")), 
+                                       labels = c("subordinate", '"one"')), 
                   context_adj = factor(pic_spec, levels = c(0, 1, 2), 
-                                       labels = c("congruent dog parade", 
-                                                  "congruent great dane parade",
-                                                  "incongruent great dane parade")))
+                                       labels = c("congruent\n basic-level parade", 
+                                                  "congruent\n subordinate parade",
+                                                  "incongruent\n subordinate parade")))
 d_infer_filt <- d_infer %>% 
   filter(grepl("en", languages, ignore.case = T))
 # choose main trials 
@@ -247,14 +311,15 @@ d_infer_main_responseCat <- d_infer_main_responseCat %>% rowwise() %>%
 
 d_infer_main_responseCat$condition <- factor(d_infer_main_responseCat$condition, 
                                              levels = c("prenominal", "predicative"))
+bar.width = 0.8
 d_infer_main_responseCat %>%  
   group_by(response_label, NP, context_adj, condition) %>%
   tidyboot_mean(column = response_num) %>% ungroup() %>% 
-  mutate(condition = factor(condition, levels = c("prenominal", "predicative"), 
-                            labels = c("That's a big NP", "That NP is big"))) %>%
-  ggplot(aes(x=NP, y = mean, fill = condition, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(0.8)) +
-  geom_linerange(position = position_dodge(0.8)) + 
+  mutate(condition = factor(condition, levels = c( "predicative", "prenominal"), 
+                            labels = c( "Subject", "Predicate"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width) +
+  geom_linerange(position = position_dodge(bar.width)) + 
   xlab("NP condition") +
   ylab("proportion of basic-level responses")+
   facet_grid(~context_adj)  
