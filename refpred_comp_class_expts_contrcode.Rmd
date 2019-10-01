@@ -26,6 +26,8 @@ Here, both Bayesian and frequentist analyses of the experimental data are presen
 The goal of the experiment was to obtain ratings of both syntactic conditions in direct comparison as descriptions of a target referent in context. The context picture was followed by a sentence providing the subordinate level label of the traget. Below the sentence, the picture of the target appeared and they were asked: "How well does each of the sentences describe it?"
 __Between-subject:__ order of the syntactic frames on the sliders
 __Within-subject:__ NP (basic-level or subordinate level), target size (big or small), congruence (big great dane or small great dane)
+
+
 __Expectation:__ In the congruent condition, given sentences with subordinate noun phrases (e. g. great dane), we expect higher mean ratings of the Subject than the Predicate condition. Sentences with basic-level noun phrases should elicit similarly high ratings, regardless of syntactic condition. In the incongruent condition, the prenominal subordinate condition is expected to elicit the highest rating, since it is the only sentence felicitous to describe the target. The endorsement wwill probably be lower than in the congruent condition. Predicative subordinate and both basic-level conditions are expected to elicit the lowest ratings. 
 
 ### Mean rating in different conditions 
@@ -170,6 +172,8 @@ summary(lm.fit)
 ## NP Free Production Experiment 
 
 In this experiment we want to see if speakers actually use different labels as noun phrases to describe the target, given different syntactic frames. The participants saw a basic-level context, below the sentence "This one is also in the parade", referring to the target. The target picture (big or small, balanced within-subject) was followed by the prompt "You say to your friend: ". Participants see either "That's a big (small) __ " or "That __ is big (small)" (between-subjects), blank to be filed in. The target size and adjective were always 'congruent'.
+
+
 __Expectation:__ We expect a higher proportion of subordinate target labels in the predicative than in the prenominal conidtion.
 
 ### Proportions of subordinate responses by syntactic condition
@@ -212,7 +216,7 @@ d_prod_main_responseCat %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, 
                             levels = c("prenominal", "predicative"),
-                            labels= c("That's a big X", "That X is big"))
+                            labels= c("Predicate NP", "Subject NP"))
         ) %>% 
   ggplot(aes(x = syntax, fill = syntax,
                            y = mean, ymin = ci_lower, ymax = ci_upper)) +
@@ -263,6 +267,8 @@ summary(prod.lm.fit)
 ## Comparison Class Inference Experiment
 
 The question in this experiment is whether participants' comparison class inference is influenced by the syntactic frame. Participants are asked to paraphrase a sentence in a free production task: They see the context (basic-level or subordinate, balanced within-subject) and are told that they and a friend see another not pictured member of the group. Their friend utters a sentence (one of the two syntactic frames, between-subject), after which the question "What do you think your friend meant?" is presented. The NP of the uttered sentence is either unerspecified ('one') or the subordinate target label (balnced within-subject). The paraphrase template is "It is big (small) relative to other __ ", blank to be filled in. There are congruent and incongruent trials in the basic-level context. 
+
+
 __Expectation:__ In the underspecified NP condition ('one'), we expect the perceptual context to set the comparison class, i. e. subordinate paraphrase in subordinate contexts and basic-level paraphrase in basic-level contexts in both congruent and incongruent trials. In the subordinate NP condition, in the congruent condition ('big' with a priori big targets) we expect a syntax effect: The prenominal syntax should elicit less basic-level paraphrases than the predicative syntax.
 
 ### Proportion of basic-level responses by congruence and NP condition
@@ -306,7 +312,7 @@ d_infer_main_responseCat <- d_infer_main %>%
 # include a context condition column
 d_infer_main_responseCat <- d_infer_main_responseCat %>% rowwise() %>%
   mutate(
-    context_cond = ifelse(context_adj == "congruent dog parade", "basic", "sub" )
+    context_cond = ifelse(context_adj == "congruent\n basic-level parade", "basic", "sub" )
   )
 
 d_infer_main_responseCat$condition <- factor(d_infer_main_responseCat$condition, 
@@ -350,13 +356,92 @@ lm.infer.fit <- glmer(response_num ~ condition*NP*congruence*context_cond  +
 summary(lm.infer.fit)
 
 ```
+
 ``` {r}
-# subset congruent trials 
+# subsetting congruent data
+# fails to converge 
 d_infer_congr <- d_infer_main_responseCat %>% filter(congruence == "congr")
-lm.infer.congr <- glmer(response_num ~ condition*NP*context_cond  + 
-                       (1 + condition*NP*context_cond|| submission_id) + (1 + condition*NP*context_cond || item), 
+lm.infer.congr <- glmer(response_num ~ condition*NP + context_cond + 
+                         #     (1 | submission_id) +
+                          #     (1 | item) +
+                          #     (0 + condition| submission_id ) +
+                          #     (0 + NP| submission_id) +
+                            #   (0 + condition:NP | submission_id),
+                          #     (0 + condition |item) +
+                            #    (0 + NP | item) +
+                      #          (0 + condition:NP | item),
+                       #(0 + condition:NP:context_cond | submission_id), 
+                         (0 + condition:NP:context_cond | item),
+                    #   + (0 + context_cond| submission_id) + (0 + context_cond|item), 
                 data = d_infer_congr, family = "binomial" , REML = F)
 summary(lm.infer.congr)
+
+```
+
+```{r}
+# model without random effects
+lm.infer.congr.fixed <- gls(response_num ~ condition * NP + context_cond, 
+                            data = d_infer_congr)
+summary(lm.infer.congr.fixed)
+```
+
+``` {r}
+# subset congruent basic context trials 
+d_infer_congr_basic <- d_infer_main_responseCat %>% filter(congruence == "congr" & context_cond== "basic")
+# full-sized model cannot be estimated, 
+# excluding all random effects but the interaction yields estimates which fully separate data 
+#lm.infer.congr.basic <- lmer(response_num ~ condition*NP,  
+                               # (1 | submission_id) +
+                              #  (1 | item) +
+                              #  (0 + condition| submission_id ) +
+                              #  (0 + NP| submission_id) +
+                             #   (0 + condition:NP | submission_id) ,
+                              #  (0 + condition |item) +
+                               # (0 + NP | item) +
+                              #  (0 + condition:NP | item),
+                       #(0 + condition*NP|| submission_id) + (0 + condition*NP|| item), 
+#                data = d_infer_congr_basic) #, family = "binomial" , REML = F)
+#summary(lm.infer.congr.basic)
+
+lm.infer.congr.basic.fixed <- gls(response_num ~ condition*NP, data = d_infer_congr_basic)
+summary(lm.infer.congr.basic.fixed)
+```
+
+```{r}
+# bayesian stats on basic context congruent condition
+brm.infer.congr.basic <- brm(response_num ~ condition*NP,  
+                               # (1 | submission_id) +
+                              #  (1 | item) +
+                              #  (0 + condition| submission_id ) +
+                              #  (0 + NP| submission_id) +
+                             #   (0 + condition:NP | submission_id) ,
+                              #  (0 + condition |item) +
+                               # (0 + NP | item) +
+                              #  (0 + condition:NP | item),
+                       #(0 + condition*NP|| submission_id) + (0 + condition*NP|| item), 
+#                data = d_infer_congr_basic) #, family = "binomial" , REML = F)
+#summary(lm.infer.congr.basic)
+```
+
+``` {r}
+# subset congruent subordinate context trials
+d_infer_congr_sub <- d_infer_main_responseCat %>% filter(congruence == "congr" & context_cond== "sub")
+#lm.infer.congr.sub <- glmer(response_num ~ condition*NP + 
+                         #     (1 | submission_id) +
+                          #     (1 | item) +
+                          #     (0 + condition| submission_id ) +
+                          #     (0 + NP| submission_id) +
+                          #      (0 + condition:NP | submission_id),
+                          #     (0 + condition |item) +
+                            #    (0 + NP | item) +
+                           #     (0 + condition:NP | item),
+                       #(0 + condition*NP|| submission_id) + (0 + condition*NP|| item), 
+                #data = d_infer_congr_basic, family = "binomial" , REML = F)
+#summary(lm.infer.congr)
+
+# simple gls model
+lm.infer.congr.sub.fixed <- gls(response_num ~ condition*NP, data= d_infer_congr_sub)
+summary(lm.infer.congr.sub.fixed)
 ```
 
 ### Bayesian Stats
