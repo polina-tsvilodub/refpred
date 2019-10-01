@@ -285,6 +285,14 @@ lm.infer.fit <- glmer(response_num ~ condition*NP*congruence*context_cond  +
 summary(lm.infer.fit)
 
 ```
+``` {r}
+# subset congruent trials 
+d_infer_congr <- d_infer_main_responseCat %>% filter(congruence == "congr")
+lm.infer.congr <- glmer(response_num ~ condition*NP*context_cond  + 
+                       (1 + condition*NP*context_cond|| submission_id) + (1 + condition*NP*context_cond || item), 
+                data = d_infer_congr, family = "binomial" , REML = F)
+summary(lm.infer.congr)
+```
 
 ### Bayesian Stats
 ``` {r inference bayes, echo = FALSE}
