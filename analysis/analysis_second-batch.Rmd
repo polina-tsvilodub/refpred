@@ -1,0 +1,286 @@
+--- 
+title: "Comparison class inference free production 50 participants"
+author: "Polina Tsvilodub"
+date: "09/06/2019"
+output: github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+
+```
+
+``` {r}
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lme4)
+```
+
+``` {r}
+d1 <- read_csv("../data/results_12_comp-class-infer-pred.csv")
+d2 <- read_csv("../data/results_13_comp-class-infer-prenom.csv")
+d <- rbind(d1, d2)
+
+glimpse(d)
+```
+
+``` {r}
+# ref_spec: 0 os subordinate, 1 is basic label 
+# picture: 0 is basic + congruent adjective, 1 is subordinate + congruent, 2 is subordinate + incongruent. 3 basic trials per subject and 3 randomly sampled adjective condition subordinate trials  
+d <- mutate(d, NP = factor(ref_spec, levels= c(0, 1), labels = c("great dane", "one")), context_adj = factor(pic_spec, levels = c(0, 1, 2), labels = c("congruent dog parade", "congruent great dane parade", "incongruent great dane parade")))
+
+
+```
+
+``` {r}
+d %>% distinct(d$languages) %>% View()
+d_filt <- d %>% 
+  filter(grepl("en", languages, ignore.case = T))
+
+# comments
+d_comments <- d_filt %>% select(comments, problems) %>% distinct()
+# choose main trials 
+d_main <- d_filt %>% filter((trial_name == "custom_main_text1")|(trial_name == "custom_main_text2")) %>% select(submission_id, trial_number, NP, context, context_adj, item, response, condition, context_picture, adj_cond, target_size)
+
+d_main %>% distinct(d_main$response)  %>% View()
+```
+## Response categorization
+```{r}
+# remove invalid responses : no invalid responses!
+
+# categorize responses
+d_main_responseCat <- d_main %>%
+  rowwise() %>%
+  mutate(  
+    response_cat =
+      ifelse(
+        tolower(response) %in% c("birds", "dogs", "fish", "fishes", "flowers", 
+                                 "flower", "large dogs", "dogs in the line",
+                                 "other birds in the group", "small dogs", "trees",
+                                 "tree's", "bird", "big tree"), "basic", 
+        ifelse(tolower(response) %in% c("plant", "animal", "things", "weeds", "plants"),
+               "super", "sub")),
+    
+    response_num = ifelse(response_cat == "basic", 1, 0),
+    response_label = "basic"
+  )
+
+```
+
+``` {r}
+# raw reponse counts by syntactic condition (6 participants each)
+d_main_responseCat %>% ggplot(aes(x=response_cat)) + geom_bar(position=position_dodge()) + facet_wrap(~condition) 
+```
+## Include item frequencies 
+``` {r}
+item_freqs <- read_csv('../data/item_freqs.csv') 
+# include the pure basic level category string
+d_main_responseCat <- d_main_responseCat %>% rowwise() %>% mutate(basic_cat = ifelse(item == "dogs1", "dogs",
+                                                ifelse(item == "dogs2", "dogs", item)))
+# include the subordinate level category string 
+                                                                                          ) ) )
+return_item <- function(condition, context_pic, target_size) {
+  if(condition == "incongr") {
+    x = sub("images/.*-parade-", "", context_pic)
+    x = sub(".png", "", x)
+    x = sub("-", " ", x)
+  } else if (condition == "congr") {
+    x = sub("images/.*-parade-", "", context_pic)
+    x = sub(".png", "", x)
+    x = sub("-", " ", x)
+  } else {
+    if (context_pic == "images/bird-parade-basic.png") {
+      if (target_size == "small") {
+        x=  "hummingbird"
+      } else {
+        x= "eagle"
+      }
+    } else if (context_pic == "images/dog-parade-basic.png") {
+      if (target_size == "small") {
+        x= "chihuahua"
+      } else {
+        x= "doberman"
+      }
+    } else if (context_pic == "images/dog-parade-basic2.png") {
+      if (target_size == "small") {
+        x= "pug"
+      } else {
+        x= "great dane"
+      }
+    } else if (context_pic == "images/fish-parade-basic.png") {
+      if (target_size == "small") {
+        x= "goldfish"
+      } else {
+        x= "swordfish"
+      }
+    } else if (context_pic == "images/flower-parade-basic.png") {
+      if (target_size == "small") {
+        x= "dandelion"
+      } else {
+        x= "sunflower"
+      }
+    } else {
+      if (target_size == "small") {
+        x= "bonsai"
+      } else{
+        x= "redwood"
+      }
+    }
+  }
+  return(x) 
+}
+items_vec <- Vectorize(return_item, vectorize.args = c("condition", "context_pic", "target_size"))
+
+exp_sub <- items_vec(d_main_responseCat$adj_cond, d_main_responseCat$context_picture, d_main_responseCat$target_size)
+
+d_main_responseCat_w_freq$sub_freq <- item_freqs$log_sub_log_basic[match(d_main_responseCat_w_freq$exp_sub, item_freqs$np)]
+d_main_responseCat_w_freq$basic_freq <- log(item_freqs$np_freqs[match(d_main_responseCat_w_freq$basic_cat, item_freqs$np)])
+```
+
+## Proportion of basic responses by syntactic condition, context specificity and NP 
+
+Expectations: When the underspecified 'one' is used, participants infer the comparison class froom the perceptual context: subordinate label (comparison class) for the subordinate parade, basic-level label for the basic-level parade. When thue subordinate noun phrase is used, the prenominal syntax sets the comparison class, whereas the predicative syntax allows for stronger context influence: more basic-level labels in the basic-level context are expected than in the subordinate context. 
+
+## Basic responses proportion by context condition
+There might be confusion within participants in the 'one' condition, since it is potentially confusing if 'small one' refer to different things in the basic and incongruent subordinate condition. 
+``` {r}
+d_main_responseCat$condition <- factor(d_main_responseCat$condition, levels = c("prenominal", "predicative"))
+
+d_main_responseCat %>% group_by(response_label, NP, context_adj, condition) %>%
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal", "predicative"), 
+                            labels = c("That's a big NP", "That NP is big"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) + 
+  scale_fill_manual("NP", values = c("great dane" = "blue", "one" = "brown")) +
+  xlab("syntactic condition") +
+  ylab("proportion of basic-level responses")+
+  facet_grid(~context_adj)  
+```
+
+``` {r}
+# collpase the subordiante context picture conditions
+d_main_responseCat <- d_main_responseCat %>% rowwise() %>% 
+  mutate(context_cats = ifelse(context_adj == "congruent dog parade", 
+                                      "Dog parade", "Great dane parade"))
+d_main_responseCat$context_cats <- factor(d_main_responseCat$context_cats, 
+                                          levels = c("Dog parade", "Great dane parade"))
+
+d_main_responseCat %>% group_by(response_label, NP, context_cats, condition) %>%
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal", "predicative"), 
+                            labels = c("That's a big NP", "That NP is big"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) + 
+  scale_fill_manual("NP", values = c("great dane" = "blue", "one" = "brown")) +
+  facet_grid(~context_cats)  
+
+```
+
+``` {r}
+d_basic_context <- d_main_responseCat %>% filter(context_cats == "Dog parade")
+lm.basic <- lmer(response_num ~ condition * NP + (1|submission_id) + (1 + condition|item), data = d_basic_context, family = "binomial")
+summary(lm.basic)
+```
+
+``` {r}
+d_congruent <- d_main_responseCat %>% filter(context_adj == "congruent dog parade" | context_adj == "congruent great dane parade") %>% mutate(context_specs = context_adj)
+# predicative reference level
+contrasts(d_congruent$condition)=matrix(c(-1, 1))
+# subordinate reference level
+contrasts(d_congruent$NP)=matrix(c(-1,1))
+# 
+contrasts(d_congruent$context_specs)=matrix(c(-1,1,0))
+blm.basic <- brm(response_num ~ 0 + condition * NP * context_adj + (1|submission_id) + (1 + condition|item), data = d_congruent, family = "binomial")
+  summary(blm.basic)
+```
+
+``` {r}
+# congruent vs incongruent trials
+d_main_responseCat %>% group_by(adj_cond, response_label) %>% 
+  tidyboot_mean(column = response_num) %>% ungroup() %>%
+  ggplot(aes(x = adj_cond, y = mean, fill = adj_cond, 
+             ymin = ci_lower, ymax = ci_upper)) + 
+  geom_col(position = position_dodge()) +
+  geom_linerange(position = position_dodge()) 
+  
+```
+
+## Stats
+``` {r}
+
+lm.fit <- glmer(response_num ~ condition*NP*context_adj + (1|submission_id), 
+                data = d_main_responseCat, family = "binomial" )
+summary(lm.fit)
+```
+
+## Condition counts table 
+``` {r}
+d_main_responseCat %>% group_by(condition, NP, context_adj) %>% count()
+
+```
+## Basic responses proportion by item, target size and context
+``` {r}
+d_main_responseCat$condition <- factor(d_main_responseCat$condition, levels = c("prenominal", "predicative"))
+
+d_main_responseCat %>% 
+  group_by(item, condition, response_label, NP, context_adj, target_size) %>% 
+  tidyboot_mean(column = response_num) %>% ungroup() %>%  
+  ggplot(aes(x=condition, fill= NP, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8))+
+  geom_linerange(position = position_dodge(0.8)) + 
+  facet_grid(item*target_size~context_adj, space = "free_y") + coord_flip() +
+  theme(strip.text.y = element_text(angle = 0)) + 
+  scale_fill_manual("NP", values = c("great dane" = "blue", "one" = "brown")) # + ggsave("by_item.jpg", width = 15, height = 20, units= "in")
+# flip right side labels to horizontal orientation, angle is relative to normal 
+
+```
+
+## Response consistency within participants
+``` {r}
+d_main_responseCat$condition <- factor(d_main_responseCat$condition, levels = c("prenominal", "predicative"))
+
+d_main_responseCat %>%
+  group_by(submission_id, condition, response_label, NP, context_adj) %>%
+  summarize(n_basic_responses = sum(response_num)) %>%
+  ungroup() %>% 
+  ggplot(., aes( x = n_basic_responses, fill=NP)) +
+  geom_bar(position=position_dodge()) +
+  facet_grid(condition~context_adj) + 
+  ggtitle("Number of basic responses uttered per participant in the 3 trials") +
+  scale_fill_manual("NP", values = c("great dane" = "blue", "one" = "brown"))
+```
+## Size effects: Basic responses proportion by size 
+``` {r}
+d_main_responseCat$condition <- factor(d_main_responseCat$condition, levels = c("prenominal", "predicative"))
+
+d_main_responseCat %>% group_by(response_label, NP, context_adj, condition, target_size) %>% tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal", "predicative"), 
+                            labels = c("That's a big NP", "That NP is big"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +  
+  geom_linerange(position = position_dodge(0.8)) + 
+  scale_fill_manual("NP", values = c("great dane" = "blue", "one" = "brown")) +
+  facet_grid(target_size~context_adj)
+
+```
+## First trial analysis
+```{r}
+d_main_responseCat$condition <- factor(d_main_responseCat$condition, levels = c("prenominal", "predicative"))
+
+
+# order effects 
+d_main_responseCat %>% filter(trial_number == 1) %>% 
+  group_by(response_label, NP, context_adj, condition) %>% 
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal", "predicative"), 
+                            labels = c("That's a big NP", "That NP is big"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +  
+  geom_linerange(position = position_dodge(0.8)) + 
+  scale_fill_manual("NP", values = c("great dane" = "blue", "one" = "brown")) +
+  facet_grid(~context_adj)
+
+```

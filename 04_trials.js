@@ -7,18 +7,18 @@ const size = function () {
 
 const utterance = utt_predicative;
 const target_size = _.shuffle([0,0,0,1,1,1])
-const referent = _.shuffle([0,0,0,1,1,1])
-const picture = _.shuffle([0,0,0,size(), size(), size()])
+const referent = _.shuffle([0,0,1,1,2,2])
+const picture = _.shuffle([0,0,0,1,1,1])
 
 const items = {
   dogs1: [
-    {referent: ["doberman", "one"],
+    {referent: ["dog", "doberman", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
      picture: [{pic: "images/dog-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/dog-parade-doberman.png", adj: "big", condition: "congr"}, {pic: "images/dog-parade-doberman.png", adj: "small", condition: "incongr"}]
 
    },
-   {referent: ["chihuahua", "one"],
+   {referent: ["dog","chihuahua", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
     picture: [{pic: "images/dog-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/dog-parade-chihuahua.png", adj: "small", condition: "congr"}, {pic: "images/dog-parade-chihuahua.png", adj: "big", condition: "incongr"} ],
@@ -26,13 +26,13 @@ const items = {
    }
   ],
   dogs2: [
-    {referent: ["great dane", "one"],
+    {referent: ["dog", "great dane", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
      picture: [{pic: "images/dog-parade-basic2.png", adj: "big", condition: "basic"}, {pic: "images/dog-parade-great-dane.png", adj: "big", condition: "congr"}, {pic: "images/dog-parade-great-dane.png", adj: "small", condition: "incongr"}],
 
    },
-   {referent: ["pug", "one"],
+   {referent: ["dog", "pug", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
     picture: [{pic: "images/dog-parade-basic2.png", adj: "small", condition: "basic"}, {pic: "images/dog-parade-pug.png", adj: "small", condition: "congr"}, {pic: "images/dog-parade-pug.png", adj: "big", condition: "incongr"}],
@@ -40,26 +40,26 @@ const items = {
    }
   ],
   birds: [
-    {referent: ["eagle", "one"],
+    {referent: ["bird", "eagle", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
      picture: [{pic: "images/bird-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/bird-parade-eagle.png", adj: "big", condition: "congr"}, {pic: "images/bird-parade-eagle.png", adj: "small", condition: "incongr"}],
 
    },
-   {referent: ["hummingbird", "one"],
+   {referent: ["bird", "hummingbird", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
     picture: [{pic: "images/bird-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/bird-parade-hummingbird.png", adj: "small", condition: "congr"}, {pic: "images/bird-parade-hummingbird.png", adj: "big", condition: "incongr"}],
    }
   ],
   fish: [
-    {referent: ["swordfish", "one"],
+    {referent: ["fish", "swordfish", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
      picture: [{pic: "images/fish-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/fish-parade-swordfish.png", adj: "big", condition: "congr"}, {pic: "images/fish-parade-swordfish.png", adj: "small", condition: "incongr"}],
 
    },
-   {referent: ["goldfish", "one"],
+   {referent: ["fish", "goldfish", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
     picture: [{pic: "images/fish-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/fish-parade-goldfish.png", adj: "small", condition: "congr"}, {pic: "images/fish-parade-goldfish.png", adj: "big", condition: "incongr"}],
@@ -67,26 +67,26 @@ const items = {
    }
   ],
   flowers: [
-  {referent: ["sunflower", "one"],
+  {referent: ["flower", "sunflower", "one"],
    utterance1: utterance.utterance1b,
    utterance2: utterance.utterance2b,
    picture: [{pic: "images/flower-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/flower-parade-sunflower.png", adj: "big", condition: "congr"}, {pic: "images/flower-parade-sunflower.png", adj: "small", condition: "incongr"}],
 
  },
- {referent: ["dandelion", "one"],
+ {referent: ["flower", "dandelion", "one"],
   utterance1: utterance.utterance1s,
   utterance2: utterance.utterance2s,
   picture: [{pic: "images/flower-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/flower-parade-dandelion.png", adj: "small", condition: "congr"}, {pic: "images/flower-parade-dandelion.png", adj: "big", condition: "incongr"}],
   adj: "small"
  }],
   trees: [
-    {referent: ["redwood", "one"],
+    {referent: ["tree", "redwood", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
      picture: [{pic: "images/tree-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/tree-parade-redwood.png", adj: "big", condition: "congr"}, {pic: "images/tree-parade-redwood.png", adj: "small", condition: "incongr"}],
      adj: "big"
    },
-   {referent: ["bonsai", "one"],
+   {referent: ["tree", "bonsai", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
     picture: [{pic: "images/tree-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/tree-parade-bonsai.png", adj: "small", condition: "congr"}, {pic: "images/tree-parade-bonsai.png", adj: "big", condition: "incongr"}],
@@ -104,7 +104,7 @@ const main_trials = {
             context: "You and your friend see the following:",
             context_picture: items.dogs1[target_size[0]].picture[picture[0]].pic,
             pic_spec: picture[0],
-            text: "You and your friend see another member of the group <br />(not pictured), and your friend says: <br/><b>" + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + items.dogs1[target_size[0]].picture[picture[0]].adj + ".</b>",
+            text: "You and your friend see another " + items.dogs1[target_size[0]].referent[1] + " (not pictured), and your friend says: <br/><b>" + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + items.dogs1[target_size[0]].picture[picture[0]].adj + ".</b>",
             ref_spec: referent[0],
             question: "What do you think your friend meant?",
             sentence_left: "It is " + items.dogs1[target_size[0]].picture[picture[0]].adj + " relative to other ",
@@ -120,7 +120,7 @@ const main_trials = {
             context: "You and your friend see the following:",
             context_picture: items.dogs2[target_size[1]].picture[picture[1]].pic,
             pic_spec: picture[1],
-            text: "You and your friend see another member of the group <br />(not pictured), and your friend says: <br/><b>" + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + items.dogs2[target_size[1]].picture[picture[1]].adj + ".</b>",
+            text: "You and your friend see another " + items.dogs2[target_size[1]].referent[1] + " (not pictured), and your friend says: <br/><b>" + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + items.dogs2[target_size[1]].picture[picture[1]].adj + ".</b>",
             ref_spec: referent[1],
             question:  "What do you think your friend meant?",
             sentence_left: "It is " + items.dogs2[target_size[1]].picture[picture[1]].adj + " relative to other ",
@@ -134,7 +134,7 @@ const main_trials = {
             context: "You and your friend see the following:",
             context_picture: items.birds[target_size[2]].picture[picture[2]].pic,
             pic_spec: picture[2],
-            text: "You and your friend see another member of the group <br />(not pictured), and your friend says: <br/><b>" + items.birds[target_size[2]].utterance1 + items.birds[target_size[2]].referent[referent[2]] + items.birds[target_size[2]].utterance2 + items.birds[target_size[2]].picture[picture[2]].adj + ".</b>",
+            text: "You and your friend see another "+ items.birds[target_size[2]].referent[1] +" (not pictured), and your friend says: <br/><b>" + items.birds[target_size[2]].utterance1 + items.birds[target_size[2]].referent[referent[2]] + items.birds[target_size[2]].utterance2 + items.birds[target_size[2]].picture[picture[2]].adj + ".</b>",
             ref_spec: referent[2],
             question:  "What do you think your friend meant?",
             sentence_left: "It is " + items.birds[target_size[2]].picture[picture[2]].adj + " relative to other ",
@@ -148,7 +148,7 @@ const main_trials = {
             context: "You and your friend see the following:",
             context_picture: items.fish[target_size[3]].picture[picture[3]].pic,
             pic_spec: picture[3],
-            text:"You and your friend see another member of the group <br />(not pictured), and your friend says: <br/><b>"+ items.fish[target_size[3]].utterance1 + items.fish[target_size[3]].referent[referent[3]] + items.fish[target_size[3]].utterance2 + items.fish[target_size[3]].picture[picture[3]].adj + ".</b>",
+            text:"You and your friend see another " + items.fish[target_size[3]].referent[1] + " (not pictured), and your friend says: <br/><b>"+ items.fish[target_size[3]].utterance1 + items.fish[target_size[3]].referent[referent[3]] + items.fish[target_size[3]].utterance2 + items.fish[target_size[3]].picture[picture[3]].adj + ".</b>",
             ref_spec: referent[3],
             question:  "What do you think your friend meant?",
             sentence_left: "It is " + items.fish[target_size[3]].picture[picture[3]].adj + " relative to other ",
@@ -162,7 +162,7 @@ const main_trials = {
             context: "You and your friend see the following:",
             context_picture: items.flowers[target_size[4]].picture[picture[4]].pic,
             pic_spec: picture[4],
-            text:"You and your friend see another member of the group <br />(not pictured), and your friend says: <br/><b>" + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + items.flowers[target_size[4]].picture[picture[4]].adj + ".</b>",
+            text:"You and your friend see another "+ items.flowers[target_size[4]].referent[1]+" (not pictured), and your friend says: <br/><b>" + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + items.flowers[target_size[4]].picture[picture[4]].adj + ".</b>",
             ref_spec: referent[4],
             question:  "What do you think your friend meant?",
             sentence_left: "It is " + items.flowers[target_size[4]].picture[picture[4]].adj + " relative to other ",
@@ -176,7 +176,7 @@ const main_trials = {
             context: "You and your friend see the following:",
             context_picture: items.trees[target_size[5]].picture[picture[5]].pic,
             pic_spec: picture[5],
-            text: "You and your friend see another member of the group <br />(not pictured), and your friend says: <br/><b>" + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + items.trees[target_size[5]].picture[picture[5]].adj + ".</b>",
+            text: "You and your friend see another "+ items.trees[target_size[5]].referent[1] + " (not pictured), and your friend says: <br/><b>" + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + items.trees[target_size[5]].picture[picture[5]].adj + ".</b>",
             ref_spec: referent[5],
             question:  "What do you think your friend meant?",
             sentence_left: "It is " + items.trees[target_size[5]].picture[picture[5]].adj + " relative to other ",
