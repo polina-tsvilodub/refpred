@@ -13,22 +13,27 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE )
 library(tidyboot)
 library(tidyverse)
 library(lmerTest)
-# library(emmeans)
 library(brms)
 ```
 # Hypothesis Outline
 
-Syntactic cues like the position of the noun phrase in a sentence might help listeners restrict the possible comparison classes upon hearing a sentence with a gradable adjective like "That great dane is big". We test this hypothesis in three experiments manipulating the syntax of a sentence that is used to describe an object: the syntax is either "That NP is big (small)" (predicative condition) or "That's a big (small) NP" (prenominal condition). 
-__We hypothesis that NPs in the prenominal condition restrict the comparison class and thus, given our experimental design, this syntax is felicitous with a basic-level label of the target object but not with a subordinate label. In contrast, in the predicative condition the comparison class is less restricted, and thus using both the basic-level and the subordinate label of the target as the NP is felicitous.__
-Here, both Bayesian and frequentist analyses of the experimental data are presented.  
+When interpreting a gradable adjective in a sentence like "That great dane is big" the listener needs to construct a felicitous comparison class for the adjective 'big' in order to infer the size of the target. Constructing the comparison class is an inferential problem, since the target might be conceptualized as a member of different levels of the taxonomy it belongs to.  
+Syntactic cues like the position of the noun phrase in a sentence might help listeners restrict possible comparison classes upon hearing a sentence with a gradable adjective like "That great dane is big". 
+
+We test this hypothesis in three experiments manipulating the syntax of a sentence that is used to describe the size of an object: the syntax is either "That NP is big (small)" (the NP serves as subject) or "That's a big (small) NP" (the NP serves as predicate). 
+
+__We hypothesize that NPs used as subjects contribute to reference, whereas NPs used as predicates contribute to predication. In terms of gradable adjectve use, predication is tantamount to communicating the comparison class, i. e. restricting the possible comparison classes to the felicitous one. Given our experimental design, the felicitous comparison class is the basic-level category of the target, such that the felicitous NP used as predicate is the basic-level label of the target. In contrast, the NP used as subject restricts the comparison class less, and thus using both the basic-level and the subordinate labels of the target as this NP is felicitous.__
+
 
 ## Syntax Rating Experiment
-The goal of the experiment was to obtain ratings of both syntactic conditions in direct comparison as descriptions of a target referent in context. The context picture was followed by a sentence providing the subordinate level label of the traget. Below the sentence, the picture of the target appeared and they were asked: "How well does each of the sentences describe it?"
+The goal of the experiment was to obtain ratings of both syntactic conditions in direct comparison as descriptions of a target referent in context. The context picture was followed by a sentence providing the subordinate level label of the traget. Below the sentence, the picture of the target appeared and participants were asked: "How well does each of the sentences describe it?". Both sentences use the same NP, differing only in NP position.
+
 __Between-subject:__ order of the syntactic frames on the sliders
+
 __Within-subject:__ NP (basic-level or subordinate level), target size (big or small), congruence (big great dane or small great dane)
 
 
-__Expectation:__ In the congruent condition, given sentences with subordinate noun phrases (e. g. great dane), we expect higher mean ratings of the Subject than the Predicate condition. Sentences with basic-level noun phrases should elicit similarly high ratings, regardless of syntactic condition. In the incongruent condition, the prenominal subordinate condition is expected to elicit the highest rating, since it is the only sentence felicitous to describe the target. The endorsement wwill probably be lower than in the congruent condition. Predicative subordinate and both basic-level conditions are expected to elicit the lowest ratings. 
+__Expectation:__ In the congruent condition, _given sentences with subordinate noun phrases (e. g. great dane), we expect higher mean ratings of the Subject than the Predicate condition_. Sentences with basic-level noun phrases should elicit similarly high ratings, regardless of syntactic condition. In the incongruent condition, the prenominal subordinate condition is expected to elicit the highest rating, since it is the only sentence felicitous to describe the target. The endorsement wwill probably be lower than in the congruent condition. Predicative subordinate and both basic-level conditions are expected to elicit the lowest ratings. 
 
 ### Mean rating in different conditions 
 n = 30 (1 excluded as non-native speaker)
@@ -62,12 +67,15 @@ d_main_prenom_pred_pred <- d_rating_main %>% filter(sentence_order == "prenom_pr
 # subset data frames
 rating_prenom <- rbind(d_main_pred_prenom_prenom, d_main_prenom_pred_prenom)
 rating_pred <- rbind(d_main_pred_prenom_pred, d_main_prenom_pred_pred)
-d_rating_full <- rbind(rating_pred, rating_prenom)  %>%   mutate(condition = factor(condition, 
+d_rating_full <- rbind(rating_pred, rating_prenom)  %>%   
+  mutate(condition = factor(condition, 
                             levels = c("pred", "prenom"), 
                             labels = c("subject", "predicate")),
          congruence = factor(congruence, levels = c("congr", "incongr"), 
-                             labels = c("congruent\n ('big' great dane)", "incongruent\n ('small' great dane)")),
-         np = factor(np, levels = c("super", "sub"), labels = c("basic/superordinate", "subordinate"))) 
+                             labels = c("congruent\n ('big' great dane)", 
+                                        "incongruent\n ('small' great dane)")),
+         np = factor(np, levels = c("super", "sub"), 
+                     labels = c("basic/superordinate", "subordinate"))) 
 
 
 # plot 
@@ -76,11 +84,11 @@ bar.width = 0.8
 d_rating_full %>%
   group_by(np, congruence, condition) %>% 
   tidyboot_mean(column = response1) %>% 
-  ggplot(aes(x = condition, y = mean, fill = np, ymin = ci_lower, ymax = ci_upper)) +
+  ggplot(aes(x = np, y = mean, fill = condition, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(bar.width), width = bar.width, alpha = 0.3, color = 'black') +
   geom_point(data = d_rating_full, 
              position = position_jitterdodge(),
-             inherit.aes = F, aes(x = condition, y = response1, color = np),
+             inherit.aes = F, aes(x = np, y = response1, color = condition),
              alpha = 0.25)+
   geom_linerange(position = position_dodge(bar.width))+ 
   facet_wrap(~congruence) +
@@ -106,25 +114,29 @@ Subject - Predicate
 # contrast coding of the variables, creating numeric variables
 # NP: 1 sub, -1 super (basic)
 # congruence:1 congruent, -1 incongruent
-# condition: 1 predicative, -1 prenominal
-d_rating_full <- d_rating_full %>% mutate(np = C(factor(np), sum),
-                                          congruence = C(factor(congruence), sum),
-                                          condition = C(factor(condition), sum))
-contrasts(d_rating_full$np)
-contrasts(d_rating_full$condition)
+# condition: 1 subject, -1 predicate
 
+d_rating_full <- d_rating_full %>% mutate(np = ifelse(np == "basic/superordinate", -1, 1),
+                                          congruence = 
+                                            ifelse(congruence == 
+                                                     "congruent\n ('big' great dane)",
+                                                   1, -1),
+                                          condition = ifelse(condition == "subject", 1, -1))
+```
 
-lm.fit <- lmer(response1 ~ condition * np + 
-                  #(1 | submission_id) + 
-                  #(1 | item) +
-                  #(0 + np | submission_id) + 
-                  #(0 + np | item) +
-                  #(0 + condition | submission_id) + 
-                  #(0 + condition | item) +
-                  #(0 + condition:np | submission_id),# + 
+```{r}
+d_rating_full_congr <- d_rating_full %>% filter(congruence == 1)
+# congruent trials only
+lm.fit <- lmer(response1 ~ condition * np  + 
+                  (1 | submission_id) + 
+                  (1 | item) +
+                  (0 + np | submission_id) + 
+                  (0 + np | item) +
+                  (0 + condition | submission_id) + 
+                  (0 + condition | item) +
+                  (0 + condition:np | submission_id) + 
                   (0 + condition:np | item), 
-               data = d_rating_full %>%
-                 filter(congruence == "congruent\n ('big' great dane)"), 
+               data = d_rating_full_congr, 
                REML = F)
 
 summary(lm.fit)
@@ -132,49 +144,34 @@ summary(lm.fit)
 
 
 ```{r}
-lm.fit.2 <- lmer(response1 ~ condition * np + 
-                  #(1 | submission_id) + 
-                  #(1 | item) +
-                  #(0 + np | submission_id) + 
-                  #(0 + np | item) +
-                  #(0 + condition | submission_id) + 
-                  #(0 + condition | item) +
-                  (0 + condition:np | submission_id),# + 
-                  #(0 + condition:np | item), 
-               data = d_rating_full %>%
-                 filter(congruence == "incongruent\n ('small' great dane)"), 
-               REML = F)
-
-summary(lm.fit.2)
-```
-
-
-This is a linear model of the rating predicted by the syntactic condition, the noun phrase, the congruence and their interaction with random intercept by-participant and random intercept by-item effects.
-
-
-```{r rating lmer stats 3-way}
-# linear model
-lm.fit <- glmer(response1 ~ condition * np * congruence + 
+# full data set
+lm.fit.full <- lmer(response1 ~ condition * np * congruence + 
                   (1 + condition*np*congruence || submission_id) + 
-                  (1 + condition*np*congruence || item), data = d_rating_full, REML = F)
-summary(lm.fit)
+                  (1 + condition*np*congruence  || item),
+                  data = d_rating_full,#
+                  REML = F)
 
-#confint(lm.fit)
+summary(lm.fit.full)
 ```
+
 
 ### Bayesian Stats
 ``` {r rating bayes stats, echo=FALSE}
-#b.lm.fit <- brm(response1 ~ condition * np * congruence + (1 | submission_id) + (1 | item), data = d_rating_full)
+#b.lm.fit <- brm(response1 ~ condition * np * congruence + (1 + condition * np * congruence || submission_id) + 
+# (1 + condition * np * congruence || item), data = d_rating_full)
 #summary(b.lm.fit)
 ```
 
 
 ## NP Free Production Experiment 
 
-In this experiment we want to see if speakers actually use different labels as noun phrases to describe the target, given different syntactic frames. The participants saw a basic-level context, below the sentence "This one is also in the parade", referring to the target. The target picture (big or small, balanced within-subject) was followed by the prompt "You say to your friend: ". Participants see either "That's a big (small) __ " or "That __ is big (small)" (between-subjects), blank to be filed in. The target size and adjective were always 'congruent'.
+In this experiment we want to see if speakers use different labels as noun phrases to describe the target, given different syntactic frames. The participants see a basic-level context, below the sentence "This one is also in the parade", referring to the target. The target picture (big or small, balanced within-subject) was followed by the prompt "You say to your friend: ". Participants see either "That's a big (small) __ " or "That __ is big (small)" (between-subjects), blank to be filed in. The target size and adjective were always 'congruent'.
 
+__Between-subject:__ syntactic condition (predicate NP vs subject NP)
 
-__Expectation:__ We expect a higher proportion of subordinate target labels in the predicative than in the prenominal conidtion.
+__Within-subject:__ target size (small or big), all conditions are congruent (e. g. only 'small chihuahua' and 'big great dane')
+
+__Expectation:__ We expect a higher proportion of subordinate target labels in the subject NP condition than in the predicate NP condition.
 
 ### Proportions of subordinate responses by syntactic condition
 n = 120 (n = 58 prenominal syntax, n = 60 predicative syntax)
@@ -230,13 +227,15 @@ d_prod_main_responseCat %>%
 
 ### Stats
 The reponse category (subordinate vs basic-level) is regressed against the syntax and random intercept by-participant and random intercept and syntax-effects by-item. The syntax is contrast coded, predicative syntax being the reference level. 
+```{r data wrangle}
+# subject NP -1, predicate NP 1
+d_prod_main_responseCat <- d_prod_main_responseCat %>% mutate (syntax = ifelse(syntax == 'predicative', -1, 1) )
+```
 
 ``` {r production lmer}
 
-# predicative syntax is reference level (-1)
-contrasts(d_prod_main_responseCat$syntax)=matrix(c(-1, 1))
 # fit regression model
-prod.lm.fit <- glmer(resp_cat ~  syntax + (1 + syntax| submission_id) + (1 + syntax|picture), data = d_prod_main_responseCat, family="binomial", REML = F)
+prod.lm.fit <- glmer(resp_cat ~  syntax + (1 + syntax || submission_id) + (1 + syntax ||picture), data = d_prod_main_responseCat, family="binomial", REML = F)
 summary(prod.lm.fit)
 #confint(prod.lm.fit)
 ```
@@ -245,13 +244,13 @@ summary(prod.lm.fit)
 ### Bayesian Stats
 
 ``` {r production bayes, echo = FALSE}
-#contrasts(d_prod_main_responseCat$syntax)=matrix(c(-1, 1))
 
-#get_prior(resp_cat ~ 0 + syntax + (1| submission_id) + (1 + syntax|picture),
+ # include priors on random effects
+#get_prior(resp_cat ~ 0 + syntax + (1 + syntax || submission_id) + (1 + syntax ||picture),
  #         data=d_prod_main_responseCat, family= "bernoulli")
 # uniform prior 
 #Prior <- set_prior("beta(1,1)", class = "b", lb = 0, ub = 1)
-#b.lm.w_prior <- brm(resp_cat ~   0 + syntax + (1| submission_id) + (1 + syntax|picture), 
+#b.lm.w_prior <- brm(resp_cat ~   0 + syntax + (1 + syntax || submission_id) + (1 + syntax ||picture), 
  #                 data = d_prod_main_responseCat, family = "bernoulli",
   #                prior = Prior, sample_prior = T)
 
@@ -266,10 +265,14 @@ summary(prod.lm.fit)
 
 ## Comparison Class Inference Experiment
 
-The question in this experiment is whether participants' comparison class inference is influenced by the syntactic frame. Participants are asked to paraphrase a sentence in a free production task: They see the context (basic-level or subordinate, balanced within-subject) and are told that they and a friend see another not pictured member of the group. Their friend utters a sentence (one of the two syntactic frames, between-subject), after which the question "What do you think your friend meant?" is presented. The NP of the uttered sentence is either unerspecified ('one') or the subordinate target label (balnced within-subject). The paraphrase template is "It is big (small) relative to other __ ", blank to be filled in. There are congruent and incongruent trials in the basic-level context. 
+The question in this experiment is whether participants' comparison class inference is influenced by the syntactic frame. Particularly, we expect the predicate NP to restrict - i. e. explicitly provide - the felicitous comaprison class. 
+Participants are asked to paraphrase a sentence in a free production task: They see a context picture (basic-level or subordinate, balanced) and are told that they and a friend see another not pictured member of the group. The friend utters a sentence (one of the two syntactic frames), after which the question "What do you think your friend meant?" is presented. The NP of the uttered sentence is either underspecified ('one') or the subordinate target label (balanced within-subject). The paraphrase template is "It is big (small) relative to other __ ", blank to be filled in. There are congruent and incongruent trials in the subordinate-level context. 
 
+__Between-subjects:__ syntactic condition
 
-__Expectation:__ In the underspecified NP condition ('one'), we expect the perceptual context to set the comparison class, i. e. subordinate paraphrase in subordinate contexts and basic-level paraphrase in basic-level contexts in both congruent and incongruent trials. In the subordinate NP condition, in the congruent condition ('big' with a priori big targets) we expect a syntax effect: The prenominal syntax should elicit less basic-level paraphrases than the predicative syntax.
+__Within-subjects:__ context picture (basic-level vs subordinate), NP ('one' or subordinate target label), size ('small' or 'big'), congruence (e. g. 'big great dane' or 'small great dane') in the subordinate contexts
+
+__Expectation:__ In the underspecified NP condition ('one'), we expect the perceptual context to set the comparison class, i. e. subordinate paraphrase in subordinate contexts and basic-level paraphrase in basic-level contexts in both congruent and incongruent trials. In the subordinate NP condition, in the congruent condition ('big' with a priori big targets) we expect a syntax effect: The predicate NP syntax should elicit less basic-level paraphrases than the subject NP syntax.
 
 ### Proportion of basic-level responses by congruence and NP condition
 n = 50 (n = 25 in prenominal, n = 25 in predicative condition)
@@ -333,64 +336,80 @@ d_infer_main_responseCat %>%
 ```
 
 ### Stats
-The response category (basic collapsed with superordinate labels vs subordinate) is regressed against the syntactic condition (contrast coded), NP ('one' vs subordinate), the congruence + context condition (context_adj) , their interaction and random intercept by-participant and random intercept and syntax by-context-item (context conditions) effects. NB: model does not converge for separate context and congruence conditions.    
-``` {r inference lmer}
+The response category (basic collapsed with superordinate labels vs subordinate) is regressed against the syntactic condition (subject vs predicate NP position), NP ('one' vs subordinate label), the congruence and the context condition (basic level vs subordinagte level parade). The desired full random effect structure includes random by-participant and by-item intercepts, random slope NP, condition, context and congruence effects and their interactions by-participant and by-item. 
+
+All the predictors are numerically contrast coded.
+``` {r inference wrangel}
 # prenominal condition is reference level (-1)
 d_infer_main_responseCat <- d_infer_main_responseCat %>% mutate(congruence = 
                                                                   ifelse(adj_cond == "incongr", "incongr", "congr"))
-d_infer_main_responseCat$congruence <- factor(d_infer_main_responseCat$congruence, levels = c("congr", "incongr")) 
-d_infer_main_responseCat$context_cond <- factor(d_infer_main_responseCat$context_cond, levels = c("sub", "basic")) 
+
 # -1 prenominal, 1 predicative
-contrasts(d_infer_main_responseCat$condition)=matrix(c(-1, 1))
-# -1 subordinate, 1 one
-contrasts(d_infer_main_responseCat$NP) = matrix(c(-1,1))
-#-1 sub, 1 basic context picture
-contrasts(d_infer_main_responseCat$context_cond) = matrix(c(-1,1))
-# -1 congruent, 1 incongruent condition
-contrasts(d_infer_main_responseCat$congruence) = matrix(c(-1,1))
+d_infer_main_responseCat <- d_infer_main_responseCat %>% mutate(condition = ifelse(condition == 'predicative', 1, -1),
+                                   NP = ifelse(NP == 'subordinate', -1, 1),
+                                   congruence = ifelse(congruence == 'congr', -1, 1),
+                                   context_cond = ifelse(context_cond == 'sub', -1, 1))
+```
 
 
+The full size model with maximal random effect structure fails to converge, although the random effect correlation is set to be 0. (probably due to a small data set and many conditions)
+```{r inference lmer}
+# fails to converge 
 lm.infer.fit <- glmer(response_num ~ condition*NP*congruence*context_cond  + 
-                       (1 + condition*NP|| submission_id) + (1 + condition*NP || item), 
+                       (0 + condition*NP*congruence*context_cond|| submission_id) + 
+                        (0 + condition*NP*congruence*context_cond || item), 
                 data = d_infer_main_responseCat, family = "binomial" , REML = F)
 summary(lm.infer.fit)
 
 ```
+### Congruent trials analysis
 
+Since the main predictions concern the congruent trials, we also analyse congruent trials separately.
+The full-scale model with maximal random effect structure fails to converge. 
+Given the data, we expect an interaction of the NP and the syntactic condition and a main effect of context, but no interaction of NP, condition and context. We fit a linear model of response predicted by the syntactic condition, the NP and their and interaction and the context, with random slope effect of condition and NP interaction by participant. This model converges and yield significant results for all predictors (p < 0.01).
 ``` {r}
-# subsetting congruent data
-# fails to converge 
-d_infer_congr <- d_infer_main_responseCat %>% filter(congruence == "congr")
-lm.infer.congr <- glmer(response_num ~ condition*NP + context_cond + 
+#  congruent trials only
+ # full-sized model fails to converge, sequentially  excluding most trivial random effects
+d_infer_congr <- d_infer_main_responseCat %>% filter(congruence == -1)
+lm.infer.congr <- glmer(response_num ~ condition*NP + context_cond +
+                         # (1 + condition*NP*context_cond || submission_id) +
+                       #   (1 + condition*NP*context_cond || item),
                          #     (1 | submission_id) +
                           #     (1 | item) +
-                          #     (0 + condition| submission_id ) +
+                           #    (0 + condition| submission_id ) +
                           #     (0 + NP| submission_id) +
-                            #   (0 + condition:NP | submission_id),
-                          #     (0 + condition |item) +
-                            #    (0 + NP | item) +
+                      #   (0 + context_cond | submission_id) +
+                       #        (0 + condition:NP | submission_id) +
+                       # (0 + condition:context_cond | submission_id) +
+                       #  (0+NP:context_cond|submission_id)+
+                        #       (0 + condition |item) +
+                            #   (0 + NP | item) +
+                        # (0 + context_cond | item) +
+                      #   (0 + condition:NP | item) +
+                     #   (0 + condition:context_cond | item) +
+                     #    (0+NP:context_cond|item)+
                       #          (0 + condition:NP | item),
-                       #(0 + condition:NP:context_cond | submission_id), 
-                         (0 + condition:NP:context_cond | item),
+                       (0 + condition:NP | submission_id), 
+                   #      (0 + condition:NP:context_cond | item),
                     #   + (0 + context_cond| submission_id) + (0 + context_cond|item), 
                 data = d_infer_congr, family = "binomial" , REML = F)
 summary(lm.infer.congr)
 
 ```
 
-```{r}
+```{r, echo = FALSE}
 # model without random effects
-lm.infer.congr.fixed <- gls(response_num ~ condition * NP + context_cond, 
-                            data = d_infer_congr)
-summary(lm.infer.congr.fixed)
+#lm.infer.congr.fixed <- gls(response_num ~ condition * NP + context_cond, 
+                           # data = d_infer_congr)
+#summary(lm.infer.congr.fixed)
 ```
 
 ``` {r}
-# subset congruent basic context trials 
-d_infer_congr_basic <- d_infer_main_responseCat %>% filter(congruence == "congr" & context_cond== "basic")
+# congruent basic context trials 
+d_infer_congr_basic <- d_infer_main_responseCat %>% filter(congruence == -1 & context_cond == 1)
 # full-sized model cannot be estimated, 
 # excluding all random effects but the interaction yields estimates which fully separate data 
-#lm.infer.congr.basic <- lmer(response_num ~ condition*NP,  
+lm.infer.congr.basic <- glmer(response_num ~ condition*NP + (1 + condition*NP || submission_id) + (1 + condition*NP || item),  
                                # (1 | submission_id) +
                               #  (1 | item) +
                               #  (0 + condition| submission_id ) +
@@ -400,16 +419,16 @@ d_infer_congr_basic <- d_infer_main_responseCat %>% filter(congruence == "congr"
                                # (0 + NP | item) +
                               #  (0 + condition:NP | item),
                        #(0 + condition*NP|| submission_id) + (0 + condition*NP|| item), 
-#                data = d_infer_congr_basic) #, family = "binomial" , REML = F)
-#summary(lm.infer.congr.basic)
+                data = d_infer_congr_basic) , family = "binomial" , REML = F)
+summary(lm.infer.congr.basic)
 
-lm.infer.congr.basic.fixed <- gls(response_num ~ condition*NP, data = d_infer_congr_basic)
-summary(lm.infer.congr.basic.fixed)
+#lm.infer.congr.basic.fixed <- gls(response_num ~ condition*NP, data = d_infer_congr_basic)
+#summary(lm.infer.congr.basic.fixed)
 ```
 
 ```{r}
 # bayesian stats on basic context congruent condition
-brm.infer.congr.basic <- brm(response_num ~ condition*NP,  
+#brm.infer.congr.basic <- brm(response_num ~ condition*NP,  
                                # (1 | submission_id) +
                               #  (1 | item) +
                               #  (0 + condition| submission_id ) +
