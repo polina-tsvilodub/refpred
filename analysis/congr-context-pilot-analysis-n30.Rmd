@@ -34,11 +34,15 @@ Including the subordinate label of the persumable target in the context setup se
 1. Basic-level context: In the underspecified noun phrase condition ('one'), the reference of the NP is interpreted to be the subordinate category. We see an effect of the syntactic condition: there are less basic-level responses in the predicate NP condition than in the subject NP condition. 
 2. In the subordinate noun phrase condition, we do not see any syntax effect, around 90% of responses are basic-level. This seems to indicate that both the predicate and the subject NP are interpreted referentially, to distinguish the target from the basic-level context. 
 3. In the basic-level noun phrase condition, we see an overall lower proportion of basic-level responses than in the subordinate condition. There seems to be a tendency towards less basic-level responses in the predicate condition. However, there is a big variance, given the small sample size. 
-4. Subordinate context: the results look very similar to the basic level condition, just with a lower overall basic response proportion. There might be a tendency to syntax sensitivity in the subordinate NP context, but the errors are very big. Again, we see a surprisingly high basic response proportion in the subordinate NP condition, indicating that the subordinate is interpreted referentially.  
+4. Subordinate context: the results look very similar to the basic level condition, just with a lower overall basic response proportion. There might be a tendency to syntax sensitivity in the subordinate NP context, but the errors are very big. We see a surprisingly high basic response proportion in the subordinate NP condition.  
 ```{r }
 d1_infer <- read_csv("./../data/results_12_comp-class-infer-pred_congr.csv")
 d2_infer <- read_csv("./../data/results_13_comp-class-infer-prenom_congr.csv")
-d_infer <- rbind(d1_infer, d2_infer)
+d3_infer <- read_csv("./../data/results_13_comp-class-infer-prenom_congr2.csv")
+d4_infer <- read_csv("./../data/results_12_comp-class-infer-pred_congr2.csv")
+d5 <- rbind(d1_infer, d2_infer)
+d6 <- rbind(d3_infer, d4_infer)
+d_infer <- rbind(d5, d6)
 
 d_infer <- mutate(d_infer, NP = factor(ref_spec, levels= c(0, 1, 2), 
                                        labels = c("subordinate", '"one"', "basic")), 
@@ -54,13 +58,16 @@ d_infer_main <- d_infer_filt %>% filter((trial_name == "custom_main_text1")|
   select(submission_id, trial_number, NP, context, item, response, condition,
          context_picture, target_size)
 
+d_infer_main_valid <- subset(d_infer_main, !(response %in% c("big"))) 
+
+
 d_infer_main_responseCat <- d_infer_main %>%
   rowwise() %>%
   mutate(  
     response_cat =
       ifelse(
         tolower(response) %in% c("birds", "dogs", "fish", "flowers", 
-                                 "flower", "trees", "dog breeds",
+                                 "flower", "trees","tree", "dog breeds",
                                  "fishes", "dog", "Fish"), "basic", 
         ifelse(tolower(response) %in% c("things", "weeds", "plants"),
                "super", "sub")),
@@ -91,7 +98,7 @@ d_infer_main_responseCat %>%
 It is not entirely clear if the change in observed effects is due to the context manipulation or also due to the presence of the basic-level NP condition. 
 
 ## Stats
-The coding has to be adjusted, since there is a three-level variable now.
+
 ``` {r}
 
 # 1 prenominal, -1 predicative
@@ -110,4 +117,36 @@ lm.fit <- glmer(response_num ~ condition*NP*context +
                 #  (0 + condition:NP:context | item), 
                 data = d_infer_main_responseCat, family = "binomial", REML = F)
 summary(lm.fit)
+```
+
+```{r by-item}
+# analysis of condition distribution by items
+bar.width = 0.8
+d_infer_main_responseCat %>%  
+  group_by(response_label, NP, context, condition, item) %>%
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal",  "predicative"), 
+                            labels = c("Predicate",  "Subject"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width) +
+  geom_linerange(position = position_dodge(bar.width)) + 
+  xlab("NP condition") +
+  ylab("proportion of basic-level responses")+
+  facet_wrap(item~context) 
+```
+
+```{r by-size}
+# analysis of condition distribution by items
+bar.width = 0.8
+d_infer_main_responseCat %>%  
+  group_by(response_label, NP, context, condition, target_size) %>%
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal",  "predicative"), 
+                            labels = c("Predicate",  "Subject"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width) +
+  geom_linerange(position = position_dodge(bar.width)) + 
+  xlab("NP condition") +
+  ylab("proportion of basic-level responses")+
+  facet_wrap(target_size~context) 
 ```
