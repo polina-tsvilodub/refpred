@@ -213,8 +213,8 @@ const main_trials = {
 
 const warmup_trials = {dogs1: {
   item: "dogs",
-  picture1: "warmup/chihuahua.jpg",
-  picture2: "warmup/doberman.png",
+  picture1: "../../../warmup/chihuahua.jpg",
+  picture2: "../../../warmup/doberman.png",
   correct1: ["chihuahua"],
   correct2: ["doberman"],
   correct3: ["dogs"],
@@ -226,8 +226,8 @@ const warmup_trials = {dogs1: {
 },
 dogs2: {
   item: "dogs",
-  picture1: "warmup/pug.jpg",
-  picture2: "warmup/great-dane.jpg",
+  picture1: "../../../warmup/pug.jpg",
+  picture2: "../../../warmup/great-dane.jpg",
   correct1: ["pug"],
   correct2: ["great dane"],
   correct3: ["dogs"],
@@ -238,8 +238,8 @@ dogs2: {
 },
 birds: {
   item: "birds",
-  picture1: "warmup/colibri.jpg",
-  picture2: "warmup/eagle.jpg",
+  picture1: "../../../warmup/colibri.jpg",
+  picture2: "../../../warmup/eagle.jpg",
   correct1: ["hummingbird"],
   correct2: ["eagle"],
   correct3: ["birds"],
@@ -250,8 +250,8 @@ birds: {
 },
 flowers: {
   item: "flowers",
-  picture1: "warmup/dandelion.jpg",
-  picture2: "warmup/sunflower.png",
+  picture1: "../../../warmup/dandelion.jpg",
+  picture2: "../../../warmup/sunflower.png",
   correct1: ["dandelion"],
   correct2: ["sunflower"],
   correct3: ["flowers"],
@@ -262,8 +262,8 @@ flowers: {
 },
 fish: {
   item: "fish",
-  picture1: "warmup/swordfish.jpg",
-  picture2: "warmup/goldfish.png",
+  picture1: "../../../warmup/swordfish.jpg",
+  picture2: "../../../warmup/goldfish.png",
   correct1: ["swordfish"],
   correct2: ["goldfish"],
   correct3: ["fish"],
@@ -275,8 +275,8 @@ fish: {
 
 trees: {
   item: "trees",
-  picture1: "warmup/sequoia.png",
-  picture2: "warmup/bonsai.jpg",
+  picture1: "../../../warmup/sequoia.png",
+  picture2: "../../../warmup/bonsai.jpg",
   correct1: "redwood or sequoia (choose one)",
   correct2: ["bonsai"],
   correct3: ["trees"],

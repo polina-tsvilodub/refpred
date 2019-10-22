@@ -111,10 +111,10 @@ const items = {
 const main_trials = {
 
     dogs1:   {
-            context: "You and your friend are in a park and watch the following:",
+            context: "You and your friend watch the following:",
             context_picture: items.dogs1[target_size[0]].picture[picture[0]].pic,
             pic_spec: picture[0],
-            text: "Your friend goes on ahead of you. You see the following at the end of the path: ",
+            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
             pic: items.dogs1[target_size[0]].target,
             utterance: "Your friend says: <br/><b>" + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + items.dogs1[target_size[0]].picture[picture[0]].adj + ".</b>",
             ref_spec: referent[0],
@@ -129,10 +129,10 @@ const main_trials = {
 
         },
     dogs2:    {
-            context: "You and your friend are in a park and watch the following:",
+            context: "You and your friend watch the following:",
             context_picture: items.dogs2[target_size[1]].picture[picture[1]].pic,
             pic_spec: picture[1],
-            text: "Your friend goes on ahead of you. You see the following at the end of the path: ",
+            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
             pic: items.dogs2[target_size[1]].target,
             utterance: "Your friend says: <br/><b>" + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + items.dogs2[target_size[1]].picture[picture[1]].adj + ".</b>",
             ref_spec: referent[1],
@@ -145,7 +145,7 @@ const main_trials = {
 
         },
     birds:    {
-            context: "You and your friend are outside and watch the following:",
+            context: "You and your friend watch the following:",
             context_picture: items.birds[target_size[2]].picture[picture[2]].pic,
             pic_spec: picture[2],
             text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
@@ -161,7 +161,7 @@ const main_trials = {
 
         },
   fish:      {
-            context: "You and your friend are at an aquarium and watch the following:",
+            context: "You and your friend watch the following:",
             context_picture: items.fish[target_size[3]].picture[picture[3]].pic,
             pic_spec: picture[3],
             text:"Your friend goes on ahead of you. You see the following: " ,
@@ -177,10 +177,10 @@ const main_trials = {
 
         },
   flowers:      {
-            context: "You and your friend are in a garden and watch the following:",
+            context: "You and your friend watch the following:",
             context_picture: items.flowers[target_size[4]].picture[picture[4]].pic,
             pic_spec: picture[4],
-            text:"Your friend goes on ahead of you. You see the following at the end of the path: ",
+            text:"Your friend goes on ahead of you. You see the following at the end of the street: ",
             pic: items.flowers[target_size[4]].target,
             utterance: "Your friend says: <br/><b>" + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + items.flowers[target_size[4]].picture[picture[4]].adj + ".</b>",
             ref_spec: referent[4],
@@ -193,10 +193,10 @@ const main_trials = {
 
         },
     trees:    {
-            context: "You and your friend are in a forest and watch the following:",
+            context: "You and your friend watch the following:",
             context_picture: items.trees[target_size[5]].picture[picture[5]].pic,
             pic_spec: picture[5],
-            text: "Your friend goes on ahead of you. You see the following at the end of the trail: ",
+            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
             pic: items.trees[target_size[5]].target,
             utterance: "Your friend says: <br/><b>" + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + items.trees[target_size[5]].picture[picture[5]].adj + ".</b>",
             ref_spec: referent[5],
@@ -213,8 +213,8 @@ const main_trials = {
 
 const warmup_trials = {dogs1: {
   item: "dogs",
-  picture1: "warmup/chihuahua.jpg",
-  picture2: "warmup/doberman.png",
+  picture1: "../../../warmup/chihuahua.jpg",
+  picture2: "../../../warmup/doberman.png",
   correct1: ["chihuahua"],
   correct2: ["doberman"],
   correct3: ["dogs"],
@@ -226,8 +226,8 @@ const warmup_trials = {dogs1: {
 },
 dogs2: {
   item: "dogs",
-  picture1: "warmup/pug.jpg",
-  picture2: "warmup/great-dane.jpg",
+  picture1: "../../../warmup/pug.jpg",
+  picture2: "../../../warmup/great-dane.jpg",
   correct1: ["pug"],
   correct2: ["great dane"],
   correct3: ["dogs"],
@@ -238,8 +238,8 @@ dogs2: {
 },
 birds: {
   item: "birds",
-  picture1: "warmup/colibri.jpg",
-  picture2: "warmup/eagle.jpg",
+  picture1: "../../../warmup/colibri.jpg",
+  picture2: "../../../warmup/eagle.jpg",
   correct1: ["hummingbird"],
   correct2: ["eagle"],
   correct3: ["birds"],
@@ -250,8 +250,8 @@ birds: {
 },
 flowers: {
   item: "flowers",
-  picture1: "warmup/dandelion.jpg",
-  picture2: "warmup/sunflower.png",
+  picture1: "../../../warmup/dandelion.jpg",
+  picture2: "../../../warmup/sunflower.png",
   correct1: ["dandelion"],
   correct2: ["sunflower"],
   correct3: ["flowers"],
@@ -262,8 +262,8 @@ flowers: {
 },
 fish: {
   item: "fish",
-  picture1: "warmup/swordfish.jpg",
-  picture2: "warmup/goldfish.png",
+  picture1: "../../../warmup/swordfish.jpg",
+  picture2: "../../../warmup/goldfish.png",
   correct1: ["swordfish"],
   correct2: ["goldfish"],
   correct3: ["fish"],
@@ -275,8 +275,8 @@ fish: {
 
 trees: {
   item: "trees",
-  picture1: "warmup/sequoia.png",
-  picture2: "warmup/bonsai.jpg",
+  picture1: "../../../warmup/sequoia.png",
+  picture2: "../../../warmup/bonsai.jpg",
   correct1: "redwood or sequoia (choose one)",
   correct2: ["bonsai"],
   correct3: ["trees"],

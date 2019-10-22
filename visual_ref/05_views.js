@@ -182,7 +182,7 @@ const custom_post_test = custom_post_test_view({
 const custom_intro = custom_intro_view({
   name: 'Intro',
   title: 'Welcome!',
-  picture1: 'images/cpl.png',
+  picture1: '../../images/cpl.png',
   trials: 1
 
 });
