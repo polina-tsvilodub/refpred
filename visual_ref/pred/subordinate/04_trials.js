@@ -15,14 +15,14 @@ const items = {
     {referent: ["dog", "doberman", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: [{pic: "../../images/dog-parade-basic.png", adj: "big", condition: "basic"}, {pic: "../../images/dog-parade-doberman.png", adj: "big", condition: "congr"}, {pic: "../../images/dog-parade-doberman.png", adj: "small", condition: "incongr"}],
-     target: "../../images/doberman.png"
+     picture: [{pic: "images/dog-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/dog-parade-doberman.png", adj: "big", condition: "congr"}, {pic: "images/dog-parade-doberman.png", adj: "small", condition: "incongr"}],
+     target: "images/doberman.png"
    },
    {referent: ["dog","chihuahua", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: [{pic: "../../images/dog-parade-basic.png", adj: "small", condition: "basic"}, {pic: "../../images/dog-parade-chihuahua.png", adj: "small", condition: "congr"}, {pic: "../../images/dog-parade-chihuahua.png", adj: "big", condition: "incongr"} ],
-    target: "../../images/chihuahua.png"
+    picture: [{pic: "images/dog-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/dog-parade-chihuahua.png", adj: "small", condition: "congr"}, {pic: "images/dog-parade-chihuahua.png", adj: "big", condition: "incongr"} ],
+    target: "images/chihuahua.png"
 
    }
   ],
@@ -30,44 +30,44 @@ const items = {
     {referent: ["dog", "great dane", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: [{pic: "../../images/dog-parade-basic2.png", adj: "big", condition: "basic"}, {pic: "../../images/dog-parade-great-dane.png", adj: "big", condition: "congr"}, {pic: "../../images/dog-parade-great-dane.png", adj: "small", condition: "incongr"}],
-     target: "../../images/great-dane.png"
+     picture: [{pic: "images/dog-parade-basic2.png", adj: "big", condition: "basic"}, {pic: "images/dog-parade-great-dane.png", adj: "big", condition: "congr"}, {pic: "images/dog-parade-great-dane.png", adj: "small", condition: "incongr"}],
+     target: "images/great-dane.png"
 
    },
    {referent: ["dog", "pug", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: [{pic: "../../images/dog-parade-basic2.png", adj: "small", condition: "basic"}, {pic: "../../images/dog-parade-pug.png", adj: "small", condition: "congr"}, {pic: "../../images/dog-parade-pug.png", adj: "big", condition: "incongr"}],
-    target: "../../images/pug.png"
+    picture: [{pic: "images/dog-parade-basic2.png", adj: "small", condition: "basic"}, {pic: "images/dog-parade-pug.png", adj: "small", condition: "congr"}, {pic: "images/dog-parade-pug.png", adj: "big", condition: "incongr"}],
+    target: "images/pug.png"
    }
   ],
   birds: [
     {referent: ["bird", "eagle", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: [{pic: "../../images/bird-parade-basic.png", adj: "big", condition: "basic"}, {pic: "../../images/bird-parade-eagle.png", adj: "big", condition: "congr"}, {pic: "../../images/bird-parade-eagle.png", adj: "small", condition: "incongr"}],
-     target: "../../images/eagle.png"
+     picture: [{pic: "images/bird-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/bird-parade-eagle.png", adj: "big", condition: "congr"}, {pic: "images/bird-parade-eagle.png", adj: "small", condition: "incongr"}],
+     target: "images/eagle.png"
    },
    {referent: ["bird", "hummingbird", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: [{pic: "../../images/bird-parade-basic.png", adj: "small", condition: "basic"}, {pic: "../../images/bird-parade-hummingbird.png", adj: "small", condition: "congr"}, {pic: "../../images/bird-parade-hummingbird.png", adj: "big", condition: "incongr"}],
-    target: "../../images/hummingbird.png"
+    picture: [{pic: "images/bird-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/bird-parade-hummingbird.png", adj: "small", condition: "congr"}, {pic: "images/bird-parade-hummingbird.png", adj: "big", condition: "incongr"}],
+    target: "images/hummingbird.png"
    }
   ],
   fish: [
     {referent: ["fish", "swordfish", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: [{pic: "../../images/fish-parade-basic.png", adj: "big", condition: "basic"}, {pic: "../../images/fish-parade-swordfish.png", adj: "big", condition: "congr"}, {pic: "../../images/fish-parade-swordfish.png", adj: "small", condition: "incongr"}],
-     target: "../../images/swordfish.png"
+     picture: [{pic: "images/fish-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/fish-parade-swordfish.png", adj: "big", condition: "congr"}, {pic: "images/fish-parade-swordfish.png", adj: "small", condition: "incongr"}],
+     target: "images/swordfish.png"
 
    },
    {referent: ["fish", "goldfish", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: [{pic: "../../images/fish-parade-basic.png", adj: "small", condition: "basic"}, {pic: "../../images/fish-parade-goldfish.png", adj: "small", condition: "congr"}, {pic: "../../images/fish-parade-goldfish.png", adj: "big", condition: "incongr"}],
-    target: "../../images/goldfish.png"
+    picture: [{pic: "images/fish-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/fish-parade-goldfish.png", adj: "small", condition: "congr"}, {pic: "images/fish-parade-goldfish.png", adj: "big", condition: "incongr"}],
+    target: "images/goldfish.png"
 
    }
   ],
@@ -75,31 +75,31 @@ const items = {
   {referent: ["flower", "sunflower", "one"],
    utterance1: utterance.utterance1b,
    utterance2: utterance.utterance2b,
-   picture: [{pic: "../../images/flower-parade-basic.png", adj: "big", condition: "basic"}, {pic: "../../images/flower-parade-sunflower.png", adj: "big", condition: "congr"}, {pic: "../../images/flower-parade-sunflower.png", adj: "small", condition: "incongr"}],
-   target: "../../images/sunflower.png"
+   picture: [{pic: "images/flower-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/flower-parade-sunflower.png", adj: "big", condition: "congr"}, {pic: "images/flower-parade-sunflower.png", adj: "small", condition: "incongr"}],
+   target: "images/sunflower.png"
 
  },
  {referent: ["flower", "dandelion", "one"],
   utterance1: utterance.utterance1s,
   utterance2: utterance.utterance2s,
-  picture: [{pic: "../../images/flower-parade-basic.png", adj: "small", condition: "basic"}, {pic: "../../images/flower-parade-dandelion.png", adj: "small", condition: "congr"}, {pic: "../../images/flower-parade-dandelion.png", adj: "big", condition: "incongr"}],
+  picture: [{pic: "images/flower-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/flower-parade-dandelion.png", adj: "small", condition: "congr"}, {pic: "images/flower-parade-dandelion.png", adj: "big", condition: "incongr"}],
   adj: "small",
-  target: "../../images/dandelion.png"
+  target: "images/dandelion.png"
  }],
   trees: [
     {referent: ["tree", "redwood", "one"],
      utterance1: utterance.utterance1b,
      utterance2: utterance.utterance2b,
-     picture: [{pic: "../../images/tree-parade-basic.png", adj: "big", condition: "basic"}, {pic: "../../images/tree-parade-redwood.png", adj: "big", condition: "congr"}, {pic: "../../images/tree-parade-redwood.png", adj: "small", condition: "incongr"}],
+     picture: [{pic: "images/tree-parade-basic.png", adj: "big", condition: "basic"}, {pic: "images/tree-parade-redwood.png", adj: "big", condition: "congr"}, {pic: "images/tree-parade-redwood.png", adj: "small", condition: "incongr"}],
      adj: "big",
-     target: "../../images/redwood.png"
+     target: "images/redwood.png"
    },
    {referent: ["tree", "bonsai", "one"],
     utterance1: utterance.utterance1s,
     utterance2: utterance.utterance2s,
-    picture: [{pic: "../../images/tree-parade-basic.png", adj: "small", condition: "basic"}, {pic: "../../images/tree-parade-bonsai.png", adj: "small", condition: "congr"}, {pic: "../../images/tree-parade-bonsai.png", adj: "big", condition: "incongr"}],
+    picture: [{pic: "images/tree-parade-basic.png", adj: "small", condition: "basic"}, {pic: "images/tree-parade-bonsai.png", adj: "small", condition: "congr"}, {pic: "images/tree-parade-bonsai.png", adj: "big", condition: "incongr"}],
     adj: "small",
-    target: "../../images/bonsai.png"
+    target: "images/bonsai.png"
    }
   ]
 }
@@ -222,8 +222,8 @@ const main_trials = {
 
 const warmup_trials = {dogs1: {
   item: "dogs",
-  picture1: "../../../warmup/chihuahua.jpg",
-  picture2: "../../../warmup/doberman.png",
+  picture1: "warmup/chihuahua.jpg",
+  picture2: "warmup/doberman.png",
   correct1: ["chihuahua"],
   correct2: ["doberman"],
   correct3: ["dogs"],
@@ -235,8 +235,8 @@ const warmup_trials = {dogs1: {
 },
 dogs2: {
   item: "dogs",
-  picture1: "../../../warmup/pug.jpg",
-  picture2: "../../../warmup/great-dane.jpg",
+  picture1: "warmup/pug.jpg",
+  picture2: "warmup/great-dane.jpg",
   correct1: ["pug"],
   correct2: ["great dane"],
   correct3: ["dogs"],
@@ -247,8 +247,8 @@ dogs2: {
 },
 birds: {
   item: "birds",
-  picture1: "../../../warmup/colibri.jpg",
-  picture2: "../../../warmup/eagle.jpg",
+  picture1: "warmup/colibri.jpg",
+  picture2: "warmup/eagle.jpg",
   correct1: ["hummingbird"],
   correct2: ["eagle"],
   correct3: ["birds"],
@@ -259,8 +259,8 @@ birds: {
 },
 flowers: {
   item: "flowers",
-  picture1: "../../../warmup/dandelion.jpg",
-  picture2: "../../../warmup/sunflower.png",
+  picture1: "warmup/dandelion.jpg",
+  picture2: "warmup/sunflower.png",
   correct1: ["dandelion"],
   correct2: ["sunflower"],
   correct3: ["flowers"],
@@ -271,8 +271,8 @@ flowers: {
 },
 fish: {
   item: "fish",
-  picture1: "../../../warmup/swordfish.jpg",
-  picture2: "../../../warmup/goldfish.png",
+  picture1: "warmup/swordfish.jpg",
+  picture2: "warmup/goldfish.png",
   correct1: ["swordfish"],
   correct2: ["goldfish"],
   correct3: ["fish"],
@@ -284,8 +284,8 @@ fish: {
 
 trees: {
   item: "trees",
-  picture1: "../../../warmup/sequoia.png",
-  picture2: "../../../warmup/bonsai.jpg",
+  picture1: "warmup/sequoia.png",
+  picture2: "warmup/bonsai.jpg",
   correct1: "redwood or sequoia (choose one)",
   correct2: ["bonsai"],
   correct3: ["trees"],
