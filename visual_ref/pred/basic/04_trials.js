@@ -111,10 +111,10 @@ const items = {
 const main_trials = {
 
     dogs1:   {
-            context: "You and your friend watch the following:",
+            context: "You and your friend see the following:",
             context_picture: items.dogs1[target_size[0]].picture[picture[0]].pic,
             pic_spec: picture[0],
-            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
+            text: "Your friend runs far ahead of you, and you see him in the distance:  ",
             pic: items.dogs1[target_size[0]].target,
             utterance: "Your friend says: <br/><b>" + items.dogs1[target_size[0]].utterance1 + items.dogs1[target_size[0]].referent[referent[0]] + items.dogs1[target_size[0]].utterance2 + items.dogs1[target_size[0]].picture[picture[0]].adj + ".</b>",
             ref_spec: referent[0],
@@ -129,10 +129,10 @@ const main_trials = {
 
         },
     dogs2:    {
-            context: "You and your friend watch the following:",
+            context: "You and your friend see the following:",
             context_picture: items.dogs2[target_size[1]].picture[picture[1]].pic,
             pic_spec: picture[1],
-            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
+            text: "Your friend runs far ahead of you, and you see him in the distance:  ",
             pic: items.dogs2[target_size[1]].target,
             utterance: "Your friend says: <br/><b>" + items.dogs2[target_size[1]].utterance1 + items.dogs2[target_size[1]].referent[referent[1]] + items.dogs2[target_size[1]].utterance2 + items.dogs2[target_size[1]].picture[picture[1]].adj + ".</b>",
             ref_spec: referent[1],
@@ -145,10 +145,10 @@ const main_trials = {
 
         },
     birds:    {
-            context: "You and your friend watch the following:",
+            context: "You and your friend see the following:",
             context_picture: items.birds[target_size[2]].picture[picture[2]].pic,
             pic_spec: picture[2],
-            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
+            text: "Your friend runs far ahead of you, and you see him in the distance:  ",
             pic: items.birds[target_size[2]].target,
             utterance: "Your friend says: <br/><b>" + items.birds[target_size[2]].utterance1 + items.birds[target_size[2]].referent[referent[2]] + items.birds[target_size[2]].utterance2 + items.birds[target_size[2]].picture[picture[2]].adj + ".</b>",
             ref_spec: referent[2],
@@ -161,10 +161,10 @@ const main_trials = {
 
         },
   fish:      {
-            context: "You and your friend watch the following:",
+            context: "You and your friend see the following:",
             context_picture: items.fish[target_size[3]].picture[picture[3]].pic,
             pic_spec: picture[3],
-            text:"Your friend goes on ahead of you. You see the following: " ,
+            text:"Your friend runs far ahead of you, and you see him in the distance:  " ,
             pic: items.fish[target_size[3]].target,
             utterance: "Your friend says: <br/><b>"+ items.fish[target_size[3]].utterance1 + items.fish[target_size[3]].referent[referent[3]] + items.fish[target_size[3]].utterance2 + items.fish[target_size[3]].picture[picture[3]].adj + ".</b>",
             ref_spec: referent[3],
@@ -177,10 +177,10 @@ const main_trials = {
 
         },
   flowers:      {
-            context: "You and your friend watch the following:",
+            context: "You and your friend see the following:",
             context_picture: items.flowers[target_size[4]].picture[picture[4]].pic,
             pic_spec: picture[4],
-            text:"Your friend goes on ahead of you. You see the following at the end of the street: ",
+            text:"Your friend runs far ahead of you, and you see him in the distance:  ",
             pic: items.flowers[target_size[4]].target,
             utterance: "Your friend says: <br/><b>" + items.flowers[target_size[4]].utterance1 + items.flowers[target_size[4]].referent[referent[4]] + items.flowers[target_size[4]].utterance2 + items.flowers[target_size[4]].picture[picture[4]].adj + ".</b>",
             ref_spec: referent[4],
@@ -193,10 +193,10 @@ const main_trials = {
 
         },
     trees:    {
-            context: "You and your friend watch the following:",
+            context: "You and your friend see the following:",
             context_picture: items.trees[target_size[5]].picture[picture[5]].pic,
             pic_spec: picture[5],
-            text: "Your friend goes on ahead of you. You see the following at the end of the street: ",
+            text: "Your friend runs far ahead of you, and you see him in the distance:  ",
             pic: items.trees[target_size[5]].target,
             utterance: "Your friend says: <br/><b>" + items.trees[target_size[5]].utterance1 + items.trees[target_size[5]].referent[referent[5]] + items.trees[target_size[5]].utterance2 + items.trees[target_size[5]].picture[picture[5]].adj + ".</b>",
             ref_spec: referent[5],
