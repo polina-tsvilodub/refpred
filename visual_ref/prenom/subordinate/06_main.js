@@ -16,14 +16,14 @@ $("document").ready(function() {
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
             custom_intro,
-            // botcaptcha,
+            botcaptcha,
             instructions,
-            // comp_class_warmup,
-            // warmup1,
+            comp_class_warmup,
+            warmup1,
             context1,
             custom_main_text1,
             context2,
-            // warmup2,
+            warmup2,
             custom_main_text2,
             custom_post_test,
             thanks,
