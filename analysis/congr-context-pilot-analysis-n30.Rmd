@@ -102,21 +102,21 @@ It is not entirely clear if the change in observed effects is due to the context
 ``` {r}
 
 # 1 prenominal, -1 predicative
-d_infer_main_responseCat <- d_infer_main_responseCat %>% mutate(
-  condition = ifelse(condition == 'predicative', -1, 1),
-                                   context = ifelse(context == 'basic-level parade',
-                                                         -1, 1))
-contrasts(d_infer_main_responseCat$NP) <- matrix(c(-1/3, 2/3, -1/3, -1/3, -1/3, 2/3), ncol=2, byrow = FALSE)
-contrasts(d_infer_main_responseCat$condition) <- matrix(c(-1, 1), byrow = F)
-contrasts(d_infer_main_responseCat$context) <- matrix(c(-1, 1), byrow = F)
+#d_infer_main_responseCat <- d_infer_main_responseCat %>% mutate(
+ # condition = ifelse(condition == 'predicative', -1, 1),
+#                                   context = ifelse(context == 'basic-level parade',
+#                                                         -1, 1))
+#contrasts(d_infer_main_responseCat$NP) <- matrix(c(-1/3, 2/3, -1/3, -1/3, -1/3, 2/3), ncol=2, byrow = FALSE)
+#contrasts(d_infer_main_responseCat$condition) <- matrix(c(-1, 1), byrow = F)
+#contrasts(d_infer_main_responseCat$context) <- matrix(c(-1, 1), byrow = F)
 ```
 
 ``` {r lmer}
-lm.fit <- glmer(response_num ~ condition*NP*context + 
-                  (0 + condition:NP| submission_id), 
+#lm.fit <- glmer(response_num ~ condition*NP*context + 
+ #                 (0 + condition:NP| submission_id), 
                 #  (0 + condition:NP:context | item), 
-                data = d_infer_main_responseCat, family = "binomial", REML = F)
-summary(lm.fit)
+ #               data = d_infer_main_responseCat, family = "binomial", REML = F)
+#summary(lm.fit)
 ```
 
 ```{r by-item}

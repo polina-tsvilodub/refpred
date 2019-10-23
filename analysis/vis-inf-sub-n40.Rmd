@@ -1,0 +1,59 @@
+---
+title: "Subordinate Visual Reference Presentation pilot"
+author: "Polina Tsvilodub"
+date: "23 10 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libs, echo = FALSE}
+library(tidyverse)
+library(tidyboot)
+library(lmerTest)
+```
+
+``` {r}
+d_infer <- rbind( read_csv('../data/results_17_inf-pred-sub.csv'), 
+                        read_csv('../data/results_20_inf-prenom-sub.csv')) 
+
+d_infer_main <- d_infer %>% mutate(context = factor(pic_spec, levels = c(0, 1), 
+                                       labels = c("basic-level parade", 
+                                                  "subordinate parade"))) %>%
+  filter(grepl("en", languages, ignore.case = T)) %>%
+  filter((trial_name == "custom_main_text1")| 
+           (trial_name == "custom_main_text2")) %>%
+  select(submission_id, trial_number, ref_spec, context, item, response, condition,
+         context_picture, target_size)
+
+d_infer_main_responseCat <- d_infer_main %>%
+  rowwise() %>%
+  mutate(  
+    response_cat =
+      ifelse(
+        tolower(response) %in% c("birds", "dogs", "fish", "flowers", 
+                                 "flower", "trees","tree", "smaller dogs",
+                                 "fishes", "dog", "Fish"), "basic", "sub"),
+    
+    response_num = ifelse(response_cat == "sub", 0, 1),
+    response_label = "basic"
+  )
+  
+```
+
+``` {r}
+bar.width = 0.8
+d_infer_main_responseCat %>%  
+  group_by(response_label, context, condition) %>%
+  tidyboot_mean(column = response_num) %>% ungroup() %>% 
+  mutate(condition = factor(condition, levels = c("prenominal",  "predicative"), 
+                            labels = c("Predicate",  "Subject"))) %>%
+  ggplot(aes(x=condition, y = mean, fill = condition, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width) +
+  geom_linerange(position = position_dodge(bar.width)) + 
+  xlab("NP condition") +
+  ylab("proportion of basic-level responses")+
+  facet_grid(~context)  
+```
