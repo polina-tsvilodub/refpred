@@ -182,13 +182,10 @@ __Expectation:__ We expect a higher proportion of subordinate target labels in t
 
 n = 120 (n = 58 prenominal syntax, n = 60 predicative syntax)
 ``` {r production, echo = FALSE}
-d1 <- read_csv('./data/results_8_exp1-post-prereg-pred.csv')
-d2 <- read_csv('./data/results_10_exp1-post-prereg-prenom.csv')
-d3 <- read_csv('./data/results_8_exp1-post-prereg-pred_batch2.csv')
-d4 <- read_csv('./data/results_10_exp1-post-prereg-prenom_batch2.csv')
-x <- rbind(d1, d3)
-y <- rbind(d2, d4)
-d_prod <- rbind(x, y)
+d_prod <- rbind( rbind( read_csv('./data/results_8_exp1-post-prereg-pred.csv'), 
+                        read_csv('./data/results_10_exp1-post-prereg-prenom.csv')) , 
+                 rbind(  read_csv('./data/results_8_exp1-post-prereg-pred_batch2.csv'),
+                         read_csv('./data/results_10_exp1-post-prereg-prenom_batch2.csv')) )
 
 d_prod_filt <- d_prod %>% 
   filter(grepl("eng", languages, ignore.case = T)) %>%
@@ -254,17 +251,17 @@ We calculate a Bayes Factor on the posterior subordinate response proportions be
 We set a uniform prior on the subordinate response proportion (Beta distribution with a = 1, b = 1) and an uninformative default student t-distribution prior on the random effects.
 ``` {r production bayes}
  # include priors on random effects
+contrasts(d_prod_main_responseCat$syntax) = matrix(c(0,1))
 get_prior(resp_cat ~ 0 + syntax + (1 + syntax || submission_id) + (1 + syntax ||picture),
           data=d_prod_main_responseCat, family= "bernoulli")
 # uniform prior 
 #set random effect priors : syntax effects also between 0 and 1 
-Prior <- c(set_prior("beta(1,1)", class = "b", lb = 0, ub = 1),
- set_prior("student_t(3,0,10)", class = "sd"))
+Prior <- set_prior("beta(1,1)", class = "b", lb = 0, ub = 1)
+ #set_prior("student_t(3,0,10)", class = "sd"))
 
-b.lm.w_prior <- brm(resp_cat ~   0 + syntax + (1 + syntax || submission_id)+ 
-                   (1 + syntax || picture), 
-                  data = d_prod_main_responseCat, family = "bernoulli",
-                  prior = Prior, sample_prior = T)
+b.lm.w_prior <- brm(resp_cat ~   0 + syntax , 
+                  data = d_prod_main_responseCat, family = "bernoulli")
+               #   prior = Prior, sample_prior = T)
 
 summary(b.lm.w_prior)
 # nullhypothesis that proportions do not differ
@@ -273,6 +270,42 @@ h1_1 <- hypothesis(b.lm.w_prior, "0 - syntaxpredicative = 0 + syntaxprenominal")
 print(h1_1, digits = 3)
 # probability of alternative hypothesis given the data 
 1/h1_1$hypothesis$Evid.Ratio
+```
+``` {r}
+# altering the prior on random effects to peak more
+Prior2 <- c(set_prior("beta(1,1)", class = "b", lb = 0, ub = 1),
+ set_prior("student_t(5,0,10)", class = "sd"))
+
+b.lm.w_prior2 <- brm(resp_cat ~   0 + syntax + (1 + syntax || submission_id)+ 
+                   (1 + syntax || picture), 
+                  data = d_prod_main_responseCat, family = "bernoulli",
+                  prior = Prior2, sample_prior = T)
+
+summary(b.lm.w_prior2)
+# nullhypothesis that proportions do not differ
+h1_2 <- hypothesis(b.lm.w_prior2, "0 - syntaxpredicative = 0 + syntaxprenominal") 
+
+print(h1_2, digits = 3)
+# probability of alternative hypothesis given the data 
+1/h1_2$hypothesis$Evid.Ratio
+```
+``` {r}
+# altering the prior on random effects to half-Cauchy distribution (t-distribution with df = 1)
+Prior3 <- c(set_prior("beta(1,1)", class = "b", lb = 0, ub = 1),
+ set_prior("student_t(1,0,20)", class = "sd"))
+
+b.lm.w_prior3 <- brm(resp_cat ~   0 + syntax + (1 + syntax || submission_id)+ 
+                   (1 + syntax || picture), 
+                  data = d_prod_main_responseCat, family = "bernoulli",
+                  prior = Prior3, sample_prior = T)
+
+summary(b.lm.w_prior3)
+# nullhypothesis that proportions do not differ
+h1_3 <- hypothesis(b.lm.w_prior3, "0 - syntaxpredicative = 0 + syntaxprenominal") 
+
+print(h1_3, digits = 3)
+# probability of alternative hypothesis given the data 
+1/h1_3$hypothesis$Evid.Ratio
 ```
 
 ## Comparison Class Inference Experiment

@@ -1,0 +1,249 @@
+# power analysis 
+
+``` {r}
+library(tidyverse)
+library(brms)
+library(broom)
+```
+
+# NP production experiment
+``` {r}
+# read data
+
+#set.seed(1)
+
+# number of participants / trials
+#nsubj <- 50
+
+# numer of items 
+#nitem <- 6
+#items <- rep(LETTERS[1:nitem], nsubj)
+
+# observed items per participant : sample(items, size = 6, replace = F)
+# means of the bernoulli distributions
+#theta_subj <- 0.7
+#theta_pred <- 0.5
+
+# how to get participants and items
+
+#d <-
+#  tibble( syntax = rep(c("subj", "pred"), each = nsubj*nitem),
+#          items = rep(items,2),
+#          subjects = rep( rep(letters[1:nsubj], each = nitem ), 2),
+#          subjeff = rep(rep(rnorm(nsubj, 0, 2), each = nitem), 2),
+#          itemeff = rep(rep(rnorm(nitem, 0, 1), each = nsubj), 2) ) %>%
+#  mutate( syntax = ifelse(syntax == "subj", -1, 1 ),
+          
+#          y = ifelse(syntax == -1, 
+#                    rbernoulli(n, p = theta_subj), #+ subjeff + itemeff,
+#                     rbernoulli(n, p = theta_pred) ))#+ subjeff + itemeff )) 
+
+
+#d <- 
+#  tibble( syntax = rep(c("subj", "pred"), each = nsubj*nitem),
+#          items = rep(items,2),
+#          subjects = rep( rep(letters[1:nsubj], each = nitem ), 2)) %>%
+#  mutate( syntax = ifelse(syntax == "subj", -1, 1 ),
+#          y = ifelse(syntax == -1, 
+#                     rbernoulli(n, p = theta_subj),
+#                     rbernoulli(n, p = theta_pred))) %>% # TRUE corresponds to subordinate response
+#  mutate( resp = ifelse(y == T, 1, 0))
+#glimpse(d)
+# define the parameters
+# answers from binomial distribution
+
+# get priors
+#get_prior( data = d,
+ #          family = binomial,         y ~ 0 + syntax)
+
+#fit <- brm( resp ~ 0 + syntax, data = d, family = "bernoulli", prior = prior(beta(1,1), class = b),
+ #          seed = 1)
+```
+
+``` {r}
+sim_d_and_fit <- function(seed, n) {
+  
+  
+  set.seed(seed)
+  
+  d <-
+     tibble( syntax = rep(c("subject", "predicate"), each = n)) %>%
+        
+  mutate( y = ifelse(syntax == "subject", 
+                     rbernoulli(n, p = 0.7),
+                     rbernoulli(n, p = 0.5))) %>%
+    mutate( resp = ifelse(y == T, 1, 0))
+  
+  contrasts(d$syntax) = matrix(c(-1, 1))
+  
+  update(fit,
+         newdata = d, 
+         seed = seed) %>% 
+    tidy(prob = .95) %>% 
+    filter(term == "b_syntax")
+}
+```
+
+``` {r}
+n_sim = 100
+s <-
+  tibble(seed = 1:n_sim) %>% 
+  mutate(tidy = map(seed, sim_d_and_fit, n = 300)) %>% 
+  unnest(tidy)
+```
+
+``` {r}
+s %>% 
+  ggplot(aes(x = seed, y = estimate, ymin = lower, ymax = upper)) +
+  geom_hline(yintercept = c(0, .5), color = "white") +
+  geom_pointrange(fatten = 1/2) +
+  labs(x = "seed (i.e., simulation index)",
+       y = expression(beta[1]))
+
+# 300 DATA POINTS PER CONDITION GIVE POWER 1
+s %>% mutate(check = ifelse(lower > 0, 1, 0)) %>% 
+  summarise(power = mean(check))
+```
+
+``` {r}
+fit2 <- brm( resp ~ 0 + intercept + syntax, data = d, family = "bernoulli", prior = prior(beta(1,1), class = b), seed = 1)
+```
+
+
+
+
+``` {r}
+# number of observations
+set.seed(2)
+nr <- 1500
+data4 <-
+  tibble(syntax     = rep(c("subject", "predicate"), each = nr)) %>% 
+  mutate( syntax = factor(syntax, levels = c("subject", "predicate")),
+          y = ifelse(syntax == "subject", 
+                            rbernoulli(nr, p = 0.7),
+                            rbernoulli(nr, p = 0.5 ))) %>%
+  mutate(resp_cat = ifelse( y == T, 1, 0))
+
+contrasts(data4$syntax) = matrix(c(0,1))
+
+glimpse(data2)
+
+Prior <- set_prior("beta(1,1)", class = "b", lb = -1, ub = 1)
+
+fit2_data3 <-
+  brm(data = data3,
+      family = bernoulli,
+      resp_cat ~  syntax
+  
+     )
+summary(fit2_data3)
+
+sim_d_and_fit <- function(seed, n) {
+  
+  
+  set.seed(seed)
+  
+  di <-
+    tibble(syntax     = rep(c("subject", "predicate"), each = nr)) %>% 
+  mutate( syntax = factor(syntax, levels = c("subject", "predicate")),
+          y = ifelse(syntax == "subject", 
+                            rbernoulli(nr, p = 0.7),
+                            rbernoulli(nr, p = 0.5 ))) %>%
+  mutate(resp_cat = ifelse( y == T, 1, 0))
+
+contrasts(data$syntax) = matrix(c(0,1))
+
+  
+  update(fit2_data3,
+         newdata = di, 
+         seed = seed) %>% 
+    tidy(prob = .95) 
+}
+```
+
+``` {r}
+n_sim = 100
+s6 <-
+  tibble(seed = 1:n_sim) %>% 
+  mutate(tidy = map(seed, sim_d_and_fit, n = 1200)) %>% 
+  unnest(tidy)
+```
+
+``` {r} 
+s6 %>% filter(term == "b_syntaxpredicate") %>% mutate(check = ifelse((upper < 0), 1, 0)) %>% 
+  summarise(power = mean(check))
+
+```
+
+``` {r}
+s2 %>% 
+  ggplot(aes(x = seed, y = estimate, ymin = lower, ymax = upper)) +
+  geom_hline(yintercept = c(0, .5), color = "white") +
+  geom_pointrange(fatten = 1/2) +
+  labs(x = "seed (i.e., simulation index)",
+       y = expression(beta[1]))
+```
+
+# Rating study 
+``` {r}
+n = 100
+my_norm <- function(n, mu, sd, lower, upper) { x<- rnorm(n, mu, sd); while(any(x<lower | x>upper)) { x <- rnorm(n = n, mean = mu, s = sd) }; return(x)}
+
+data_rating <- tibble( syntax = rep(c("subject", "predicate"), each = n),
+                       NP = rep(c("basic", "sub"),  n)) %>% 
+  mutate(syntax = ifelse(syntax == "subject", -1, 1),
+         NP = ifelse(NP == "basic", -1, 1),
+         y = ifelse( NP == 1, 
+                     ifelse( syntax == 1,
+                             my_norm(n, 55, 10, 0, 100),
+                             my_norm(n, 80, 10, 0, 100)),
+                     my_norm(n, 85, 8, 0, 100)))
+
+glimpse(data_rating)
+
+set.seed(150)
+get_prior(data = data_rating,
+         family = gaussian,
+         y ~ 0 + intercept + syntax*NP)
+Prior <- c(set_prior("normal(0, 30)", class = "b"), set_prior("student_t(3, 10, 5)", class = "sigma"))
+
+fit_rating <- brm( y ~ 0 + intercept + syntax*NP,
+                   family = gaussian,
+                   data = data_rating,
+                   prior = Prior,
+                   sample_prior = T,
+                   seed = 150)
+```
+
+``` {r}
+sim_rating_and_fit <- function(seed, n) {
+  
+  
+  set.seed(seed)
+  
+  di <-
+    tibble( syntax = rep(c("subject", "predicate"), each = n),
+                       NP = rep(c("basic", "sub"),  n)) %>% 
+  mutate(syntax = ifelse(syntax == "subject", -1, 1),
+         NP = ifelse(NP == "basic", -1, 1),
+         y = ifelse( NP == 1, 
+                     ifelse( syntax == 1,
+                             my_norm(n, 55, 10, 0, 100),
+                             my_norm(n, 80, 10, 0, 100)),
+                     my_norm(n, 85, 8, 0, 100)))
+  
+  update(fit_rating,
+         newdata = di, 
+         seed = seed) %>% 
+    tidy(prob = .95) %>% 
+    filter(term == "b_syntax:NP")
+}
+```
+
+```{r}
+n_sim = 100
+s3 <-
+  tibble(seed = 1:n_sim) %>% 
+  mutate(tidy = map(seed, sim_rating_and_fit, n = 100)) %>% 
+  unnest(tidy)
+```
