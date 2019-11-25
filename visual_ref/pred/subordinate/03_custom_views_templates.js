@@ -551,6 +551,11 @@ const custom_intro_view = function(config) {
           </div>
           <section class="magpie-text-container">
             <p class="magpie-view-text"> Thank you for taking part in our study. We are studying how people talk about things around them. The study will take about 7-9 minutes.<br /> <br />
+            <br/>
+            <p class="magpie-view-text" style="font-family:Courier New, Courier"> Please note: There will be multiple posted versions of this HIT (name:<b> Adjectives - 111</b>).
+            Please attempt only one HIT in this series. You will not be allowed to complete multiple HITs in this series. </br> </br>
+            </p>
+            <p class="magpie-view-text">
             By continuing, you are participating in an experiment being performed by cognitive scientists in the MIT Computational Psycholinguistics Lab. If you have questions about this research, please contact Polina Tsvilodub, at <a href="mailto:polinats@mit.edu">polinats@mit.edu</a>, or MH Tessler, at tessler@mit.edu. You must be at least 18 years old to participate. Your participation in this research is voluntary. You may decline to answer any or all of the following questions. You may decline further participation, at any time, without adverse consequences. Your anonymity is assured; the researchers who have requested your participation will not receive any personal information about you.
              </p>
           </section>

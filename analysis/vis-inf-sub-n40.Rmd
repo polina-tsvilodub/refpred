@@ -16,8 +16,8 @@ library(lmerTest)
 ```
 
 ``` {r}
-d_infer <- rbind( read_csv('../data/results_17_inf-pred-sub.csv'), 
-                        read_csv('../data/results_20_inf-prenom-sub.csv')) 
+d_infer <- rbind( read_csv('../data/results_17_inf-pred-sub_clean.csv'), 
+                        read_csv('../data/results_20_inf-prenom-sub_clean.csv')) 
 
 d_infer_main <- d_infer %>% mutate(context = factor(pic_spec, levels = c(0, 1), 
                                        labels = c("basic-level parade", 
@@ -40,7 +40,7 @@ d_infer_main_responseCat <- d_infer_main %>%
     response_num = ifelse(response_cat == "sub", 0, 1),
     response_label = "basic"
   )
-  
+write_csv(d_infer_main_responseCat, '../data/categorizedResps_full.csv')  
 ```
 
 ``` {r}
