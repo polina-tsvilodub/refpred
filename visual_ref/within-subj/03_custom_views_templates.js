@@ -90,6 +90,9 @@ const custom_forced_choice = function(config, startingTime) {
     CT: 0,
     trials: config.trials,
     render: function(CT, magpie, startingTime) {
+      jQuery(document).ready(function() {
+        jQuery(this).scrollTop(0);
+      });
       $("main").html(`<div class='magpie-view'>
       <section class="magpie-text-container">
         <p class="magpie-view-question">${config.data[CT].context}</p>
