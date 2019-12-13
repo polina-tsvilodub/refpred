@@ -16,7 +16,7 @@ d_infer <- read_csv('./data/results_30_prereg-cc-inf.csv')
 ``` {r filter}
 # exclude participants who report difficulties 
 d_infer %>% select(submission_id, comments, problems) %>% distinct() %>% View()
-# d_infer <- subset(d_infer, !(submission_id %in% c(....)))
+d_infer <- subset(d_infer, !(submission_id %in% c(1438, 1515)))
 
 # exclude data from non-native English speakers and those where the language information is missing
 d_infer %>% distinct(languages)
@@ -43,6 +43,7 @@ d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_
 ``` {r categorization}
 d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")| 
                                           (trial_name == "custom_main_text2")) %>%
+  filter(submission_id != 1548) %>% filter(submission_id != 1549) %>%
   mutate(context = factor(pic_spec, levels = c(0, 1), 
                           labels = c("basic", 
                                      "subordinate")),
@@ -54,14 +55,21 @@ d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
 
 # categorize responses
 d_infer_main %>% distinct(response) %>% View()
-d_infer_main_responseCat <- d_infer_main %>%
+# exclude invalid responses 
+d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c("that man is big", "that's small boy", "that is big one", "that's a small doberman",
+                                                                      "that bird compare small", "that boy is small", "me is big", "but some one small", "that pug small",
+                                                                      "you are small", "beauty for fish", "yes", "aim", "growth", "honest", "medicine", "heathy", "dogs name", "trees name",
+                                                                      "big", "tall", "small", "cute", "good", "bushes",
+                                                                      "why it in land", "what is this flower", "fish nose", "labrador")))
+d_infer_main_responseCat <- d_infer_valid %>%
   rowwise() %>%
   mutate(  
     response_cat =
       ifelse( # do be extended dependent on responses provided
-        tolower(response) %in% c("birds", "bird", "dogs", "fish", "flowers", 
-                                 "flower", "trees","tree", "animal",
-                                 "fishes", "dog", "plant"), "basic", "subordinate"),
+        tolower(response) %in% c("birds", "bird", "dogs", "fish", "flowers", "birds in the sky", "big dogs", "fower", "tress", "things", "objects", "dogs.", "dogd",
+                                 "burds", "dogs that we see", "fish that we see", "birds that we see",
+                                 "flower", "trees","tree", "animal", "the other birds", "the other dogs", "digs", "treees", "weeds", "small flowers", "fishs",
+                                 "fishes", "dog", "large dogs", "giant trees", "breeds", "plant", "variety of dogs", "long trees"), "basic", "subordinate"),
     
     response_num = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
@@ -75,7 +83,7 @@ d_infer_main_responseCat <- d_infer_main_responseCat %>%
   mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
          NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
          NP_sub = ifelse(NP == "subordinate", 1, 0),
-         context_sub = ifelse(context == "subordinate parade", 1, 0))
+         context_sub = ifelse(context == "subordinate", 1, 0))
 ```
 
 ``` {r proportions plot}
@@ -85,7 +93,9 @@ d_infer_main_responseCat %>%
   group_by( context, NP, condition) %>%
   tidyboot_mean(column = response_num) %>% ungroup() %>% 
   mutate(condition = factor(condition, levels = c("prenominal",  "predicative"), 
-                            labels = c("Predicate",  "Subject"))) %>%
+                            labels = c("Predicate",  "Subject"))) -> d_infer_main_responseCat.bs
+
+d_infer_main_responseCat.bs %>%
   ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(bar.width), width = bar.width) +
   geom_linerange(position = position_dodge(bar.width)) + 
@@ -108,20 +118,21 @@ lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub | submission_id) + 
+                        syntax_contr:NP_sub:context_sub || submission_id) + 
                         (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub | item), 
+                        syntax_contr:NP_sub:context_sub || item), 
                       data = d_infer_main_responseCat, 
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                   )
-summary(lm.infer.fit)
+summary(lm.infer.fit) # full model with (deficient)
+summary(lm.infer.fit2)
 ```
 
 ``` {r brm model}
@@ -132,20 +143,21 @@ lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
                         syntax_contr:NP_sub:context_sub +
-                        (1 + csyntax_contr + NP_basic + NP_sub + context_sub  + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        context_sub:NP_basic + context_sub:NP_sub +
-                        syntax_contr:context_sub +
-                        syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub | submission_id) + 
                         (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub | item), 
+                        syntax_contr:NP_sub:context_sub || submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub || item), 
                       data = d_infer_main_responseCat, 
-                      family = "bernoulli" )
+                      family = "bernoulli",
+                      cores = 4)
 summary(lm.b.infer.fit)
 ```
 
@@ -162,9 +174,9 @@ d_infer_contextSub <- d_infer_main_responseCat %>%
 lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub | submission_id) + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
                         (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub | item), 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
                       data = d_infer_contextBasic, 
                       family = "binomial",
                       REML = F,
@@ -175,16 +187,41 @@ lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub 
 lm.infer.context.sub <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub | submission_id) + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
                         (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub | item), 
-                        data = d_infer_contextSub
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
+                        data = d_infer_contextSub,
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+summary(lm.infer.context.basic)
+summary(lm.infer.context.sub)
 
+b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
+                      data = d_infer_contextBasic, 
+                      family = "bernoulli",
+                      cores = 4)
+b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
+                        data = d_infer_contextSub,
+                      family = "bernoulli",
+                     cores = 4)
+summary(b.context.basic)
+summary(b.context.sub)
+```
+
+``` {r}
 # subset by NP
 d_infer_contextBasic_sub <- d_infer_contextBasic %>%
   filter(NP == "subordinate")
