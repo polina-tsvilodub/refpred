@@ -77,14 +77,6 @@ d_infer_main_responseCat <- d_infer_valid %>%
 
 ```
 
-``` {r}
-# explicit numeric coding to improve model convergence 
-d_infer_main_responseCat <- d_infer_main_responseCat %>%
-  mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
-         NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
-         NP_sub = ifelse(NP == "subordinate", 1, 0),
-         context_sub = ifelse(context == "subordinate", 1, 0))
-```
 
 ``` {r proportions plot}
 # plot
@@ -104,9 +96,18 @@ d_infer_main_responseCat.bs %>%
   facet_grid(~context)  
 
 ```
-
+``` {r}
+# explicit numeric coding to improve model convergence 
+d_infer_main_responseCat <- d_infer_main_responseCat %>%
+  mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
+         NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
+         NP_sub = ifelse(NP == "subordinate", 1, 0),
+         context_sub = ifelse(context == "subordinate", 1, 0))
+```
 
 ``` {r lmer}
+# random effects correlation must be set to 0 to estimate the model
+# significant effect of context and sub NP
 lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
@@ -131,12 +132,13 @@ lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                   )
-summary(lm.infer.fit) # full model with (deficient)
-summary(lm.infer.fit2)
+summary(lm.infer.fit) # full model 
+
 ```
 
 ``` {r brm model}
 # Bayesian full model
+# significant effect of sub NP and context
 lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
@@ -157,7 +159,8 @@ lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                         syntax_contr:NP_sub:context_sub || item), 
                       data = d_infer_main_responseCat, 
                       family = "bernoulli",
-                      cores = 4)
+                      cores = 4,
+                      control = list(adapt_delta = 0.9)) # otherwise there are divergent chains
 summary(lm.b.infer.fit)
 ```
 
@@ -171,6 +174,7 @@ d_infer_contextSub <- d_infer_main_responseCat %>%
   filter(context == "subordinate")
 
 # lmer analysis 
+# does not converge 
 lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + 
@@ -183,7 +187,7 @@ lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub 
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
-
+# converges 
 lm.infer.context.sub <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + 
@@ -199,6 +203,8 @@ lm.infer.context.sub <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub +
 summary(lm.infer.context.basic)
 summary(lm.infer.context.sub)
 
+# bayesian models of separate contexts
+# basic context
 b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + 
@@ -208,6 +214,9 @@ b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  +
                       data = d_infer_contextBasic, 
                       family = "bernoulli",
                       cores = 4)
+summary(b.context.basic) 
+
+# sub context
 b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + 
@@ -217,19 +226,20 @@ b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub +
                         data = d_infer_contextSub,
                       family = "bernoulli",
                      cores = 4)
-summary(b.context.basic)
+
 summary(b.context.sub)
 ```
 
 ``` {r}
-# subset by NP
+# basic context, subset by NP
 d_infer_contextBasic_sub <- d_infer_contextBasic %>%
   filter(NP == "subordinate")
 d_infer_contextBasic_basic <- d_infer_contextBasic %>%
-  filter(NP = "basic")
+  filter(NP == "basic")
 d_infer_contextBasic_one <- d_infer_contextBasic %>% 
   filter(NP == "one")
 
+# these model should all run 
 lm.basic.sub <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
@@ -257,7 +267,10 @@ lm.basic.one <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+```
 
+``` {r}
+# subordinate context, subset by NP
 d_infer_contextSub_sub <- d_infer_contextSub %>%
   filter(NP == "subordinate")
 d_infer_contextSub_basic <- d_infer_contextSub %>%
@@ -299,59 +312,121 @@ lm.sub.one <- glmer(response_num ~ syntax_contr +
 d_infer_subsetNP <- d_infer_main_responseCat %>%
   filter(NP != "one")
 d_infer_subsetNP <- d_infer_subsetNP %>%
-  mutate(NP_treatment = ifelse(NP == "subordinate", 1, 0))
+  mutate(NP_treatment = ifelse(NP == "subordinate", 1, 0)) # NP treatment coded, basic level - reference level
 
+# model cannot be estimated with correlating random effects
+# converges, significant effect of sub NP and sub context
 lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_sub  + 
                         syntax_contr:NP_treatment +
-                        context_sub:NP_treatment 
+                        context_sub:NP_treatment +
                         syntax_contr:context_sub +
                         syntax_contr:NP_treatment:context_sub +
                         (1 + syntax_contr + NP_treatment + context_sub  + 
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub | submission_id) + 
+                        syntax_contr:NP_treatment:context_sub || submission_id) + 
                         (1 + syntax_contr + NP_treatment + context_sub  + 
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub  | item), 
-                      data = d_infer_main_responseCat, 
+                        syntax_contr:NP_treatment:context_sub  || item), 
+                      data = d_infer_subsetNP, 
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+summary(lm.infer.subset)
+
+# bayesian full model without 'one'
+
+b.infer.subset <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        context_sub:NP_treatment +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_treatment:context_sub +
+                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        context_sub:NP_treatment +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_treatment:context_sub || submission_id) + 
+                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        context_sub:NP_treatment +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_treatment:context_sub  || item), 
+                      data = d_infer_subsetNP, 
+                      family = "bernoulli",
+                      control = list(adapt_delta = 0.9))
+summary(b.infer.subset)
+```
+
+``` {r}
+
 # subset by context
 d_subset_contextBasic <- d_infer_subsetNP %>%
   filter(context == "basic")
 d_subset_contextSub <- d_infer_subsetNP %>%
   filter(context == "subordinate")
-# similar subsets and analyses as above will be performed 
+
+# full model does not converge, random effects must be set to 0  
+# significant effect of NP
 lm.subset.context.basic <- glmer(response_num ~ syntax_contr + NP_treatment  + 
                         syntax_contr:NP_treatment + 
                         (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment | submission_id) + 
+                        syntax_contr:NP_treatment || submission_id) + 
                         (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment | item), 
+                        syntax_contr:NP_treatment || item), 
                       data = d_subset_contextBasic, 
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+summary(lm.subset.context.basic)
+
+# converges, significant effect of NP
 lm.subset.context.sub <- glmer(response_num ~ syntax_contr + NP_treatment  + 
                         syntax_contr:NP_treatment + 
                         (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment | submission_id) + 
+                        syntax_contr:NP_treatment || submission_id) + 
                         (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment | item), 
+                        syntax_contr:NP_treatment || item), 
                       data = d_subset_contextSub, 
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+
+summary(lm.subset.context.sub)
+
+# bayesian model of sub context without 'one'
+b.subset.context.sub <- brm(response_num ~ syntax_contr + NP_treatment  + 
+                        syntax_contr:NP_treatment + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment || submission_id) + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment || item), 
+                      data = d_subset_contextSub, 
+                      family = "bernoulli")
+summary(b.subset.context.sub)
+# bayesian model of basic context without 'one'
+b.subset.context.basic <- brm(response_num ~ syntax_contr + NP_treatment  + 
+                        syntax_contr:NP_treatment + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment || submission_id) + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment || item), 
+                      data = d_subset_contextBasic, 
+                      family = "bernoulli")
+summary(b.subset.context.basic)
+```
+
+``` {r}
+
+# subset by NP
 d_subset_contextSub_sub <- d_subset_contextSub %>%
   filter(NP == "subordinate")
 d_subset_contextSub_basic <- d_subset_contextSub %>%
@@ -359,6 +434,7 @@ d_subset_contextSub_basic <- d_subset_contextSub %>%
 d_subset_contextSub_one <- d_subset_contextSub %>%
   filter(NP == "one")
 
+# these models should run 
 lm.subset.sub.sub <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
@@ -386,7 +462,7 @@ lm.subset.sub.one <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
-
+# basic context
 d_subset_contextBasic_sub <- d_subset_contextBasic %>%
   filter(NP == "subordinate")
 d_subset_contextBasic_basic <- d_subset_contextBasic %>%
