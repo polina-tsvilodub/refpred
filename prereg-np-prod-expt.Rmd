@@ -1,6 +1,6 @@
 # NP production experiment analysis
 
-``` {r}
+``` {r libs}
 # libraries
 library(tidyverse)
 library(tidyboot)
@@ -8,24 +8,23 @@ library(brms)
 library(lmerTest)
 ```
 
-``` {r}
+``` {r data}
 # read the data
-d_prod <- rbind( rbind(read_csv('./data/results_8_exp1-post-prereg-pred.csv'),
-                       read_csv('./data/results_8_exp1-post-prereg-pred_batch2.csv')), 
-                  rbind(read_csv('./data/results_10_exp1-post-prereg-prenom.csv'),
-                        read_csv('./data/results_10_exp1-post-prereg-prenom_batch2.csv')
-                        )) 
+d_prod <- rbind( read_csv('./data/results_28_prereg-NP-prod-subj.csv'),
+                 read_csv('./data/results_29_prereg-NP-prod-pred.csv')) 
+d_clean <- 
+                  
 ```
 
-``` {r}
+``` {r warmups}
 # exclude participants who report difficulties 
 d_prod %>% select(submission_id, comments, problems) %>% distinct() %>% View()
-# d_prod <- subset(d_prod, !(submission_id %in% c(....)))
+d_prod <- subset(d_prod, !(submission_id %in% c(1214)))
 
 # exclude data from non-native English speakers and those where the language information is missing
 d_prod %>% distinct(languages)
 d_prod_filt <- d_prod %>% 
-  filter(grepl("eng", languages, ignore.case = T)) %>%
+  filter(grepl("eng", languages, ignore.case = T)) %>% # excluded 14 participants
   select(submission_id, trial_name, trial_number, attempts, size, item, botresponse, response,
          condition,  picture, target) %>% 
   mutate(size = factor(size), syntax = factor(condition))
@@ -33,13 +32,18 @@ d_prod_filt <- d_prod %>%
 # get participants who need more than 4 attempts per warmup
 d_prod_warmup <- d_prod_filt %>% 
   filter( (trial_name == "warmup1") | (trial_name == "warmup2"))
-d_prod_warmup <- d_prod_warmup %>% group_by(submission_id) %>% 
+d_prod_warmup1 <- d_prod_warmup %>% group_by(submission_id) %>% 
   filter( attempts > 4)
 # exclude those participants
-d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup, by = c("submission_id"))
+d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
 ``` 
 
-```{r}
+``` {r}
+# 2 participants too many in prenominal condition, excluding last 2 : 1299, 1300
+d_prod_filt <- d_prod_filt %>% filter(!(submission_id %in% c(1299, 1300)))
+```
+
+```{r filtering}
 # main trials 
 d_prod_main <- d_prod_filt %>% filter((trial_name == "main1") | (trial_name == "main2")) %>%
   select(submission_id, trial_number, trial_name, response, size, item, syntax, picture, target)
@@ -47,7 +51,7 @@ d_prod_main <- d_prod_filt %>% filter((trial_name == "main1") | (trial_name == "
 # look at the responses
 d_prod_main %>% distinct(response) %>% View()
 # exlclude invalid responses 
-d_prod_main_valid <- subset(d_prod_main, !(tolower(response) %in% c("rose", "duck", "pigeon", "rat"))) 
+d_prod_main_valid <- subset(d_prod_main, !(tolower(response) %in% c("last", "oak", "finch", "duck", "lavender", "salmon", "goldfinch", "dahlia", "poetry", "one", "lablador", "geony" ))) 
 
 # categprize responses
 d_prod_main_responseCat <- d_prod_main_valid %>%
@@ -56,22 +60,27 @@ d_prod_main_responseCat <- d_prod_main_valid %>%
     response_cat =
       ifelse(
         # to be extended depending on participants' responses
-        tolower(response) %in% c("bird", "birds", "dog", "dogs", "fish","fishes",
-                                 "flower", "flowers", "tree", "trees", "animal", "plant", "plants", "one plant", "weed", "weeds"),
+        tolower(response) %in% c("bird", "birds", "dog", "dogs", "dig", "dogt", "great dog", "fish","fishes",
+                                 "flower", "flowers", "tree", "trees", "animal", "plant", "plants", "weed", "weeds"),
         "basic", "sub"),
     resp_cat = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
   )
 ``` 
 
-```{r}
+``` {r}
+# predicative : 95
+# prenominal 94 
+```
+
+```{r plot}
 # plot
 d_prod_main_responseCat %>%
   group_by(syntax, response_label) %>%
   tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions 
   ungroup() %>%
   mutate(syntax = factor(syntax, 
-                         levels = c("prenominal", "predicative"),
+                         levels = c("prenominal", "predicative"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
                          labels= c("Predicate NP", "Subject NP"))
   ) %>% 
   ggplot(aes(x = syntax, fill = syntax,
@@ -83,51 +92,32 @@ d_prod_main_responseCat %>%
   ggtitle("The proportion of basic-level responses by syntactic condition")
 ```
 
-``` {r}
+``` {r contrasts}
 # contrast coding of syntax 
-# subject NP -1. predicate NP 1, explicit numeric coding to avoid unpredicted bahaviour due to factors
+# subject NP -0.5. predicate NP 0.5, explicit numeric coding to avoid unpredicted bahaviour due to factors
 d_prod_main_responseCat <- d_prod_main_responseCat %>%
-  mutate(syntax_num = ifelse( syntax == "prenominal", 0.5, -0.5),
-         size = ifelse(size == "big", -1, 1))
+  mutate(syntax_contr = ifelse( syntax == "prenominal", 0.5, -0.5),
+         size = ifelse(size == "big", -0.5, 0.5)) # target size contrast coding
 
 ```
 
 ``` {r lmer}
-# exploratory frequentist analysis
-lm.prod.fit <- glmer(resp_cat ~ 0 + syntax + (1 + syntax | submission_id) +
-                      (1 + syntax | picture), 
+# frequentist analysis
+lm.prod.fit <- glmer(resp_cat ~  syntax_contr + (1 | submission_id) +
+                      (1  + syntax_contr | target), 
                     data = d_prod_main_responseCat, 
                     family = "binomial",
                     REML = F,
                     control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                     )
-
-
-lm.prod.fit.simple <- glm(resp_cat ~  syntax_num, 
-                    data = d_prod_main_responseCat , 
-                    family = binomial(link = "identity")
-                    )
-
-
-summary(lm.prod.fit.simple)
-
-head()
-contrasts(d_prod_main_responseCat$syntax) <- c(0, 1)
-```
-```{r}
-x <- 0.65*0.5 -0.5
-exp(x)/(1 + exp(x))
-
-d_prod_main_responseCat %>%
-  group_by(syntax) %>%
-  summarize(m = mean(resp_cat))
+summary(lm.prod.fit)
 ```
 
 ``` {r lmer w size}
 # exploratory analysis with the main effect of target size
-lm.prod.w.size <- glmer(resp_cat ~ 0 + syntax*size + (1 + syntax*size | submission_id) +
-                      (1 + syntax*size | target), 
+lm.prod.w.size <- glmer(resp_cat ~ syntax_contr*size + (1 + size | submission_id) +
+                      (1 + syntax_contr*size | target), 
                     data = d_prod_main_responseCat, 
                     family = "binomial",
                     REML = F,
@@ -136,32 +126,18 @@ lm.prod.w.size <- glmer(resp_cat ~ 0 + syntax*size + (1 + syntax*size | submissi
                     )
 summary(lm.prod.w.size)
 
-head(d_prod_main_responseCat)
 ```
 
 
 ``` {r brm}
 # Bayesian model
 
-# set priors
-Prior <- c(set_prior("beta(1,1)", lb=0, ub=1, class = "b")) # prior on random effects
-
 # full model
-b.prod.w.prior.dummy.noint <- brm( resp_cat ~  syntax , 
+b.prod.lm <- brm( resp_cat ~  syntax_contr + (1 | submission_id) +
+                      (1 + syntax_contr | target),
                     data = d_prod_main_responseCat, 
-                    family = binomial(link="identity"),
-                    prior=Prior,
-                    sample_prior = T,
+                    family = "bernoulli",
                     control=list(adapt_delta=0.95))
-summary(b.prod.w.prior.dummy)
+summary(b.prod.lm)
 ```
 
-``` {r}
-# nullhypothesis that proportions of basic-level responses do not differ
-h1 <- hypothesis(b.prod.w.prior.dummy, " -syntax =  syntax", class = "b") 
-
-print(h1, digits = 3)
-
-# alternative hypothesis given the posterior compared to the prior
-1/h1$hypothesis$Evid.Ratio
-```

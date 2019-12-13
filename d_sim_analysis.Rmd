@@ -1,0 +1,436 @@
+---
+title: "Untitled"
+author: "Polina Tsvilodub"
+date: "04 12 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(tidyboot)
+library(lme4)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r prod}
+data.sim <-
+  tibble(
+    syntax = rep( c("subj", "pred"), each = 60),
+    resp = c(rbinom(60, 1, 0.3), rbinom(60, 1, 0.5))
+  ) %>%
+  mutate(syntax = ifelse(syntax == "pred", -1, 1))
+data.sim %>% group_by(syntax) %>% tidyboot_mean(column = resp)
+fit.sim <- glm(resp ~  0 + syntax, data = data.sim, family = "binomial")
+summary(fit.sim)
+```
+```{r inf, echo=FALSE}
+# simulate inference data with normal dist
+d.n.sim.basic <- tibble(
+  resp = c(rnorm(180, 0.6, 0.05), # sub pred
+            rnorm(180, 0.9, 0.05), # sub subj
+            rnorm(180, 0.9, 0.05), # one pred
+            rnorm(180, 0.9, 0.05), # one subj
+            rnorm(180, 0.9, 0.05), # basic pred
+            rnorm(180, 0.9, 0.05)), # basic subj
+  NP = rep(c("sub", "one", "basic"), each=360),
+  syntax = rep(c("pred", "subj", "pred", "subj", "pred", "subj"), each = 180),
+  context = rep("basic", 1080)
+)
+d.n.sim.basic %>%
+  group_by(syntax, NP) %>%
+  summarize(m = mean(resp)) %>% # calculate proportion of basic-level labels in the different conditions 
+  ggplot(aes(x = syntax, fill = NP,
+             y = m)) +
+  geom_col(position = position_dodge(0.8)) +
+  labs( y = "Proportion of basic-level responses") +
+  ggtitle("The proportion of basic-level responses by syntactic condition")
+
+```
+
+``` {r}
+d.n.sim.basic.means <- d.n.sim.basic %>%
+  group_by(syntax, NP) %>%
+  summarize(m = mean(resp))
+d.n.sim.basic <- d.n.sim.basic %>%
+  mutate(syntax_contr = ifelse(syntax == "subj", 0.5, -0.5),
+         NP_sub = ifelse(NP == "sub", 1, 0),
+         NP_basic = ifelse(NP == "basic", 1, 0))
+lm.n.basic <- lm(resp ~ syntax_contr*NP_sub*NP_basic, data = d.n.sim.basic)
+summary(lm.n.basic)
+```
+``` {r}
+n.sim.int <- lm.n.basic$coefficients[["(Intercept)"]]
+n.sim.beta_syntax <- lm.n.basic$coefficients[["syntax_contr"]]
+n.sim.beta_npSub <- lm.n.basic$coefficients[["NP_sub"]]
+n.sim.beta_npBasic <- lm.n.basic$coefficients[["NP_basic"]]
+n.sim.beta_syntax_npSub <- lm.n.basic$coefficients[["syntax_contr:NP_sub"]]
+n.sim.beta_syntax_npBasic <- lm.n.basic$coefficients[["syntax_contr:NP_basic"]]
+n.sim.beta_syntax_npSub_npBasic <- lm.n.basic$coefficients[["syntax_contr:NP_sub:NP_basic"]]
+print(
+  paste(
+    "actual mean of ONE subj " ,  
+    d.n.sim.basic.means %>% filter(NP == "one", syntax == "subj") %>% pull(m),
+    "model prediction", 
+   ( n.sim.int + 0.5 * n.sim.beta_syntax)
+  )
+)
+print(
+  paste(
+    "actual mean of ONE pred" ,  
+    d.n.sim.basic.means %>% filter(NP == "one", syntax == "pred") %>% pull(m),
+    "model prediction", 
+   ( n.sim.int - 0.5 * n.sim.beta_syntax)
+  )
+)
+
+print(
+  paste(
+    "actual mean of BASIC subj" ,  
+    d.n.sim.basic.means %>% filter(NP == "basic", syntax == "subj") %>% pull(m),
+    "model prediction", 
+    (n.sim.int + 0.5 * n.sim.beta_syntax + n.sim.beta_npBasic + 0.5 * n.sim.beta_syntax_npBasic)
+  )
+)
+print(
+  paste(
+    "actual mean of BASIC pred" ,  
+    d.n.sim.basic.means %>% filter(NP == "basic", syntax == "pred") %>% pull(m),
+    "model prediction", 
+    (n.sim.int - 0.5 * n.sim.beta_syntax + n.sim.beta_npBasic - 0.5 * n.sim.beta_syntax_npBasic)
+  )
+)
+
+print(
+  paste(
+    "actual mean of SUB subj" ,  
+    d.n.sim.basic.means %>% filter(NP == "sub", syntax == "subj") %>% pull(m),
+    "model prediction", 
+    (n.sim.int + 0.5 * n.sim.beta_syntax + n.sim.beta_npSub + 0.5 * n.sim.beta_syntax_npSub)
+  )
+)
+print(
+  paste(
+    "actual mean of SUB pred" ,  
+    d.n.sim.basic.means %>% filter(NP == "sub", syntax == "pred") %>% pull(m),
+    "model prediction", 
+    (n.sim.int - 0.5 * n.sim.beta_syntax + n.sim.beta_npSub - 0.5 * n.sim.beta_syntax_npSub)
+  )
+)
+```
+
+
+
+``` {r}
+# subordinate context
+d.inf.sim.sub <- tibble(
+  resp = c(rnorm(180, 0.4, 0.05), # sub pred
+            rnorm(180, 0.4, 0.05), # sub subj
+            rnorm(180, 0.4, 0.05), # one pred
+            rnorm(180, 0.4, 0.05), # one subj
+            rnorm(180, 0.5, 0.05), # basic pred
+            rnorm(180, 0.8, 0.05)), # basic subj
+  NP = rep(c("sub", "one", "basic"), each=360),
+  syntax = rep(c("pred", "subj", "pred", "subj", "pred", "subj"), each = 180),
+  context = rep("sub", 1080))
+  
+d.inf.sim.sub %>%
+  group_by(syntax, NP) %>%
+  summarize(m = mean(resp)) %>% # calculate proportion of basic-level labels in the different conditions 
+  ggplot(aes(x = syntax, fill = NP,
+             y = m)) +
+  geom_col(position = position_dodge(0.8)) +
+  labs( y = "Proportion of basic-level responses") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  ggtitle("The proportion of basic-level responses by syntactic condition")
+```
+
+``` {r}
+d.inf.sim.sub.means <- d.inf.sim.sub %>%
+  group_by(syntax, NP) %>%
+  summarize(m = mean(resp))
+d.inf.sim.sub.means
+
+```
+
+```{r}
+d.inf.sim.sub <- d.inf.sim.sub %>%
+  mutate(syntax_contr = ifelse(syntax == "subj", 0.5, -0.5),
+         NP_sub = ifelse(NP == "sub", 1, 0),
+         NP_basic = ifelse(NP == "basic", 1, 0))
+lm.sub <- lm(resp ~ syntax_contr*NP_sub*NP_basic, 
+                data = d.inf.sim.sub)
+summary(lm.sub)
+lm.sub$coefficients
+```
+
+
+``` {r}
+sub.int <- lm.sub$coefficients[["(Intercept)"]]
+sub.beta_syntax <- lm.sub$coefficients[["syntax_contr"]]
+sub.beta_npSub <- lm.sub$coefficients[["NP_sub"]]
+sub.beta_npBasic <- lm.sub$coefficients[["NP_basic"]]
+sub.beta_syntax_npSub <- lm.sub$coefficients[["syntax_contr:NP_sub"]]
+sub.beta_syntax_npBasic <- lm.sub$coefficients[["syntax_contr:NP_basic"]]
+sub.beta_syntax_npSub_npBasic <- lm.sub$coefficients[["syntax_contr:NP_sub:NP_basic"]]
+print(
+  paste(
+    "actual mean of ONE subj " ,  
+    d.inf.sim.sub.means %>% filter(NP == "one", syntax == "subj") %>% pull(m),
+    "model prediction", 
+   ( sub.int + 0.5 * sub.beta_syntax)
+  )
+)
+print(
+  paste(
+    "actual mean of ONE pred" ,  
+    d.inf.sim.sub.means %>% filter(NP == "one", syntax == "pred") %>% pull(m),
+    "model prediction", 
+   ( sub.int - 0.5 * sub.beta_syntax)
+  )
+)
+
+print(
+  paste(
+    "actual mean of BASIC subj" ,  
+    d.inf.sim.sub.means %>% filter(NP == "basic", syntax == "subj") %>% pull(m),
+    "model prediction", 
+    (sub.int + 0.5 * sub.beta_syntax + sub.beta_npBasic + 0.5 * sub.beta_syntax_npBasic)
+  )
+)
+print(
+  paste(
+    "actual mean of BASIC pred" ,  
+    d.inf.sim.sub.means %>% filter(NP == "basic", syntax == "pred") %>% pull(m),
+    "model prediction", 
+    (sub.int - 0.5 * sub.beta_syntax + sub.beta_npBasic - 0.5 * sub.beta_syntax_npBasic)
+  )
+)
+
+print(
+  paste(
+    "actual mean of SUB subj" ,  
+    d.inf.sim.sub.means %>% filter(NP == "sub", syntax == "subj") %>% pull(m),
+    "model prediction", 
+    (sub.int + 0.5 * sub.beta_syntax + sub.beta_npSub + 0.5 * sub.beta_syntax_npSub)
+  )
+)
+print(
+  paste(
+    "actual mean of SUB pred" ,  
+    d.inf.sim.sub.means %>% filter(NP == "sub", syntax == "pred") %>% pull(m),
+    "model prediction", 
+    (sub.int - 0.5 * sub.beta_syntax + sub.beta_npSub - 0.5 * sub.beta_syntax_npSub)
+  )
+)
+```
+
+``` {r}
+# putting the context conditions  together 
+d.inf.sim.full <- rbind(d.n.sim.basic, d.inf.sim.sub)
+d.inf.sim.full %>%
+  group_by(syntax, NP, context) %>%
+  summarize(m = mean(resp)) %>% # calculate proportion of basic-level labels in the different conditions 
+  ggplot(aes(x = syntax, fill = NP,
+             y = m)) +
+  geom_col(position = position_dodge(0.8)) +
+  labs( y = "Proportion of basic-level responses") +
+  facet_wrap(~context)+
+  ggtitle("The proportion of basic-level responses by syntactic condition")
+```
+``` {r}
+# putting the context conditions  together 
+d.inf.sim.full <- rbind(d.n.sim.basic, d.inf.sim.sub)
+d.inf.sim.full %>%
+  group_by(syntax, NP, context) %>%
+  summarize(m = mean(resp)) %>% # calculate proportion of basic-level labels in the different conditions 
+  ggplot(aes(x = NP, fill = syntax,
+             y = m)) +
+  geom_col(position = position_dodge(0.8)) +
+  labs( y = "Proportion of basic-level responses") +
+  facet_wrap(~context)+
+  ggtitle("The proportion of basic-level responses by syntactic condition")
+```
+
+``` {r}
+d.inf.sim.full.means <- d.inf.sim.full %>%
+  group_by(syntax, NP, context) %>%
+  summarize(m = mean(resp))
+d.inf.sim.full.means
+
+```
+
+```{r}
+d.inf.sim.full <- d.inf.sim.full %>%
+  mutate(syntax_contr = ifelse(syntax == "subj", 0.5, -0.5),
+         context_contr = ifelse(context == "basic", 0.5, -0.5),
+         NP_sub = ifelse(NP == "sub", 1, 0),
+         NP_basic = ifelse(NP == "basic", 1, 0))
+
+lm.full <- lm(resp ~ syntax_contr + NP_sub + NP_basic + context_contr +
+                syntax_contr:NP_sub + syntax_contr:NP_basic + 
+                syntax_contr:context_contr +
+                NP_sub:context_contr + NP_basic:context_contr +
+                syntax_contr:NP_sub:context_contr +
+                syntax_contr:NP_basic:context_contr, 
+                data = d.inf.sim.full)
+summary(lm.full)
+lm.full$coefficients
+```
+```{r}
+# dummy coding context conditions
+
+d.inf.sim.full <- d.inf.sim.full %>%
+  mutate(syntax_contr = ifelse(syntax == "subj", 0.5, -0.5),
+         context_sub = ifelse(context == "sub", 1, 0),
+         NP_sub = ifelse(NP == "sub", 1, 0),
+         NP_basic = ifelse(NP == "basic", 1, 0))
+
+lm.full.dummy <- lm(resp ~ context_sub + syntax_contr + NP_sub + NP_basic + 
+                syntax_contr:NP_sub + syntax_contr:NP_basic + 
+                syntax_contr:context_sub +
+                NP_sub:context_sub + NP_basic:context_sub +
+                syntax_contr:NP_sub:context_sub +
+                syntax_contr:NP_basic:context_sub, 
+                data = d.inf.sim.full)
+summary(lm.full.dummy)
+lm.full.dummy$coefficients
+```
+
+``` {r}
+d.int <- lm.full.dummy$coefficients[["(Intercept)"]]
+d.beta_syntax <- lm.full.dummy$coefficients[["syntax_contr"]]
+d.beta_contextSub <- lm.full.dummy$coefficients[["context_sub"]]
+d.beta_npSub <- lm.full.dummy$coefficients[["NP_sub"]]
+d.beta_npBasic <- lm.full.dummy$coefficients[["NP_basic"]]
+d.beta_syntax_npSub <- lm.full.dummy$coefficients[["syntax_contr:NP_sub"]]
+d.beta_syntax_npBasic <- lm.full.dummy$coefficients[["syntax_contr:NP_basic"]]
+d.beta_syntax_context <- lm.full.dummy$coefficients[["context_sub:syntax_contr"]]
+d.beta_contextSub_npSub <- lm.full.dummy$coefficients[["context_sub:NP_sub"]]
+d.beta_contextSub_npBasic <- lm.full.dummy$coefficients[["context_sub:NP_basic"]]
+d.beta_syntax_contextSub_npSub <- lm.full.dummy$coefficients[["context_sub:syntax_contr:NP_sub"]]
+d.beta_syntax_contextSub_npBasic <- lm.full.dummy$coefficients[["context_sub:syntax_contr:NP_basic"]]
+```
+
+```{r}
+print(
+  paste(
+    "actual mean of subject ONE in basic context " ,  
+    d.inf.sim.full.means %>% filter(NP == "one", syntax == "subj", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+   d.int + 0.5 * d.beta_syntax
+  )
+)
+
+print(
+  paste(
+    "actual mean of predicate ONE in basic context" ,  
+    d.inf.sim.full.means %>% filter(NP == "one", syntax == "pred", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int - 0.5 * d.beta_syntax
+  )
+)
+
+print(
+  paste(
+    "actual mean of ONE in basic context " ,  
+    d.inf.sim.full.means %>% filter(NP == "one", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int 
+  )
+)
+print(
+  paste(
+    "actual mean of ONE in subordinate context " ,  
+    d.inf.sim.full.means %>% filter(NP == "one", context == "sub") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int + d.beta_contextSub
+  )
+)
+
+print(
+  paste(
+    "actual mean of subject BASIC in basic context" ,  
+    d.inf.sim.full.means %>% filter(NP == "basic", syntax == "subj", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+   d.int + 0.5 * d.beta_syntax + d.beta_npBasic + 0.5*d.beta_syntax_npBasic
+  )
+)
+print(
+  paste(
+    "actual mean of predicate BASIC in basic context" ,  
+    d.inf.sim.full.means %>% filter(NP == "basic", syntax == "pred", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+   d.int - 0.5 * d.beta_syntax + d.beta_npBasic - 0.5*d.beta_syntax_npBasic
+  )
+)
+print(
+  paste(
+    "actual mean of BASIC in basic context " ,  
+    d.inf.sim.full.means %>% filter(NP == "basic", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int + d.beta_npBasic
+  )
+)
+print(
+  paste(
+    "actual mean of BASIC in subordinate context " ,  
+    d.inf.sim.full.means %>% filter(NP == "basic", context == "sub") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int + d.beta_contextSub + d.beta_npBasic + d.beta_contextSub_npBasic
+  )
+)
+print(
+  paste(
+    "actual mean of subject SUB in basic context " ,  
+    d.inf.sim.full.means %>% filter(NP == "sub", syntax == "subj", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int + 0.5 * d.beta_syntax + d.beta_npSub + 0.5*d.beta_syntax_npSub
+  )
+)
+print(
+  paste(
+    "actual mean of predicate SUB in basic context" ,  
+    d.inf.sim.full.means %>% filter(NP == "sub", syntax == "pred", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+   d.int - 0.5 * d.beta_syntax + d.beta_npSub - 0.5*d.beta_syntax_npSub
+  )
+)
+print(
+  paste(
+    "actual mean of SUB in basic context " ,  
+    d.inf.sim.full.means %>% filter(NP == "sub", context == "basic") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int  + d.beta_npSub
+  )
+)
+print(
+  paste(
+    "actual mean of SUB in subordinate context " ,  
+    d.inf.sim.full.means %>% filter(NP == "sub", context == "sub") %>% pull(m) %>% mean(),
+    "model prediction", 
+    d.int + d.beta_contextSub + d.beta_npSub + d.beta_contextSub_npSub
+  )
+)
+
+print(
+  paste(
+    "actual mean of subject SUB in basic context" ,  
+    d.inf.sim.full.means %>% filter(NP == "sub", context == "basic", syntax == "subj") %>% pull(m) %>% mean(),
+    "model prediction", 
+   d.int + 0.5 * d.beta_syntax + d.beta_npSub + 0.5 * d.beta_syntax_npSub
+  )
+)
+print(
+  paste(
+    "actual mean of predicate  SUB in basic context" ,  
+    d.inf.sim.full.means %>% filter(NP == "sub", context == "basic", syntax == "pred") %>% pull(m) %>% mean(),
+    "model prediction", 
+   d.int - 0.5 * d.beta_syntax + d.beta_npSub - 0.5 * d.beta_syntax_npSub 
+  )
+)
+```

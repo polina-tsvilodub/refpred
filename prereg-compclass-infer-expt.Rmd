@@ -9,8 +9,8 @@ library(lmerTest)
 
 ``` {r data}
 # read data
-d_infer <- rbind( read_csv('./data/results_exp3-infer-pred.csv'), 
-                  read_csv('./data/results_exp3-infer-prenom.csv')) 
+d_infer <- read_csv('./data/results_30_prereg-cc-inf.csv')
+                         
 ```
 
 ``` {r filter}
@@ -23,31 +23,34 @@ d_infer %>% distinct(languages)
 d_infer_filt <- d_infer %>% 
   filter(grepl("en", languages, ignore.case = T)) %>%
   select(submission_id, trial_name, trial_number, target_size, item, botresponse, response,
-         condition,  picture, pic_spec, ref_spec)
+         condition,  pic, pic_spec, ref_spec, attempts)
 
 # participants who do not get the comparison class warmup right
 d_infer_cc_warmup <- d_infer_filt %>% filter( trial_name == "comp_class_warmup") %>%
-  group_by(submission_id, trial_number) %>% count() %>% ungroup() %>%
-  filter( tidyboot_mean(column = n) > 3 )
+  group_by(submission_id) %>% count() %>% 
+  filter( n > 4 )
 
 # exclude participants who need more than 4 attempts per warmup
 d_infer_warmup <- d_infer_filt %>% 
-  filter( (trial_name == "warmup1") | (trial_name == "warmup2"))
-d_infer_warmup <- d_infer_warmup %>% group_by(submission_id, trial_number) %>% count() %>%
-  ungroup() %>% filter ( tidyboot_mean(column = n)/2 > 4)
-d_infer_filt <- anti_join(d_infer_filt, d_infer_warmup, by = c("submission_id"))
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>% 
+  group_by(submission_id) %>%
+  filter(attempts > 4)
+
+d_infer_filt1 <- anti_join(d_infer_filt, d_infer_warmup, by = c("submission_id"))
+d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
 ```
 
 ``` {r categorization}
-d_infer_main <- d_infer_filt %>% filter((trial_name == "custom_main_text1")| 
+d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")| 
                                           (trial_name == "custom_main_text2")) %>%
   mutate(context = factor(pic_spec, levels = c(0, 1), 
-                          labels = c("basic-level parade", 
-                                     "subordinate parade")),
+                          labels = c("basic", 
+                                     "subordinate")),
          NP = ifelse(ref_spec == 2, "one", 
-                     ifelse(ref_spec == 1, "subordinate", "basic")) ) %>%
+                     ifelse(ref_spec == 1, "subordinate", "basic")),
+         condition = ifelse(condition == 0, "prenominal", "predicative")) %>%
   select(submission_id, trial_number, context, item, response, condition,
-         context_picture, target_size, NP)
+        pic, target_size, NP)
 
 # categorize responses
 d_infer_main %>% distinct(response) %>% View()
@@ -58,18 +61,28 @@ d_infer_main_responseCat <- d_infer_main %>%
       ifelse( # do be extended dependent on responses provided
         tolower(response) %in% c("birds", "bird", "dogs", "fish", "flowers", 
                                  "flower", "trees","tree", "animal",
-                                 "fishes", "dog", "plant"), "basic", "sub"),
+                                 "fishes", "dog", "plant"), "basic", "subordinate"),
     
     response_num = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
   )
+
+```
+
+``` {r}
+# explicit numeric coding to improve model convergence 
+d_infer_main_responseCat <- d_infer_main_responseCat %>%
+  mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
+         NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
+         NP_sub = ifelse(NP == "subordinate", 1, 0),
+         context_sub = ifelse(context == "subordinate parade", 1, 0))
 ```
 
 ``` {r proportions plot}
 # plot
 bar.width = 0.8
 d_infer_main_responseCat %>%  
-  group_by(response_label, context, NP, condition) %>%
+  group_by( context, NP, condition) %>%
   tidyboot_mean(column = response_num) %>% ungroup() %>% 
   mutate(condition = factor(condition, levels = c("prenominal",  "predicative"), 
                             labels = c("Predicate",  "Subject"))) %>%
@@ -83,26 +96,292 @@ d_infer_main_responseCat %>%
 ```
 
 
-``` {rlmer}
-lm.infer.fit <- glmer(response_num ~ condition*NP*context  + 
-                        (1 + condition*NP*context | submission_id) + 
-                        (1 + condition*NP*context | item), 
+``` {r lmer}
+lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub | submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub | item), 
+                      data = d_infer_main_responseCat, 
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                  )
+summary(lm.infer.fit)
+```
+
+``` {r brm model}
+# Bayesian full model
+lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub +
+                        (1 + csyntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub | submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub | item), 
+                      data = d_infer_main_responseCat, 
+                      family = "bernoulli" )
+summary(lm.b.infer.fit)
+```
+
+
+``` {r}
+# secondary analysis
+# subsetting the data by context condition
+d_infer_contextBasic <- d_infer_main_responseCat %>% 
+  filter(context == "basic")
+d_infer_contextSub <- d_infer_main_responseCat %>%
+  filter(context == "subordinate")
+
+# lmer analysis 
+lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub | submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub | item), 
+                      data = d_infer_contextBasic, 
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+
+lm.infer.context.sub <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub | submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub | item), 
+                        data = d_infer_contextSub
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+
+# subset by NP
+d_infer_contextBasic_sub <- d_infer_contextBasic %>%
+  filter(NP == "subordinate")
+d_infer_contextBasic_basic <- d_infer_contextBasic %>%
+  filter(NP = "basic")
+d_infer_contextBasic_one <- d_infer_contextBasic %>% 
+  filter(NP == "one")
+
+lm.basic.sub <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextBasic_sub,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.basic.basic <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextBasic_basic,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.basic.one <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextBasic_one,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+
+d_infer_contextSub_sub <- d_infer_contextSub %>%
+  filter(NP == "subordinate")
+d_infer_contextSub_basic <- d_infer_contextSub %>%
+  filter(NP = "basic")
+d_infer_contextSub_one <- d_infer_contextSub %>%
+  filter(NP == "one")
+
+lm.sub.sub <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextSub_sub,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.sub.basic <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextSub_basic,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.sub.one <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextSub_one,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+```
+
+``` {r}
+# secondary analysis without the NP 'one'
+d_infer_subsetNP <- d_infer_main_responseCat %>%
+  filter(NP != "one")
+d_infer_subsetNP <- d_infer_subsetNP %>%
+  mutate(NP_treatment = ifelse(NP == "subordinate", 1, 0))
+
+lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        context_sub:NP_treatment 
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_treatment:context_sub +
+                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        context_sub:NP_treatment +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_treatment:context_sub | submission_id) + 
+                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        context_sub:NP_treatment +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_treatment:context_sub  | item), 
                       data = d_infer_main_responseCat, 
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
-summary(lm.infer.fit)
-```
+# subset by context
+d_subset_contextBasic <- d_infer_subsetNP %>%
+  filter(context == "basic")
+d_subset_contextSub <- d_infer_subsetNP %>%
+  filter(context == "subordinate")
+# similar subsets and analyses as above will be performed 
+lm.subset.context.basic <- glmer(response_num ~ syntax_contr + NP_treatment  + 
+                        syntax_contr:NP_treatment + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment | submission_id) + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment | item), 
+                      data = d_subset_contextBasic, 
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.subset.context.sub <- glmer(response_num ~ syntax_contr + NP_treatment  + 
+                        syntax_contr:NP_treatment + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment | submission_id) + 
+                        (1 + syntax_contr + NP_treatment + 
+                        syntax_contr:NP_treatment | item), 
+                      data = d_subset_contextSub, 
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+d_subset_contextSub_sub <- d_subset_contextSub %>%
+  filter(NP == "subordinate")
+d_subset_contextSub_basic <- d_subset_contextSub %>%
+  filter(NP = "basic")
+d_subset_contextSub_one <- d_subset_contextSub %>%
+  filter(NP == "one")
 
-``` {r brm model}
-# Bayesian full model
-# variables are dummy coded
-lm.b.infer.fit <- brm(response_num ~ condition*NP*context  + 
-                        (1 + condition*NP*context | submission_id) + 
-                        (1 + condition*NP*context | item), 
-                      data = d_infer_main_responseCat, 
-                      family = "bernoulli" )
-summary(lm.b.infer.fit)
+lm.subset.sub.sub <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_subset_contextSub_sub,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.subset.sub.basic <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_subset_contextSub_basic,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.subset.sub.one <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_subset_contextSub_one,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+
+d_subset_contextBasic_sub <- d_subset_contextBasic %>%
+  filter(NP == "subordinate")
+d_subset_contextBasic_basic <- d_subset_contextBasic %>%
+  filter(NP = "basic")
+d_subset_contextBasic_one <- d_subset_contextBasic %>%
+  filter(NP == "one")
+
+lm.subset.basic.sub <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_subset_contextBasic_sub,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.subset.basic.basic <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_subset_contextBasic_basic,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
+lm.subset.basic.one <- glmer(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_subset_contextBasic_one,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                      )
 ```

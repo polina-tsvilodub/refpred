@@ -1,0 +1,193 @@
+# Syntax Rating Experiment Analysis
+
+``` {r libraries}
+# libraries
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+```
+
+``` {r}
+# read the data
+d_rate <- read_csv('../data/results_27_syntax-rating-prereg-80_cleaned.csv')
+d_rate_second <- read_csv('../data/results_27_syntax-rating-prereg-29_cleaned.csv')
+
+d_rate_second <- d_rate_second[!(names(d_rate_second) %in% c("worker_id", "hit_id", "assignment_id"))]
+#write_csv(d_rate_second, '../data/results_27_syntax-rating-prereg-29_cleaned.csv')
+d_rate <- rbind(d_rate, d_rate_second)
+```
+
+``` {r filters}
+# exclude participants who report difficulties 
+d_rate %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+# d_rate <- subset(d_rate, !(submission_id %in% c(....)))
+
+# exclude data from non-native English speakers and those where the language information is missing
+d_rate %>% distinct(languages) %>% View()
+
+d_rate_filt <- d_rate %>% filter(grepl("en", languages, ignore.case = T))
+``` 
+
+``` {r warmup analysis}
+# warmup trials 
+d_rate_warmup <- d_rate_filt %>% filter(trial_name == "custom_warmup")
+
+# exclude participants who gave nonsense ratings on warmup trials 
+# for chair trial: sentence1 > sentence 2
+# for basketball trial: sentence 2 > sentence 1 or sentence 1 < 50
+d_catch_trials <- d_rate_warmup %>% group_by(submission_id) %>%
+  filter( ( ( (target == "warmup/basketball.png") & 
+                                               (response2 >= response1)  ) | 
+              ( (target == "warmup/basketball.png") &  (response1 <= 50) )  ) |
+            ( (target == "warmup/purple-chair.png") & 
+                                                  (response1 > response2 ) )
+            ) 
+            
+# exclude these participants
+d_rate_filt <- anti_join(d_rate_filt, d_catch_trials, by = c("submission_id"))
+
+# exclude participants who give ratings within 5 points for one condition on every trial
+d_catch_main <- d_rate_filt %>% filter((trial_name == "custom_slider1") |
+                                      (trial_name == "custom_slider2")) %>%
+  group_by(submission_id) %>% 
+  mutate(check_resp1 = ifelse(max(response1)-min(response1) <= 5, 1, 0),
+         check_resp2 = ifelse(max(response2)-min(response2) <= 5, 1, 0)) 
+# exclude participants whose ratings are within 5 for the two sentences on every trial
+d_catch_main_counts <- d_catch_main %>% 
+  rowwise() %>% 
+  mutate(check_ratings = ifelse( abs(response1 - response2) <= 5 , 1, 0 )) %>%
+  group_by(submission_id) %>% 
+  mutate(sum_check = sum(check_ratings)) %>% ungroup() %>%
+  # participants not passing exclusion criteria
+  filter((sum_check == 6) | (check_resp1 == 1) | (check_resp2 == 1))
+
+# exclude failing participants 
+d_rate_filt <- anti_join(d_rate_filt, d_catch_main_counts, by = c("submission_id"))
+```
+
+``` {r categorization}
+# get main trials
+d_rate_main <- d_rate_filt %>% filter((trial_name == "custom_slider1") |
+                                      (trial_name == "custom_slider2")) %>%
+  select(submission_id, trial_number, trial_name, np, sentence_order, domain, item, target_size, sentence1, sentence2, response1, response2)
+
+# turn NP, syntax, sentence order to factors 
+d_rate_main <- d_rate_main %>% mutate(NP = factor(np, levels = c(0, 1),
+                                                  labels = c("sub", "basic")),
+                                      target_size = factor(target_size, levels = c(0, 1),
+                                                           labels = c("small", "big")),
+                                      sentence1 = ifelse(sentence1 == 0, "predicate", "subject"),
+                                      sentence2 = ifelse(sentence2 == 0, "predicate", "subject")
+                                      )
+
+d_rate_main_subj1 <- d_rate_main %>% filter(sentence1 == "subject") %>% mutate(syntax = "subject", order = "sub_pred") # response1 is for subject NP condition in subj/pred order
+
+d_rate_main_pred1 <- d_rate_main %>% filter(sentence1 == "subject") %>%
+  mutate(response1 = response2, syntax = "predicate", order = "sub_pred") # response1 for predicate NP condition
+
+d_rate_main_pred2 <- d_rate_main %>% filter(sentence1 == "predicate")  %>% mutate(syntax = "predicate", order = "pred_sub")# response1 for predicate NP condition in pred/subj order
+
+d_rate_main_subj2 <- d_rate_main %>% filter(sentence1 == "predicate")  %>% 
+  mutate(response1 = response2, syntax = "subject", order = "pred_sub") # response1 for subject NP condition
+
+# full long data frame
+d_rate_main_full <- rbind(rbind(d_rate_main_subj1, d_rate_main_pred1), 
+                          rbind(d_rate_main_pred2, d_rate_main_subj2))
+# exclude the last participant (81)
+d_rate_main_full <- d_rate_main_full %>% filter(submission_id != 1053)
+```
+
+``` {r plot}
+# plot
+d_rate_main_full <- d_rate_main_full %>% mutate(NP = ifelse(NP == "sub", "subordinate", "basic")) 
+bar.width = 0.8
+d_rate_main_full %>%
+  mutate(order = ifelse(order == "sub_pred", "Subject-Predicate", "Predicate-Subject")) %>%
+  group_by(NP, syntax) %>% 
+  tidyboot_mean(column = response1) %>% 
+  ggplot(aes(x = NP, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), 
+           width = bar.width, alpha = 0.3, color = 'black') +
+  geom_point(data = d_rate_main_full, 
+             position = position_jitterdodge(),
+             inherit.aes = F, aes(x = NP, y = response1, color = syntax),
+             alpha = 0.25)+
+  geom_linerange(position = position_dodge(bar.width)) +
+  #facet_wrap(~order) +
+  xlab("NP condition") + 
+  ylab(" sentence rating") +
+  ggtitle("Mean ratings by syntactic and NP condition")
+```
+
+``` {r contrasts}
+# contrast coding: explicitly numeric, to avoid strange behavior of random effects estimation
+# subject NP -1, predicate NP 1
+# basic-level NP -1, subordinate NP 1
+d_rate_main_full <- d_rate_main_full %>% mutate(syntax = ifelse(syntax =="subject", -1, 1 ),
+                                                NP = ifelse( NP == "basic", -1, 1   ),
+                                                order = ifelse(order == "sub_pred", -1 , 1)
+                                                  ) 
+```
+
+``` {r exploratory lm}
+# exploratory analysis with presentation order main effect
+lm.fit.w.order <- lmer(response1 ~ syntax*NP + order + 
+                         (1 + syntax*NP | submission_id) + 
+                         (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                REML = F)
+summary(lm.fit.w.order)
+```
+``` {r plot full}
+bar.width = 0.8
+d_rate_main_full %>%
+  mutate(order = ifelse(order == "sub_pred", "Subject-Predicate", "Predicate-Subject")) %>%
+  group_by(NP, syntax, order) %>% 
+  tidyboot_mean(column = response1) %>% 
+  ggplot(aes(x = NP, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), 
+           width = bar.width, alpha = 0.3, color = 'black') +
+  geom_point(data = d_rate_main_full, 
+             position = position_jitterdodge(),
+             inherit.aes = F, aes(x = NP, y = response1, color = syntax),
+             alpha = 0.25)+
+  geom_linerange(position = position_dodge(bar.width)) +
+  #facet_wrap(~order) +
+  xlab("NP condition") + 
+  ylab(" sentence rating") +
+  ggtitle("Mean ratings by syntactic and NP condition in full data set")
+```
+
+``` {r lmer full}
+# model on the full data set
+lm.fit.full <- lmer(response1 ~ syntax*NP + 
+                         (1 + syntax*NP | submission_id) + 
+                         (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                REML = F
+                )
+summary(lm.fit.full)
+```
+
+
+``` {r lmer}
+# full model without presentation order main effect, it will be used in case the order effect is not significant 
+lm.fit <- lmer(response1 ~ syntax*NP + 
+                         (1 + syntax*NP | submission_id) + 
+                         (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                REML = F
+                )
+summary(lm.fit)
+```
+
+``` {r brm}
+# Bayesian model 
+b.lm.fit <- brm(response1 ~ syntax*NP + 
+                  (1 + syntax*NP | submission_id) + 
+                  (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                family = "gaussian")
+summary(b.lm.fit)
+```
