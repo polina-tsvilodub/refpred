@@ -11,7 +11,7 @@ library(lmerTest)
 ``` {r}
 # read the data
 d_rate <- read_csv('./data/results_27_syntax-rating-prereg-80_cleaned.csv')
-#d_rate_second <- read_csv('./data/results_27_syntax-rating-prereg-29_cleaned.csv')
+d_rate_second <- read_csv('./data/results_27_syntax-rating-prereg-29_cleaned.csv')
 
 d_rate_second <- d_rate_second[!(names(d_rate_second) %in% c("worker_id", "hit_id", "assignment_id"))]
 #write_csv(d_rate_second, '../data/results_27_syntax-rating-prereg-29_cleaned.csv')
@@ -149,6 +149,7 @@ lm.fit.w.order <- lmer(response1 ~ syntax*NP + order +
                 REML = F)
 summary(lm.fit.w.order)
 ```
+
 ``` {r plot full}
 bar.width = 0.8
 d_rate_main_full %>%
