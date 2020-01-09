@@ -267,6 +267,7 @@ lm.basic.one <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+summary(lm.basic.sub)
 ```
 
 ``` {r}
