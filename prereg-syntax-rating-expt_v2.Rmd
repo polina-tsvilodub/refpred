@@ -81,43 +81,53 @@ d_rate_main <- d_rate_main %>% mutate(NP = factor(np, levels = c(0, 1),
                                       sentence2 = ifelse(sentence2 == 0, "predicate", "subject")
                                       )
 
-d_rate_main_subj1 <- d_rate_main %>% filter(sentence1 == "subject") %>% mutate(syntax = "subject", order = "sub_pred") # response1 is for subject NP condition in subj/pred order
 
-d_rate_main_pred1 <- d_rate_main %>% filter(sentence1 == "subject") %>%
-  mutate(response1 = response2, syntax = "predicate", order = "sub_pred") # response1 for predicate NP condition
+d_rate_main_full <- d_rate_main %>%
+  mutate(predicate = ifelse(sentence1 == "predicate", response1, response2),
+         subject = ifelse(sentence1 == "subject", response1, response2)) %>% 
+  select(-sentence1, -sentence2, -response1, -response2) %>% 
+  gather(syntax, response, predicate, subject) %>%
+  filter(submission_id != 1053)  %>% # exclude the last participant (81)
+  mutate(NP = ifelse(NP == "sub", "subordinate", "basic")) 
 
-d_rate_main_pred2 <- d_rate_main %>% filter(sentence1 == "predicate")  %>% mutate(syntax = "predicate", order = "pred_sub")# response1 for predicate NP condition in pred/subj order
+#  mutate(order = ifelse(order == "sub_pred", "Subject-Predicate", "Predicate-Subject")) %>%
 
-d_rate_main_subj2 <- d_rate_main %>% filter(sentence1 == "predicate")  %>% 
-  mutate(response1 = response2, syntax = "subject", order = "pred_sub") # response1 for subject NP condition
 
-# full long data frame
-d_rate_main_full <- rbind(rbind(d_rate_main_subj1, d_rate_main_pred1), 
-                          rbind(d_rate_main_pred2, d_rate_main_subj2))
-# exclude the last participant (81)
-d_rate_main_full <- d_rate_main_full %>% filter(submission_id != 1053)
 ```
 
 ``` {r plot}
 # plot
-d_rate_main_full <- d_rate_main_full %>% mutate(NP = ifelse(NP == "sub", "subordinate", "basic")) 
 bar.width = 0.8
 d_rate_main_full %>%
-  mutate(order = ifelse(order == "sub_pred", "Subject-Predicate", "Predicate-Subject")) %>%
   group_by(NP, syntax) %>% 
-  tidyboot_mean(column = response1) %>% 
-  ggplot(aes(x = NP, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper)) +
+  tidyboot_mean(column = response) -> d_rate_main_full.bs
+
+d_rate_main_full.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subject", "predicate"),
+                         labels = c("Subject NP\n(That NP is big.)", "Predicate NP\n(That's a big NP.)"))) %>%
+  ggplot(., aes(x = syntax, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(bar.width), 
-           width = bar.width, alpha = 0.3, color = 'black') +
-  geom_point(data = d_rate_main_full, 
-             position = position_jitterdodge(),
-             inherit.aes = F, aes(x = NP, y = response1, color = syntax),
-             alpha = 0.25)+
-  geom_linerange(position = position_dodge(bar.width)) +
+           width = bar.width, alpha = 0.3, color = 'black', size = 1) +
+  geom_point(data = d_rate_main_full %>% 
+               group_by(submission_id, syntax, NP) %>%
+               summarize(subj_mean = mean(response)) %>%
+               ungroup() %>%
+               mutate(syntax = factor(syntax, levels = c("subject", "predicate"),
+                         labels = c("Subject NP\n(That NP is big.)", "Predicate NP\n(That's a big NP.)"))), 
+             position = position_jitterdodge(dodge.width = bar.width, jitter.width = 0.1),
+             inherit.aes = F, aes(x = syntax, y = subj_mean, color = NP, fill = NP),
+             #shape = 21,
+             alpha = 0.5)+
+  geom_linerange(position = position_dodge(bar.width), size = 1.2) +
+  ggthemes::theme_few()+
   #facet_wrap(~order) +
-  xlab("NP condition") + 
-  ylab(" sentence rating") +
-  ggtitle("Mean ratings by syntactic and NP condition")
+  xlab("") + 
+  ylab("Sentence rating") +
+  ggtitle("Experiment 1: Syntax Rating")
+
+ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 6, height = 3.5)
+#
 ```
 
 ``` {r contrasts}

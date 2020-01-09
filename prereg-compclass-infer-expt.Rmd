@@ -83,18 +83,28 @@ d_infer_main_responseCat <- d_infer_valid %>%
 bar.width = 0.8
 d_infer_main_responseCat %>%  
   group_by( context, NP, condition) %>%
-  tidyboot_mean(column = response_num) %>% ungroup() %>% 
-  mutate(condition = factor(condition, levels = c("prenominal",  "predicative"), 
-                            labels = c("Predicate",  "Subject"))) -> d_infer_main_responseCat.bs
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
 
-d_infer_main_responseCat.bs %>%
-  ggplot(aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(bar.width), width = bar.width) +
+
+d_infer_main_responseCat.bs %>% 
+  ungroup() %>% 
+  mutate(condition = factor(condition, levels = c( "predicative", "prenominal"), 
+                            labels = c(  "Subject NP\n(That NP is big)", "Predicate NP\n(That's a big NP)")),
+         context = factor(context, levels = c("basic", "subordinate"),
+                          labels = c("Basic-Level Context","Subordinate-Level Context")),
+         NP = factor(NP, levels = c("basic", "one", "subordinate"),
+                     labels = c("basic", '"one"', "subordinate"))) %>%
+  ggplot(., aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black', alpha = 0.5) +
   geom_linerange(position = position_dodge(bar.width)) + 
-  xlab("Syntactic condition") +
-  ylab("proportion of basic-level responses")+
+  ggthemes::theme_few()+
+  xlab("") +
+  ylab("Proportion of basic-level responses")+
+  ggtitle("Experiment 3: Comparison Class Inference")+
   facet_grid(~context)  
 
+
+ggsave("figs/expt-cci-prereg-bars.png", width = 7.5, height = 3.5)
 ```
 ``` {r}
 # explicit numeric coding to improve model convergence 
@@ -159,6 +169,7 @@ lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                         syntax_contr:NP_sub:context_sub || item), 
                       data = d_infer_main_responseCat, 
                       family = "bernoulli",
+                      iter = 1000,
                       cores = 4,
                       control = list(adapt_delta = 0.9)) # otherwise there are divergent chains
 summary(lm.b.infer.fit)
@@ -321,7 +332,6 @@ lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_su
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub +
                         (1 + syntax_contr + NP_treatment + context_sub  + 
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
@@ -331,7 +341,7 @@ lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_su
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub  || item), 
+                        syntax_contr:NP_treatment:context_sub  || item),
                       data = d_infer_subsetNP, 
                       family = "binomial",
                       REML = F,
@@ -498,4 +508,65 @@ lm.subset.basic.one <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+```
+
+
+MH playing around
+
+```{r}
+d_infer_subsetNP.fctrs <- d_infer_subsetNP %>%
+  ungroup() %>%
+  mutate(NP = factor(NP),
+         condition = factor(condition))
+
+contrasts(d_infer_subsetNP.fctrs$context)
+contrasts(d_infer_subsetNP.fctrs$NP) #<- c(-0.5, 0.5)
+contrasts(d_infer_subsetNP.fctrs$condition) <- c(-0.5, 0.5)
+
+lm.infer.subset <- glmer(response_num ~ context * NP * condition + 
+                           (1  | submission_id),
+                         family = "binomial",
+                        data = d_infer_subsetNP.fctrs)
+
+glm.infer.subset <- glm(response_num ~ context * NP * condition,
+                         family = "binomial",
+                        data = d_infer_subsetNP.fctrs)
+```
+
+
+```{r}
+glm.infer.subset.basicContext <- glm(response_num ~ NP * condition,
+                         family = "binomial",
+                        data = d_infer_subsetNP.fctrs %>% 
+                          filter(context == "basic"))
+
+summary(glm.infer.subset.basicContext)
+
+d_infer_subsetNP.fctrs %>% 
+  filter(context == "basic") %>%
+  group_by(NP, condition) %>%
+  summarize(m = mean(response_num))
+```
+
+```{r}
+glm.infer.subset.subContext <- glm(response_num ~ NP * condition,
+                         family = "binomial",
+                        data = d_infer_subsetNP.fctrs %>% 
+                          filter(context == "subordinate"))
+
+summary(glm.infer.subset.subContext)
+```
+
+```{r}
+glm.infer.subset.mainContext <- glm(response_num ~  context + NP * condition,
+                         family = "binomial",
+                        data = d_infer_subsetNP.fctrs)
+
+glmer.infer.subset.mainContext <- glmer(response_num ~ context + NP * condition  + 
+                                        ( 1 + condition | submission_id) + 
+                                        ( 1 + condition | item),
+                         family = "binomial",
+                        data = d_infer_subsetNP.fctrs)
+
+summary(glmer.infer.subset.mainContext)
 ```
