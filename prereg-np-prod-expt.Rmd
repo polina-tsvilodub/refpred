@@ -10,10 +10,11 @@ library(lmerTest)
 
 ``` {r data}
 # read the data
-d_prod <- rbind( read_csv('./data/results_28_prereg-NP-prod-subj.csv'),
-                 read_csv('./data/results_29_prereg-NP-prod-pred.csv')) 
-d_clean <- 
-                  
+d_prod1 <- read_csv('./data/results_28_prereg-NP-prod-subj.csv')
+                 
+d_prod2 <- read_csv('./data/results_29_prereg-NP-prod-pred.csv') 
+d_prod2 <- d_prod2[!(names(d_prod2) %in% c("X40"))]
+d_prod <- rbind(d_prod1, d_prod2)
 ```
 
 ``` {r warmups}
@@ -40,7 +41,7 @@ d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup1, by = c("submission_id")) #
 
 ``` {r}
 # 2 participants too many in prenominal condition, excluding last 2 : 1299, 1300
-d_prod_filt <- d_prod_filt %>% filter(!(submission_id %in% c(1299, 1300)))
+d_prod_filt <- d_prod_filt %>% filter(!(submission_id %in% c(1299)))
 ```
 
 ```{r filtering}
