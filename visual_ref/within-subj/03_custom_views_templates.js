@@ -1,5 +1,7 @@
-// In this file you can create your own custom view templates
+// In this file we create our own custom view templates
 
+
+// botcaptcha
 const custom_botcaptcha = function(config){
   const view = {
     name: config.name,
@@ -84,7 +86,9 @@ const custom_botcaptcha = function(config){
   return view;
 };
 
-const custom_forced_choice = function(config, startingTime) {
+
+// main trials template
+const custom_free_paraphrase = function(config, startingTime) {
   const view = {
     name: config.name,
     CT: 0,
@@ -126,11 +130,12 @@ const custom_forced_choice = function(config, startingTime) {
 
         next = $("#next");
         textInput = $("textarea");
+        // minimal answer length until next-button is rendered - 2 chracters
         const minChars = config.data[CT].min_chars === undefined ? 2 : config.data[CT].min_chars;
 
         // attaches an event listener to the textbox input
         textInput.on("keyup", function() {
-            // if the text is longer than (in this case) 10 characters without the spaces
+            // if the text is longer than (in this case) 2 characters without the spaces
             // the 'next' button appears
             if (textInput.val().trim().length > minChars) {
                 next.removeClass("magpie-nodisplay");
@@ -139,7 +144,7 @@ const custom_forced_choice = function(config, startingTime) {
             }
         });
 
-
+// record trial data
         $("#next").on("click", function() {
             const RT = Date.now() - startingTime; // measure RT before anything else
             let trial_data = {
@@ -155,14 +160,12 @@ const custom_forced_choice = function(config, startingTime) {
             magpie.trial_data.push(trial_data);
             magpie.findNextView();
         });
-
-
     },
-
+  };
+ return view;
 };
-return view;
-};
 
+// custom comparison class inference task comprehension warm-up trial view
 const custom_comp_class_warmup = function(config, startingTime) {
   const view = {
     name: config.name,
@@ -202,7 +205,7 @@ const custom_comp_class_warmup = function(config, startingTime) {
 
         // attaches an event listener to the textbox input
         textInput.on("keyup", function() {
-            // if the text is longer than (in this case) 10 characters without the spaces
+            // if the text is longer than (in this case) 4 characters without the spaces
             // the 'next' button appears
             if (textInput.val().trim().length > minChars) {
                 next.removeClass("magpie-nodisplay");
@@ -217,14 +220,14 @@ const custom_comp_class_warmup = function(config, startingTime) {
               let trial_data = {
                   trial_name: config.name,
                   trial_number: CT + 1,
-                  attempts: attempts,
+                  attempts: attempts, // record how often the participants re-insert the label
                   response: textInput.val().trim()
               };
               trial_data = magpieUtils.view.save_config_trial_data(config, trial_data);
               magpie.trial_data.push(trial_data);
 
               var flag = true;
-
+              // check if all the labels are correct
               if (config.correct.includes(textInput.val().trim().toLowerCase()) == false) {
                 flag = false;
                 $(".correct-answer").removeClass("magpie-nodisplay")
@@ -235,24 +238,16 @@ const custom_comp_class_warmup = function(config, startingTime) {
 
               if (flag) {
                 magpie.findNextView();
-               }
-
-
+              }
         });
-
-
-
         $('#next').on("click");
   }
-
-};
+ };
 return view;
 };
 
 
-
-
-
+// labelling warm-up trials warm-up views
 const custom_textfield_warmup = function(config, startingTime) {
   const view = {
     name: config.name,
@@ -264,7 +259,6 @@ const custom_textfield_warmup = function(config, startingTime) {
       <section class="magpie-text-container">
         <p class="magpie-view-question">${config.data[CT].text}</p>
       </section>
-
 
     <div style="width:100%;">
      <div style="width:50%;height:400px;float:left;position:relative;align:center;">
@@ -322,7 +316,7 @@ const custom_textfield_warmup = function(config, startingTime) {
         textInput3 = $("#textbox-input3")
 
         textInput1.on("keyup", function() {
-            // if the text is longer than (in this case) 10 characters without the spaces
+            // if the text is longer than (in this case) 2 characters without the spaces in all textboxes
             // the 'next' button appears
             if (textInput1.val().trim().length > minChars)  {
               textInput2.on("keyup", function() {
@@ -387,7 +381,7 @@ const custom_textfield_warmup = function(config, startingTime) {
           let trial_data = {
               trial_name: config.name,
               trial_number: CT + 1,
-              attempts: attempts,
+              attempts: attempts, // record how often participants re-enter labels
               response1: textInput1.val().trim(),
               response2: textInput2.val().trim(),
               response3: textInput3.val().trim()
@@ -397,7 +391,7 @@ const custom_textfield_warmup = function(config, startingTime) {
           magpie.trial_data.push(trial_data);
 
           var flag = true;
-
+          // check if all the labels are correct
           if (config.data[CT].correct1.includes(textInput1.val().trim().toLowerCase()) == false) {
             flag = false;
             $(".correct-answer1").removeClass("magpie-nodisplay")
@@ -424,7 +418,6 @@ const custom_textfield_warmup = function(config, startingTime) {
           }
 
           if (flag) {
-
             magpie.findNextView();
            }
 
@@ -439,7 +432,7 @@ return view;
 
 
 
-
+// custom post-experiment questions
 const custom_post_test_view = function(config) {
   const _survey = {
       name: config.name,
@@ -539,11 +532,11 @@ const custom_post_test_view = function(config) {
   return _survey;
 };
 
+// custom introduction view
 const custom_intro_view = function(config) {
   const view = {
       name: config.name,
       title: config.title,
-    //  text: config.text,
       render: function(CT, magpie) {
           let startingTime;
           const viewTemplate = `
@@ -564,7 +557,7 @@ const custom_intro_view = function(config) {
           `;
           $("#main").html(viewTemplate);
 
-
+//unique turker check
           var bad_worker = false;
 
           console.log("UNIQUE TURKER?");
@@ -575,7 +568,7 @@ const custom_intro_view = function(config) {
               }
           })();
 
-
+// US IP address check
           console.log("ARE YOU FROM THE US???");
           function USOnly() {var accessKey = 'b487843addca6e9ec32e6ae28aeaa022';
 
