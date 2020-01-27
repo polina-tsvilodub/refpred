@@ -13,51 +13,51 @@ library(lmerTest)
 d_prod <- rbind( read_csv('./data/results_28_prereg-NP-prod-subj.csv') ,
                  read_csv('./data/results_29_prereg-NP-prod-pred.csv')%>%
                    select(-`X40`))
-#d_clean <- 
-                  
+#d_clean <-
+
 ```
 
 ``` {r warmups}
-# exclude participants who report difficulties 
+# exclude participants who report difficulties
 d_prod %>% select(submission_id, comments, problems) %>% distinct() %>% View()
 d_prod <- subset(d_prod, !(submission_id %in% c(1214)))
 
 # exclude data from non-native English speakers and those where the language information is missing
 d_prod %>% distinct(languages)
-d_prod_filt <- d_prod %>% 
+d_prod_filt <- d_prod %>%
   filter(grepl("eng", languages, ignore.case = T)) %>% # excluded 14 participants
   select(submission_id, trial_name, trial_number, attempts, size, item, botresponse, response,
-         condition,  picture, target) %>% 
+         condition,  picture, target) %>%
   mutate(size = factor(size), syntax = factor(condition))
 
 # get participants who need more than 4 attempts per warmup
-d_prod_warmup <- d_prod_filt %>% 
+d_prod_warmup <- d_prod_filt %>%
   filter( (trial_name == "warmup1") | (trial_name == "warmup2"))
-d_prod_warmup1 <- d_prod_warmup %>% group_by(submission_id) %>% 
+d_prod_warmup1 <- d_prod_warmup %>% group_by(submission_id) %>%
   filter( attempts > 4)
 # exclude those participants
 d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
-``` 
+```
 
 ``` {r}
 # 2 participants too many in prenominal condition, excluding last 2 : 1299, 1300
-d_prod_filt <- d_prod_filt %>% filter(!(submission_id %in% c(1299, 1300)))
+d_prod_filt <- d_prod_filt %>% filter(!(submission_id %in% c(1299)))
 ```
 
 ```{r filtering}
-# main trials 
+# main trials
 d_prod_main <- d_prod_filt %>% filter((trial_name == "main1") | (trial_name == "main2")) %>%
   select(submission_id, trial_number, trial_name, response, size, item, syntax, picture, target)
 
 # look at the responses
 d_prod_main %>% distinct(response) %>% View()
-# exlclude invalid responses 
-d_prod_main_valid <- subset(d_prod_main, !(tolower(response) %in% c("last", "oak", "finch", "duck", "lavender", "salmon", "goldfinch", "dahlia", "poetry", "one", "lablador", "geony" ))) 
+# exlclude invalid responses
+d_prod_main_valid <- subset(d_prod_main, !(tolower(response) %in% c("last", "oak", "finch", "duck", "lavender", "salmon", "goldfinch", "dahlia", "poetry", "one", "lablador", "geony" )))
 
 # categprize responses
 d_prod_main_responseCat <- d_prod_main_valid %>%
   rowwise() %>%
-  mutate( 
+  mutate(
     response_cat =
       ifelse(
         # to be extended depending on participants' responses
@@ -67,23 +67,23 @@ d_prod_main_responseCat <- d_prod_main_valid %>%
     resp_cat = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
   )
-``` 
+```
 
 ``` {r}
 # predicative : 95
-# prenominal 94 
+# prenominal 94
 ```
 
 ```{r plot}
 # plot
 d_prod_main_responseCat %>%
   group_by(syntax, response_label) %>%
-  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions 
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
   ungroup() %>%
-  mutate(syntax = factor(syntax, 
+  mutate(syntax = factor(syntax,
                          levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
                          labels= c( "Subject NP\n(That ___ is big.)", "Predicate NP\n(That's a big ___.)"))
-  ) %>% 
+  ) %>%
   ggplot(aes(x = syntax,
              y = mean, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(0.8), width = 0.8, fill = 'white', color = 'black') +
@@ -97,7 +97,7 @@ ggsave("figs/expt-np-production-prereg-bars.png", width = 4, height = 4)
 ```
 
 ``` {r contrasts}
-# contrast coding of syntax 
+# contrast coding of syntax
 # subject NP -0.5. predicate NP 0.5, explicit numeric coding to avoid unpredicted bahaviour due to factors
 d_prod_main_responseCat <- d_prod_main_responseCat %>%
   mutate(syntax_contr = ifelse( syntax == "prenominal", 0.5, -0.5),
@@ -108,8 +108,8 @@ d_prod_main_responseCat <- d_prod_main_responseCat %>%
 ``` {r lmer}
 # frequentist analysis
 lm.prod.fit <- glmer(resp_cat ~  syntax_contr + (1 | submission_id) +
-                      (1  + syntax_contr | target), 
-                    data = d_prod_main_responseCat, 
+                      (1  + syntax_contr | target),
+                    data = d_prod_main_responseCat,
                     family = "binomial",
                     REML = F,
                     control=glmerControl(optimizer="bobyqa",
@@ -121,8 +121,8 @@ summary(lm.prod.fit)
 ``` {r lmer w size}
 # exploratory analysis with the main effect of target size
 lm.prod.w.size <- glmer(resp_cat ~ syntax_contr*size + (1 + size | submission_id) +
-                      (1 + syntax_contr*size | target), 
-                    data = d_prod_main_responseCat, 
+                      (1 + syntax_contr*size | target),
+                    data = d_prod_main_responseCat,
                     family = "binomial",
                     REML = F,
                     control=glmerControl(optimizer="bobyqa",
@@ -139,9 +139,8 @@ summary(lm.prod.w.size)
 # full model
 b.prod.lm <- brm( resp_cat ~  syntax_contr + (1 | submission_id) +
                       (1 + syntax_contr | target),
-                    data = d_prod_main_responseCat, 
+                    data = d_prod_main_responseCat,
                     family = "bernoulli",
                     control=list(adapt_delta=0.95))
 summary(b.prod.lm)
 ```
-

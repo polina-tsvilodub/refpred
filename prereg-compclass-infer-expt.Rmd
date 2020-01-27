@@ -184,7 +184,7 @@ summary(lm.infer.fit) # full model
 ``` {r brm model}
 # Bayesian full model
 # significant effect of sub NP and context
-lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
+lm.b.infer.fit.by.target <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
@@ -201,13 +201,14 @@ lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub || item), 
+                        syntax_contr:NP_sub:context_sub || pic), 
                       data = d_infer_main_responseCat, 
                       family = "bernoulli",
                       iter = 1000,
                       cores = 4,
                       control = list(adapt_delta = 0.9)) # otherwise there are divergent chains
 summary(lm.b.infer.fit)
+summary(lm.b.infer.fit.by.target)
 ```
 
 Assuming NO interaction with context
@@ -333,6 +334,7 @@ lm.basic.one <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+summary(lm.basic.sub)
 ```
 
 ``` {r}

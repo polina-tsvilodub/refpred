@@ -126,7 +126,7 @@ d_rate_main_full.bs %>%
   ylab("Sentence rating") +
   ggtitle("Experiment 1: Syntax Rating")
 
-ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 6, height = 3.5)
+#ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 6, height = 3.5)
 #
 ```
 
@@ -136,13 +136,14 @@ ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 6, height = 3.5)
 # basic-level NP -1, subordinate NP 1
 d_rate_main_full <- d_rate_main_full %>% mutate(syntax = ifelse(syntax =="subject", -1, 1 ),
                                                 NP = ifelse( NP == "basic", -1, 1   ),
-                                                order = ifelse(order == "sub_pred", -1 , 1)
+                                                # predicate | subject is -1 , subject|predictae is 1
+                                                order = ifelse(sentence_order == "0|1", -1 , 1)
                                                   ) 
 ```
 
 ``` {r exploratory lm}
 # exploratory analysis with presentation order main effect
-lm.fit.w.order <- lmer(response1 ~ syntax*NP + order + 
+lm.fit.w.order <- lmer(response ~ syntax*NP + order + 
                          (1 + syntax*NP | submission_id) + 
                          (1 + syntax*NP  | item),
                 data = d_rate_main_full,
@@ -172,7 +173,7 @@ d_rate_main_full %>%
 
 ``` {r lmer full}
 # model on the full data set
-lm.fit.full <- lmer(response1 ~ syntax*NP + 
+lm.fit.full <- lmer(response ~ syntax*NP + 
                          (1 + syntax*NP | submission_id) + 
                          (1 + syntax*NP  | item),
                 data = d_rate_main_full,
@@ -184,7 +185,7 @@ summary(lm.fit.full)
 
 ``` {r lmer}
 # full model without presentation order main effect, it will be used in case the order effect is not significant 
-lm.fit <- lmer(response1 ~ syntax*NP + 
+lm.fit <- lmer(response ~ syntax*NP + 
                          (1 + syntax*NP | submission_id) + 
                          (1 + syntax*NP  | item),
                 data = d_rate_main_full,
@@ -195,7 +196,7 @@ summary(lm.fit)
 
 ``` {r brm}
 # Bayesian model 
-b.lm.fit <- brm(response1 ~ syntax*NP + 
+b.lm.fit <- brm(response ~ syntax*NP + 
                   (1 + syntax*NP | submission_id) + 
                   (1 + syntax*NP  | item),
                 data = d_rate_main_full,
