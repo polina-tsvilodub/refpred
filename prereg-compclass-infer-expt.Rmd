@@ -104,8 +104,10 @@ d_infer_main_responseCat.bs %>%
   facet_grid(~context)  
 
 
-ggsave("figs/expt-cci-prereg-bars.png", width = 7.5, height = 3.5)
+#ggsave("figs/expt-cci-prereg-bars.png", width = 7.5, height = 3.5)
 ```
+
+
 ``` {r}
 # explicit numeric coding to improve model convergence 
 d_infer_main_responseCat <- d_infer_main_responseCat %>%
@@ -113,6 +115,39 @@ d_infer_main_responseCat <- d_infer_main_responseCat %>%
          NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
          NP_sub = ifelse(NP == "subordinate", 1, 0),
          context_sub = ifelse(context == "subordinate", 1, 0))
+
+
+contrasts(d_infer_main_responseCat$NP)
+
+d_infer_main_responseCat2 <- d_infer_main_responseCat %>%
+  ungroup() %>%
+  mutate(NP_fac = factor(as.character(NP)),
+         NP_num = as.numeric(NP_fac)) %>%
+  mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
+         context_sub = ifelse(context == "subordinate", 0.5,-0.5)) %>%
+  rowwise() %>%
+  mutate(NP_sub1 = contr.sum(3)[NP_num,][1],
+         NP_sub2 = contr.sum(3)[NP_num,][2])
+
+rs.glm <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub,
+    data = d_infer_main_responseCat2, 
+    family = 'binomial')
+
+summary(rs.glm)
+
+rs.glm0 <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub - (NP_sub1 + NP_sub2) : syntax_contr,
+    data = d_infer_main_responseCat2, 
+    family = 'binomial')
+
+summary(rs.glm)
+
+anova(rs.glm0,rs.glm,test="Chisq")
+
+rs.glm.noint <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub - syntax_contr : (NP_sub1 + NP_sub2) : context_sub,
+    data = d_infer_main_responseCat2, 
+    family = 'binomial')
+
+anova(rs.glm.noint,rs.glm,test="Chisq")
 ```
 
 ``` {r lmer}
@@ -175,6 +210,24 @@ lm.b.infer.fit <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_
 summary(lm.b.infer.fit)
 ```
 
+Assuming NO interaction with context
+
+```{r}
+
+b.infer.noContextInt <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + 
+                                     context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
+                      data = d_infer_main_responseCat, 
+                      chains = 4, cores = 4, iter = 2000,
+                      family = "bernoulli",
+                      control = list(adapt_delta = 0.92))
+summary(b.infer.noContextInt)
+```
+
 
 ``` {r}
 # secondary analysis
@@ -224,7 +277,9 @@ b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
                       data = d_infer_contextBasic, 
                       family = "bernoulli",
-                      cores = 4)
+                      iter = 1000, 
+                      chains = 3,
+                      cores = 3)
 summary(b.context.basic) 
 
 # sub context
@@ -368,9 +423,30 @@ b.infer.subset <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  
                         syntax_contr:NP_treatment:context_sub  || item), 
                       data = d_infer_subsetNP, 
                       family = "bernoulli",
+                      chains = 3, cores = 3, iter = 1000,
                       control = list(adapt_delta = 0.9))
 summary(b.infer.subset)
 ```
+
+Assuming NO interaction with context
+
+```{r}
+# bayesian full model without 'one'
+
+b.infer.subset.noContextInt <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment +
+                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment || submission_id) + 
+                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment || item), 
+                      data = d_infer_subsetNP, 
+                      chains = 3, cores = 3, iter = 1000,
+                      family = "bernoulli",
+                      control = list(adapt_delta = 0.9))
+summary(b.infer.subset.noContextInt)
+```
+
+
 
 ``` {r}
 
@@ -420,7 +496,8 @@ b.subset.context.sub <- brm(response_num ~ syntax_contr + NP_treatment  +
                         (1 + syntax_contr + NP_treatment + 
                         syntax_contr:NP_treatment || item), 
                       data = d_subset_contextSub, 
-                      family = "bernoulli")
+                      family = "bernoulli",
+                      cores = 3, chains = 3, iter = 1000)
 summary(b.subset.context.sub)
 # bayesian model of basic context without 'one'
 b.subset.context.basic <- brm(response_num ~ syntax_contr + NP_treatment  + 
@@ -430,7 +507,8 @@ b.subset.context.basic <- brm(response_num ~ syntax_contr + NP_treatment  +
                         (1 + syntax_contr + NP_treatment + 
                         syntax_contr:NP_treatment || item), 
                       data = d_subset_contextBasic, 
-                      family = "bernoulli")
+                      family = "bernoulli",
+                      cores = 3, chains = 3, iter = 1000)
 summary(b.subset.context.basic)
 ```
 
