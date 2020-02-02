@@ -10,44 +10,64 @@ library(lmerTest)
 ``` {r data}
 # read data
 d_infer <- read_csv('./data/results_30_prereg-cc-inf.csv')
-                         
+
 ```
 
 ``` {r filter}
-# exclude participants who report difficulties 
+# exclude participants who report difficulties
 d_infer %>% select(submission_id, comments, problems) %>% distinct() %>% View()
-d_infer <- subset(d_infer, !(submission_id %in% c(1438, 1515)))
+d_infer_woGlitches <- subset(d_infer, !(submission_id %in% c(1438, 1515)))
 
 # exclude data from non-native English speakers and those where the language information is missing
-d_infer %>% distinct(languages)
-d_infer_filt <- d_infer %>% 
+d_infer_woGlitches %>% distinct(languages)
+d_infer_Native <- d_infer_woGlitches %>%
   filter(grepl("en", languages, ignore.case = T)) %>%
   select(submission_id, trial_name, trial_number, target_size, item, botresponse, response,
          condition,  pic, pic_spec, ref_spec, attempts)
 
 # participants who do not get the comparison class warmup right
-d_infer_cc_warmup <- d_infer_filt %>% filter( trial_name == "comp_class_warmup") %>%
-  group_by(submission_id) %>% count() %>% 
+d_infer_cc_warmup <- d_infer_Native %>% filter( trial_name == "comp_class_warmup") %>%
+  group_by(submission_id) %>% count() %>%
   filter( n > 4 )
 
 # exclude participants who need more than 4 attempts per warmup
-d_infer_warmup <- d_infer_filt %>% 
-  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>% 
+d_infer_warmup <- d_infer_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
   group_by(submission_id) %>%
   filter(attempts > 4)
 
-d_infer_filt1 <- anti_join(d_infer_filt, d_infer_warmup, by = c("submission_id"))
+d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
 d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
 ```
 
+``` {r csv vars}
+# write a csv with subject exclusion stats for TeX
+myvars = list()
+
+myvars["nSubj"] = (d_infer %>% distinct(submission_id) %>% count() %>% .$n) - 2   # one extra participant was collected, excluded below
+myvars["nExcludedTotal"] = ((d_infer %>% distinct(submission_id) %>% count() %>% .$n) ) -
+  (d_infer_filt1 %>% distinct(submission_id) %>% count() %>% .$n)
+myvars["nBugs"] = 0 # subject excluded due to glitches
+myvars["nNonEN"] = (d_infer_woGlitches %>% distinct(submission_id) %>% count() %>% .$n) -
+  (d_infer_Native %>% distinct(submission_id) %>% count() %>% .$n)
+myvars["nFailedWarmUp"] = (d_infer_warmup %>% distinct(submission_id) %>% count() %>% .$n %>% sum())
+myvars["nFailedCCWarmUp"] = d_infer_cc_warmup %>% distinct(submission_id) %>% count() %>% .$n %>% sum()
+#myvars["nFailedMains"] = d_catch_main_counts %>% distinct(submission_id) %>% count() %>% .$n
+
+myvars = as_tibble(myvars)
+write_csv(myvars, path = "R_results_TeX/myvars-infer.csv", col_names = T)
+```
+
+
+
 ``` {r categorization}
-d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")| 
+d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
                                           (trial_name == "custom_main_text2")) %>%
   filter(submission_id != 1548) %>% filter(submission_id != 1549) %>%
-  mutate(context = factor(pic_spec, levels = c(0, 1), 
-                          labels = c("basic", 
+  mutate(context = factor(pic_spec, levels = c(0, 1),
+                          labels = c("basic",
                                      "subordinate")),
-         NP = ifelse(ref_spec == 2, "one", 
+         NP = ifelse(ref_spec == 2, "one",
                      ifelse(ref_spec == 1, "subordinate", "basic")),
          condition = ifelse(condition == 0, "prenominal", "predicative")) %>%
   select(submission_id, trial_number, context, item, response, condition,
@@ -55,7 +75,7 @@ d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
 
 # categorize responses
 d_infer_main %>% distinct(response) %>% View()
-# exclude invalid responses 
+# exclude invalid responses
 d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c("that man is big", "that's small boy", "that is big one", "that's a small doberman",
                                                                       "that bird compare small", "that boy is small", "me is big", "but some one small", "that pug small",
                                                                       "you are small", "beauty for fish", "yes", "aim", "growth", "honest", "medicine", "heathy", "dogs name", "trees name",
@@ -70,11 +90,12 @@ d_infer_main_responseCat <- d_infer_valid %>%
                                  "burds", "dogs that we see", "fish that we see", "birds that we see",
                                  "flower", "trees","tree", "animal", "the other birds", "the other dogs", "digs", "treees", "weeds", "small flowers", "fishs",
                                  "fishes", "dog", "large dogs", "giant trees", "breeds", "plant", "variety of dogs", "long trees"), "basic", "subordinate"),
-    
+
     response_num = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
   )
-
+d_infer_main_superordinate <- d_infer_main_responseCat %>%
+  filter(tolower(response) %in% c("things", "objects", "animal", "weeds", "plant"))
 ```
 
 
@@ -86,21 +107,22 @@ d_infer_main_responseCat %>%
   tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
 
 
-d_infer_main_responseCat.bs %>% 
-  ungroup() %>% 
-  mutate(condition = factor(condition, levels = c( "predicative", "prenominal"), 
+d_infer_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, levels = c( "predicative", "prenominal"),
                             labels = c(  "Subject NP\n(That NP is big)", "Predicate NP\n(That's a big NP)")),
          context = factor(context, levels = c("basic", "subordinate"),
                           labels = c("Basic-Level Context","Subordinate-Level Context")),
          NP = factor(NP, levels = c("basic", "one", "subordinate"),
                      labels = c("basic", '"one"', "subordinate"))) %>%
   ggplot(., aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black', alpha = 0.5) +
-  geom_linerange(position = position_dodge(bar.width)) + 
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(bar.width), size = 1) +
   ggthemes::theme_few()+
   xlab("") +
   ylab("Proportion of basic-level responses")+
-  ggtitle("Experiment 3: Comparison Class Inference")+
+ # ggtitle("Experiment 3: Comparison Class Inference")+
   facet_grid(~context)  
 
 
@@ -109,7 +131,7 @@ d_infer_main_responseCat.bs %>%
 
 
 ``` {r}
-# explicit numeric coding to improve model convergence 
+# explicit numeric coding to improve model convergence
 d_infer_main_responseCat <- d_infer_main_responseCat %>%
   mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
          NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
@@ -145,13 +167,13 @@ d_infer_main_responseCat2 %>%
 #     )
 
 rs.glm <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub,
-    data = d_infer_main_responseCat2, 
+    data = d_infer_main_responseCat2,
     family = 'binomial')
 
 summary(rs.glm)
 
 rs.glm0 <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub - (NP_sub1 + NP_sub2) : syntax_contr,
-    data = d_infer_main_responseCat2, 
+    data = d_infer_main_responseCat2,
     family = 'binomial')
 
 summary(rs.glm)
@@ -159,7 +181,7 @@ summary(rs.glm)
 anova(rs.glm0,rs.glm,test="Chisq")
 
 rs.glm.noint <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub - syntax_contr : (NP_sub1 + NP_sub2) : context_sub,
-    data = d_infer_main_responseCat2, 
+    data = d_infer_main_responseCat2,
     family = 'binomial')
 
 anova(rs.glm.noint,rs.glm,test="Chisq")
@@ -226,56 +248,56 @@ summary(rs.glmer.subContext.noOne)
 ``` {r lmer}
 # random effects correlation must be set to 0 to estimate the model
 # significant effect of context and sub NP
-lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
+lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
                         syntax_contr:NP_sub:context_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_sub:context_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub || item), 
-                      data = d_infer_main_responseCat, 
+                        syntax_contr:NP_sub:context_sub || item),
+                      data = d_infer_main_responseCat,
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                   )
-summary(lm.infer.fit) # full model 
+summary(lm.infer.fit) # full model
 
 ```
 
 ``` {r brm model}
 # Bayesian full model
 # significant effect of sub NP and context
-lm.b.infer.fit.by.target <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  + 
+lm.b.infer.fit.by.target <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
                         syntax_contr:NP_sub:context_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
+                        syntax_contr:NP_sub:context_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         context_sub:NP_basic + context_sub:NP_sub +
                         syntax_contr:context_sub +
                         syntax_contr:NP_basic:context_sub +
-                        syntax_contr:NP_sub:context_sub || pic), 
-                      data = d_infer_main_responseCat, 
+                        syntax_contr:NP_sub:context_sub || pic),
+                      data = d_infer_main_responseCat,
                       family = "bernoulli",
                       iter = 1000,
                       cores = 4,
@@ -284,18 +306,107 @@ summary(lm.b.infer.fit)
 summary(lm.b.infer.fit.by.target)
 ```
 
+``` {r brm csv}
+myTable_infer = cbind(tibble(Rowname = row.names(summary(lm.b.infer.fit.by.target)[["fixed"]])),
+                summary(lm.b.infer.fit.by.target)[["fixed"]] %>% as_tibble())
+write_csv(myTable_infer, path = "R_results_TeX/cc-infer-brm.csv", col_names = T)
+lm.b.infer.summary <- summary(lm.b.infer.fit.by.target)
+write_csv(data.frame(lm.b.infer.summary[["fixed"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt3_brm.csv")
+
+```
+
+
+``` {r by-item}
+d_infer_main_responseCat %>%  
+  group_by( context, NP, condition, target_size) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.by.size
+
+d_infer_main_responseCat.by.size %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, levels = c( "predicative", "prenominal"),
+                            labels = c(  "Subject NP\n(That NP is big)", "Predicate NP\n(That's a big NP)")),
+         context = factor(context, levels = c("basic", "subordinate"),
+                          labels = c("Basic-Level Context","Subordinate-Level Context")),
+         NP = factor(NP, levels = c("basic", "one", "subordinate"),
+                     labels = c("basic", '"one"', "subordinate"))) %>%
+  ggplot(., aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(bar.width), size = 1) +
+  ggthemes::theme_few()+
+  xlab("") +
+  ylab("Proportion of basic-level responses")+
+ # ggtitle("Experiment 3: Comparison Class Inference")+
+  facet_grid(target_size~context)  +
+ ggsave("figs/expt-cc-infer-by-size.png", width = 7.5, height = 3.5)
+```
+
+```{r}
+# two-way analysis
+lm.b.infer.fit.two.way2 <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item),
+                      data = d_infer_main_responseCat,
+                      family = "bernoulli",
+                      iter = 1500,
+                      cores = 4,
+                      control = list(adapt_delta = 0.9)) # otherwise there are divergent chains
+summary(lm.b.infer.fit.two.way) # 1000 iterations and by-target radom effects
+lm.b.infer.fit.two.way.by.item.summary <- summary(lm.b.infer.fit.two.way2)
+```
+
+``` {r csv}
+write_csv(data.frame(lm.b.infer.fit.two.way.by.item.summary[["fixed"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt3_2_way_brm.csv")
+```
+
+``` {r by-size}
+d_infer_big <- d_infer_main_responseCat %>% filter(target_size == "big")
+d_infer_small <- d_infer_main_responseCat %>% filter(target_size == "small")
+lm.b.infer.big <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        context_sub:NP_basic + context_sub:NP_sub +
+                        syntax_contr:context_sub +
+                        syntax_contr:NP_basic:context_sub +
+                        syntax_contr:NP_sub:context_sub || pic),
+                      data = d_infer_big,
+                      family = "bernoulli",
+                      iter = 1000,
+                      cores = 4,
+                      control = list(adapt_delta = 0.9))
+summary(lm.b.infer.big)
+```
+
 Assuming NO interaction with context
 
 ```{r}
 
-b.infer.noContextInt <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + 
-                                     context_sub  + 
+b.infer.noContextInt <- brm(response_num ~ syntax_contr + NP_basic + NP_sub +
+                                     context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
-                      data = d_infer_main_responseCat, 
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item),
+                      data = d_infer_main_responseCat,
                       chains = 4, cores = 4, iter = 2000,
                       family = "bernoulli",
                       control = list(adapt_delta = 0.92))
@@ -303,35 +414,36 @@ summary(b.infer.noContextInt)
 ```
 
 
+
 ``` {r}
 # secondary analysis
 # subsetting the data by context condition
-d_infer_contextBasic <- d_infer_main_responseCat %>% 
+d_infer_contextBasic <- d_infer_main_responseCat %>%
   filter(context == "basic")
 d_infer_contextSub <- d_infer_main_responseCat %>%
   filter(context == "subordinate")
 
-# lmer analysis 
-# does not converge 
-lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  + 
+# lmer analysis
+# does not converge
+lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
-                      data = d_infer_contextBasic, 
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item),
+                      data = d_infer_contextBasic,
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
-# converges 
-lm.infer.context.sub <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + 
+# converges
+lm.infer.context.sub <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item),
                         data = d_infer_contextSub,
                       family = "binomial",
                       REML = F,
@@ -343,26 +455,26 @@ summary(lm.infer.context.sub)
 
 # bayesian models of separate contexts
 # basic context
-b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  + 
+b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
-                      data = d_infer_contextBasic, 
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item),
+                      data = d_infer_contextBasic,
                       family = "bernoulli",
-                      iter = 1000, 
+                      iter = 1000,
                       chains = 3,
                       cores = 3)
-summary(b.context.basic) 
+summary(b.context.basic)
 
 # sub context
-b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + 
+b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) + 
-                        (1 + syntax_contr + NP_basic + NP_sub + 
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || item), 
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
+                        (1 + syntax_contr + NP_basic + NP_sub +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub || item),
                         data = d_infer_contextSub,
                       family = "bernoulli",
                      cores = 4)
@@ -376,10 +488,10 @@ d_infer_contextBasic_sub <- d_infer_contextBasic %>%
   filter(NP == "subordinate")
 d_infer_contextBasic_basic <- d_infer_contextBasic %>%
   filter(NP == "basic")
-d_infer_contextBasic_one <- d_infer_contextBasic %>% 
+d_infer_contextBasic_one <- d_infer_contextBasic %>%
   filter(NP == "one")
 
-# these model should all run 
+# these model should all run
 lm.basic.sub <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
@@ -457,21 +569,21 @@ d_infer_subsetNP <- d_infer_subsetNP %>%
 
 # model cannot be estimated with correlating random effects
 # converges, significant effect of sub NP and sub context
-lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_sub  + 
+lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        (1 + syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment:context_sub || submission_id) +
+                        (1 + syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
                         syntax_contr:NP_treatment:context_sub  || item),
-                      data = d_infer_subsetNP, 
+                      data = d_infer_subsetNP,
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
@@ -479,24 +591,29 @@ lm.infer.subset <- glmer(response_num ~ syntax_contr + NP_treatment + context_su
                       )
 summary(lm.infer.subset)
 
+lm.infer.subset.summary <- summary(lm.infer.subset)
+write_csv(data.frame(lm.infer.subset.summary[["coefficients"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt3_wo_one_3_way_lmer.csv")
+
 # bayesian full model without 'one'
 
-b.infer.subset <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  + 
+b.infer.subset <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
                         syntax_contr:NP_treatment:context_sub +
-                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        (1 + syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + context_sub  + 
+                        syntax_contr:NP_treatment:context_sub || submission_id) +
+                        (1 + syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
                         context_sub:NP_treatment +
                         syntax_contr:context_sub +
-                        syntax_contr:NP_treatment:context_sub  || item), 
-                      data = d_infer_subsetNP, 
+                        syntax_contr:NP_treatment:context_sub  || item),
+                      data = d_infer_subsetNP,
                       family = "bernoulli",
                       chains = 3, cores = 3, iter = 1000,
                       control = list(adapt_delta = 0.9))
@@ -508,13 +625,13 @@ Assuming NO interaction with context
 ```{r}
 # bayesian full model without 'one'
 
-b.infer.subset.noContextInt <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  + 
+b.infer.subset.noContextInt <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  +
                         syntax_contr:NP_treatment +
-                        (1 + syntax_contr + NP_treatment + context_sub  + 
-                        syntax_contr:NP_treatment || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + context_sub  + 
-                        syntax_contr:NP_treatment || item), 
-                      data = d_infer_subsetNP, 
+                        (1 + syntax_contr + NP_treatment + context_sub  +
+                        syntax_contr:NP_treatment || submission_id) +
+                        (1 + syntax_contr + NP_treatment + context_sub  +
+                        syntax_contr:NP_treatment || item),
+                      data = d_infer_subsetNP,
                       chains = 3, cores = 3, iter = 1000,
                       family = "bernoulli",
                       control = list(adapt_delta = 0.9))
@@ -533,55 +650,60 @@ d_subset_contextSub <- d_infer_subsetNP %>%
 
 # full model does not converge, random effects must be set to 0  
 # significant effect of NP
-lm.subset.context.basic <- glmer(response_num ~ syntax_contr + NP_treatment  + 
-                        syntax_contr:NP_treatment + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || item), 
-                      data = d_subset_contextBasic, 
+lm.subset.context.basic <- glmer(response_num ~ syntax_contr + NP_treatment  +
+                        syntax_contr:NP_treatment +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || submission_id) +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || item),
+                      data = d_subset_contextBasic,
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
-summary(lm.subset.context.basic)
+lm.subset.context.basic.summary <- summary(lm.subset.context.basic)
+write_csv(data.frame(lm.subset.context.basic.summary[["coefficients"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt3_wo_one_basicContext.csv")
 
 # converges, significant effect of NP
-lm.subset.context.sub <- glmer(response_num ~ syntax_contr + NP_treatment  + 
-                        syntax_contr:NP_treatment + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || item), 
-                      data = d_subset_contextSub, 
+lm.subset.context.sub <- glmer(response_num ~ syntax_contr + NP_treatment  +
+                        syntax_contr:NP_treatment +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || submission_id) +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || item),
+                      data = d_subset_contextSub,
                       family = "binomial",
                       REML = F,
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
 
-summary(lm.subset.context.sub)
-
+lm.subset.context.sub.summary <- summary(lm.subset.context.sub)
+write_csv(data.frame(lm.subset.context.sub.summary[["coefficients"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt3_wo_one_subContext.csv")
 # bayesian model of sub context without 'one'
-b.subset.context.sub <- brm(response_num ~ syntax_contr + NP_treatment  + 
-                        syntax_contr:NP_treatment + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || item), 
-                      data = d_subset_contextSub, 
+b.subset.context.sub <- brm(response_num ~ syntax_contr + NP_treatment  +
+                        syntax_contr:NP_treatment +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || submission_id) +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || item),
+                      data = d_subset_contextSub,
                       family = "bernoulli",
                       cores = 3, chains = 3, iter = 1000)
 summary(b.subset.context.sub)
 # bayesian model of basic context without 'one'
-b.subset.context.basic <- brm(response_num ~ syntax_contr + NP_treatment  + 
-                        syntax_contr:NP_treatment + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || submission_id) + 
-                        (1 + syntax_contr + NP_treatment + 
-                        syntax_contr:NP_treatment || item), 
-                      data = d_subset_contextBasic, 
+b.subset.context.basic <- brm(response_num ~ syntax_contr + NP_treatment  +
+                        syntax_contr:NP_treatment +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || submission_id) +
+                        (1 + syntax_contr + NP_treatment +
+                        syntax_contr:NP_treatment || item),
+                      data = d_subset_contextBasic,
                       family = "bernoulli",
                       cores = 3, chains = 3, iter = 1000)
 summary(b.subset.context.basic)
@@ -597,7 +719,7 @@ d_subset_contextSub_basic <- d_subset_contextSub %>%
 d_subset_contextSub_one <- d_subset_contextSub %>%
   filter(NP == "one")
 
-# these models should run 
+# these models should run
 lm.subset.sub.sub <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
@@ -675,7 +797,7 @@ contrasts(d_infer_subsetNP.fctrs$context)
 contrasts(d_infer_subsetNP.fctrs$NP) #<- c(-0.5, 0.5)
 contrasts(d_infer_subsetNP.fctrs$condition) <- c(-0.5, 0.5)
 
-lm.infer.subset <- glmer(response_num ~ context * NP * condition + 
+lm.infer.subset <- glmer(response_num ~ context * NP * condition +
                            (1  | submission_id),
                          family = "binomial",
                         data = d_infer_subsetNP.fctrs)
@@ -689,12 +811,12 @@ glm.infer.subset <- glm(response_num ~ context * NP * condition,
 ```{r}
 glm.infer.subset.basicContext <- glm(response_num ~ NP * condition,
                          family = "binomial",
-                        data = d_infer_subsetNP.fctrs %>% 
+                        data = d_infer_subsetNP.fctrs %>%
                           filter(context == "basic"))
 
 summary(glm.infer.subset.basicContext)
 
-d_infer_subsetNP.fctrs %>% 
+d_infer_subsetNP.fctrs %>%
   filter(context == "basic") %>%
   group_by(NP, condition) %>%
   summarize(m = mean(response_num))
@@ -703,7 +825,7 @@ d_infer_subsetNP.fctrs %>%
 ```{r}
 glm.infer.subset.subContext <- glm(response_num ~ NP * condition,
                          family = "binomial",
-                        data = d_infer_subsetNP.fctrs %>% 
+                        data = d_infer_subsetNP.fctrs %>%
                           filter(context == "subordinate"))
 
 summary(glm.infer.subset.subContext)
@@ -714,8 +836,8 @@ glm.infer.subset.mainContext <- glm(response_num ~  context + NP * condition,
                          family = "binomial",
                         data = d_infer_subsetNP.fctrs)
 
-glmer.infer.subset.mainContext <- glmer(response_num ~ context + NP * condition  + 
-                                        ( 1 + condition | submission_id) + 
+glmer.infer.subset.mainContext <- glmer(response_num ~ context + NP * condition  +
+                                        ( 1 + condition | submission_id) +
                                         ( 1 + condition | item),
                          family = "binomial",
                         data = d_infer_subsetNP.fctrs)
