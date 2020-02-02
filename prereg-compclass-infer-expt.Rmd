@@ -117,7 +117,7 @@ d_infer_main_responseCat <- d_infer_main_responseCat %>%
          context_sub = ifelse(context == "subordinate", 1, 0))
 
 
-contrasts(d_infer_main_responseCat$NP)
+contrasts(d_infer_main_responseCat$NP_sub)
 
 d_infer_main_responseCat2 <- d_infer_main_responseCat %>%
   ungroup() %>%
@@ -126,8 +126,23 @@ d_infer_main_responseCat2 <- d_infer_main_responseCat %>%
   mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
          context_sub = ifelse(context == "subordinate", 0.5,-0.5)) %>%
   rowwise() %>%
-  mutate(NP_sub1 = contr.sum(3)[NP_num,][1],
-         NP_sub2 = contr.sum(3)[NP_num,][2])
+  mutate(NP_OneVsub = case_when(NP == "subordinate" ~ -1L, # baseline
+                        NP == "one" ~ 1L,  # target
+                        TRUE      ~ 0L), # anything else
+        NP_basicVsub = case_when(NP == "subordinate" ~ -1L, # baseline
+                        NP == "basic" ~  1L, # target
+                        TRUE      ~ 0L),
+        syntax_sum = ifelse(condition == "predicative", -1L, 1L),
+        context_sum = ifelse(context == "basic", -1L, 1L))
+
+d_infer_main_responseCat2 %>%
+  select(condition, syntax_sum, context, context_sum, NP, NP_OneVsub, NP_basicVsub) %>%
+  View()
+# 
+#   mutate(
+#     NP_sub1 = contr.sum(3)[NP_num,][1],
+#     NP_sub2 = contr.sum(3)[NP_num,][2]
+#     )
 
 rs.glm <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub,
     data = d_infer_main_responseCat2, 
@@ -149,6 +164,64 @@ rs.glm.noint <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_su
 
 anova(rs.glm.noint,rs.glm,test="Chisq")
 ```
+
+```{r}
+rs.glmer <- glmer(response_num~syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum + 
+                    (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum || submission_id)  + 
+                    (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum || item),
+    data = d_infer_main_responseCat2, 
+    family = 'binomial',
+    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5)))
+
+summary(rs.glmer)
+```
+
+
+```{r}
+rs.glmer.basicContext <- glmer(response_num~syntax_sum * (NP_OneVsub + NP_basicVsub) + 
+                    (1 | submission_id)  + 
+                    (1 | item),
+                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || submission_id)  + 
+                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || item),
+    data = d_infer_main_responseCat2 %>% 
+      filter(context == "basic"), 
+    family = 'binomial')
+  #  control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
+
+
+rs.glmer.basicContext.summary <- summary(rs.glmer.basicContext)
+
+rs.glmer.basicContext.summary$varcor
+```
+
+```{r}
+rs.glmer.basicContext.noOne <- glmer(response_num~syntax_sum * NP_basicVsub + 
+                    (1 | submission_id)  + 
+                    (1 | item),
+                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || submission_id)  + 
+                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || item),
+    data = d_infer_main_responseCat2 %>% 
+      filter(context == "basic", NP != "one"), 
+    family = 'binomial')
+  #  control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
+
+rs.glmer.subContext.noOne <- glmer(response_num~syntax_sum * NP_basicVsub + 
+                    (1 | submission_id),
+                    #(1 | item),
+                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || submission_id)  + 
+                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || item),
+    data = d_infer_main_responseCat2 %>% 
+      filter(context == "subordinate", NP != "one"), 
+    family = 'binomial')
+  #  control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
+
+
+rs.glmer.basicContext.noOne.summary <- summary(rs.glmer.basicContext.noOne)
+
+summary(rs.glmer.subContext.noOne)
+```
+
 
 ``` {r lmer}
 # random effects correlation must be set to 0 to estimate the model
