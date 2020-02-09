@@ -31,21 +31,20 @@ var stateProbs = {
 };
 
 var statePrior = {
-  sub: Infer({
-    model: function(){ return categorical({vs: stateVals, ps: stateProbs.sub}) }
-  }),
-  super: Infer({
-    model: function(){ return categorical({ vs: stateVals, ps: stateProbs.super}) }
-  })
+  referent: Categorical({vs:["dog1", "dog2", "dog3"], ps: [1,1,1]}),
+  property: {
+    sub: Categorical({vs: stateVals, ps: stateProbs.sub}),
+    super: Categorical({ vs: stateVals, ps: stateProbs.super})
+  }
 };
 
 var thresholdBins ={
   positive: map(function(x){
     return  x - (1/(binParam*2));
-  }, sort(statePrior.super.support())),
+  }, sort(statePrior.property.super.support())),
   negative: map(function(x){
     return  x + (1/(binParam*2));
-  }, sort(statePrior.super.support()))
+  }, sort(statePrior.property.super.support()))
 };
 
 var thresholdPrior = cache(function(form){
@@ -73,50 +72,59 @@ var utterancePrior = cache(function(form){
   })
 });
 
+// var sampleUtterance = function(){
+//   return {
+//     reference:,
+//     predication:
+//   }
+// }
+
 var meaning = function(utterance, state, threshold) {
-  utterance == "positive" ? state > threshold ? flip(0.9999) : flip(0.0001) :
-  utterance == "negative" ? state < threshold ? flip(0.9999) : flip(0.0001) :
-  true
+  var propertyTruthVal = utterance.predication == "big" ? state.property > threshold : //? flip(0.9999) : flip(0.0001) :
+    utterance.predication == "small" ? state.property < threshold : //? flip(0.9999) : flip(0.0001) :
+    true
+  var referentTruthVal = state.referent == utterance.reference
+  referentTruthVal && propertyTruthVal
 }
 
 var classPrior = Infer({
   model: function(){return uniformDraw(["sub", "super"])}
 });
 
-var literalListener = cache(function(u, comparisonClass) {
+var literalListener = cache(function(utterance, comparisonClass) {
   Infer({model: function(){
-    var adj = u.split("_")[0]
+    var adj = utterance.predication == "big" ? "positive" : "negative"
     var threshold = adj == "silence" ? -99 :  sample(thresholdPrior(adj))
-    var cc = u.split("_")[1] == "Adjective" ?
-        comparisonClass :
-    u.split("_")[1] == "silence" ?
-        comparisonClass :
-    u.split("_")[1]
-
-    var state = sample(statePrior[cc]);
-    var m = meaning(adj, state, threshold);
+    var state = {
+      referent: sample(statePrior["referent"]),
+      property: sample(statePrior["property"][comparisonClass])
+    }
+    var m = meaning(utterance, state, threshold);
     condition(m);
     return state;
   }})
 }, 10000)
 
-var speaker1 = cache(function(state, comparisonClass, form) {
-  Infer({model: function(){
-    var utterance = sample(utterancePrior(form))
-    var L0 = literalListener(utterance, comparisonClass)
-    factor( alphas.s1 * L0.score(state) )
-    return utterance
-  }})
-}, 10000)
+// var speaker1 = cache(function(state, comparisonClass, form) {
+//   Infer({model: function(){
+//     var utterance = sample(utterancePrior(form))
+//     var L0 = literalListener(utterance, comparisonClass)
+//     factor( alphas.s1 * L0.score(state) )
+//     return utterance
+//   }})
+// }, 10000)
+//
+// var pragmaticListener = function(form) {
+//   Infer({model: function(){
+//     var utterance = form + "_Adjective";
+//     var comparisonClass = sample(classPrior);
+//     var state = sample(statePrior["sub"]);
+//     var S1 = speaker1(state, comparisonClass, form);
+//     observe(S1, utterance);
+//     return comparisonClass
+//   }})
+// }
+// pragmaticListener('positive')
+literalListener({reference: "dog1", predication: "big"}, "super")
 
-var pragmaticListener = function(form) {
-  Infer({model: function(){
-    var utterance = form + "_Adjective";
-    var comparisonClass = sample(classPrior);
-    var state = sample(statePrior["sub"]);
-    var S1 = speaker1(state, comparisonClass, form);
-    observe(S1, utterance);
-    return comparisonClass
-  }})
-}
-pragmaticListener('positive')
+// "That dog is big"
