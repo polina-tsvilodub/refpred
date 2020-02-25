@@ -25,11 +25,10 @@ d_prod_woGlitch <- subset(d_prod, !(submission_id %in% c(1214)))
 # exclude data from non-native English speakers and those where the language information is missing
 
 d_prod_woGlitch %>% distinct(languages)
-d_prod_Native <- d_prod_woGlitch %>%
+#d_prod_Native <- d_prod_woGlitch %>%
 
-d_prod %>% distinct(languages)
+#d_prod %>% distinct(languages)
 d_prod_filt <- d_prod %>%
-
   filter(grepl("eng", languages, ignore.case = T)) %>% # excluded 14 participants
   select(submission_id, trial_name, trial_number, attempts, size, item, botresponse, response,
          condition,  picture, target) %>%
@@ -37,18 +36,13 @@ d_prod_filt <- d_prod %>%
 
 # get participants who need more than 4 attempts per warmup
 
-d_prod_warmup <- d_prod_Native %>%
-
 d_prod_warmup <- d_prod_filt %>%
-
   filter( (trial_name == "warmup1") | (trial_name == "warmup2"))
 d_prod_warmup1 <- d_prod_warmup %>% group_by(submission_id) %>%
   filter( attempts > 4)
 # exclude those participants
 
-d_prod_filt <- anti_join(d_prod_Native, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
-```
-
+#d_prod_filt <- anti_join(d_prod_Native, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
 d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
 ```
 
@@ -79,11 +73,8 @@ write_csv(myvars, path = "R_results_TeX/myvars-np.csv", col_names = T)
 ```{r filtering}
 
 # main trials
-d_prod_main <- d_prod_cleanData  %>% filter((trial_name == "main1") | (trial_name == "main2")) %>%
-
 # main trials
 d_prod_main <- d_prod_filt %>% filter((trial_name == "main1") | (trial_name == "main2")) %>%
-
   select(submission_id, trial_number, trial_name, response, size, item, syntax, picture, target)
 
 # look at the responses
@@ -117,19 +108,23 @@ d_prod_main_responseCat %>%
   group_by(syntax, response_label) %>%
   tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
   ungroup() %>%
-
   mutate(syntax = factor(syntax,
-                         levels = c("prenominal", "predicative"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
-                         labels= c("Predicate NP\n(That's a big NP.)", "Subject NP\n(That NP is big.)"))
-  ) %>%
-  ggplot(aes(x = syntax,
+                         levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
+                         labels= c( "Subject NP\n(That __ is big.)", "Predicate NP\n(That's a big __.)"))
+  ) -> d_prod_main_responseCat.bs
+
+ggplot(d_prod_main_responseCat.bs, aes(x = syntax,
              y = mean, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(0.8), fill="white", color = 'black', size = 1) +
+  geom_col(position = position_dodge(0.8),  color = 'black', size = 1,
+           fill= 'grey89') +
   geom_linerange(position = position_dodge(0.8), size=1.2) +
-  labs( y = "Proportion of basic-level responses") +
+  labs( y = "Proportion of basic-level responses", x = "") +
   ggthemes::theme_few()+
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) #+
   #ggtitle("The proportion of basic-level responses by syntactic condition")
+
+ggsave("figs/expt-np-prod-prereg-bars.pdf", width = 3.5, height = 3.5)
+
 ```
 
 ``` {r contrasts}

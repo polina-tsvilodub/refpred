@@ -81,7 +81,7 @@ myvars["nFailedWarmUp"] = d_warmUp_catch_trials %>% distinct(submission_id) %>% 
 myvars["nFailedMains"] = d_catch_main_counts %>% distinct(submission_id) %>% count() %>% .$n
 
 myvars = as_tibble(myvars)
-write_csv(myvars, path = "R_results_TeX/myvars.csv", col_names = T)
+#write_csv(myvars, path = "R_results_TeX/myvars.csv", col_names = T)
 ```
 
 
@@ -145,7 +145,7 @@ d_rate_main_full.bs %>%
   ylab("Sentence rating") #+
   #ggtitle("Experiment 1: Syntax Rating")
 
-#ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 6, height = 3.5)
+ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 5, height = 3.5)
 #
 ```
 
