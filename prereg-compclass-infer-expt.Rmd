@@ -127,10 +127,8 @@ d_infer_main_responseCat.bs %>%
   scale_y_continuous(breaks = c(0, 0.5, 1))+
   ylab("Proportion of basic-level responses")+
  # ggtitle("Experiment 3: Comparison Class Inference")+
-  facet_grid(~context)  
-
-
-ggsave("figs/expt-cci-prereg-bars.pdf", width = 6, height = 3.75)
+  facet_grid(~context)  +
+  ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
 ```
 
 
@@ -358,7 +356,7 @@ write_csv(data.frame(lm.b.infer.summary[["fixed"]]) %>%
 ```
 
 
-``` {r by-item}
+``` {r by-size}
 d_infer_main_responseCat %>%  
   group_by( context, NP, condition, target_size) %>%
   tidyboot_mean(column = response_num) -> d_infer_main_responseCat.by.size
@@ -384,7 +382,8 @@ d_infer_main_responseCat.by.size %>%
 ```
 
 ```{r}
-lm.b.infer.fit.two.way2 <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
+# two-way analysis
+lm.b.infer.fit.two.way3 <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
                         (1 + syntax_contr + NP_basic + NP_sub + context_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
@@ -457,15 +456,29 @@ lm.b.infer.fit.two.way2.item <- brm(response_num ~ syntax_sum + NP_OneVsub + NP_
                       family = "bernoulli",
                       iter = 1500,
                       cores = 4,
-                      control = list(adapt_delta = 0.9)) # otherwise there are divergent chains
-#summary(lm.b.infer.fit.two.way) # 1000 iterations and by-target radom effects
+                      control = list(adapt_delta = 0.98)) # otherwise there are divergent chains
+
+summary(lm.b.infer.fit.two.way) # 1000 iterations and by-target radom effects
+
 lm.b.infer.fit.two.way.by.item.summary <- summary(lm.b.infer.fit.two.way2)
+lm.b.infer.fit.two.way3.summary <- summary(lm.b.infer.fit.two.way3)
+write_csv(data.frame(lm.b.infer.fit.two.way3.summary[["fixed"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt3_2_way_full_brm.csv")
 ```
+
 
 ``` {r csv}
 write_csv(data.frame(lm.b.infer.fit.two.way.by.item.summary[["fixed"]]) %>%
             mutate(Rowname = row.names(.)),
           path = "R_results_TeX/expt3_2_way_brm.csv")
+```
+
+``` {r}
+d_infer_main_responseCat <- d_main_responseCat %>%
+  mutate(syntax_sum = ifelse(syntax == "subject", 0, 1),
+         NP_sum = ifelse(NP == "basic", 0, 1),
+         context_sum = ifelse(context == "basic", 0, 1))
 ```
 
 ``` {r by-size}
@@ -496,6 +509,36 @@ lm.b.infer.big <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_
                       control = list(adapt_delta = 0.9))
 summary(lm.b.infer.big)
 ```
+
+``` {r by-context and size}
+# GIVEN plot above, analysis of small targets in basic level context 
+d_infer_basicContext_small <- d_infer_main_responseCat %>% filter((target_size == "small") & (context == "basic"))
+lm.infer.basicC.small <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  +
+                        syntax_contr:NP_basic + syntax_contr:NP_sub +
+                        (0 + #syntax_contr + NP_basic + NP_sub + 
+                       # syntax_contr:NP_basic + 
+                          syntax_contr:NP_sub  || submission_id) +
+                        (0 + #syntax_contr + NP_basic + NP_sub + 
+                        #syntax_contr:NP_basic + 
+                          syntax_contr:NP_sub || item),
+                      data = d_infer_basicContext_small,
+                      family = "binomial",
+                      REML = F,
+                      control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                  )
+d_infer_basicContext_small.summary <- summary(lm.infer.basicC.small)
+d_infer_basicContext_small_sub <- d_infer_basicContext_small %>% filter(NP == "subordinate")
+lm.infer.basicC.small.sub <- glmer(response_num ~ syntax_contr +(0 + syntax_contr || submission_id) +
+                                     (1 + syntax_contr | pic),
+                                   data = d_infer_basicContext_small_sub,
+                                   family = "binomial",
+                                   control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                            )
+lm.infer.basicC.small.sub.summary <- summary(lm.infer.basicC.small.sub)
+```
+
 
 Assuming NO interaction with context
 
@@ -583,6 +626,8 @@ b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub +
 
 summary(b.context.sub)
 ```
+
+
 
 ``` {r}
 # basic context, subset by NP

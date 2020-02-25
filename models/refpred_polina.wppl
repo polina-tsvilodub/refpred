@@ -1,0 +1,182 @@
+// webppl refpred.wppl
+var binParam = 4;
+
+var stateParams = {
+  sub: {mu: 1, sigma: 0.5}, //paramsFromR.priorParams.sub[0],
+  super: {mu: 0, sigma: 1}// paramsFromR.priorParams.super[0]
+};
+
+var alphas = {s1: 3};
+
+var round = function(x){
+  return Math.round(x*10)/10
+}
+
+var stateVals = map(
+  round,
+  _.range(stateParams.super.mu - 2 * stateParams.super.sigma,
+          stateParams.super.mu + 2 * stateParams.super.sigma + stateParams.super.sigma/binParam,
+          stateParams.super.sigma/binParam)
+);
+
+var stateProbs = {
+  sub: map(function(s){
+    Math.exp(Gaussian(stateParams.sub).score(s))+
+    Number.EPSILON
+  }, stateVals),
+  super: map(function(s){
+    Math.exp(Gaussian(stateParams.super).score(s))+
+    Number.EPSILON
+  }, stateVals)
+};
+
+var statePrior = {
+  referent: Categorical({vs:["dog1", "dog2", "dog3"], ps: [1,1,1]}),
+  property: {
+    sub: Categorical({vs: stateVals, ps: stateProbs.sub}),
+    super: Categorical({ vs: stateVals, ps: stateProbs.super})
+  }
+};
+
+var thresholdBins ={
+  positive: map(function(x){
+    return  x - (1/(binParam*2));
+  }, sort(statePrior.property.super.support())),
+  negative: map(function(x){
+    return  x + (1/(binParam*2));
+  }, sort(statePrior.property.super.support()))
+};
+
+var thresholdPrior = cache(function(form){
+  return Infer({
+    model: function() { return uniformDraw(thresholdBins[form]) }
+  });
+});
+
+// var utterances = { positive: ["positive_Adjective", "positive_sub", "positive_super"], negative: ["negative_Adjective", "negative_sub", "negative_super"] };
+
+var utterances = {
+  positive: {reference: ["dog1", "dog"],
+              predication: ["big", "silence"]},
+  negative:  {reference: ["dog1", "dog"],
+              predication: ["small", "silence"]}};
+
+var referenceProbs = [1, 3];
+var predicationProbs = [1, 1]; // at this point reference and predication are not connected
+var utterancePrior = cache(function(form){
+  return Infer({
+    model: function() {
+      return {reference: categorical({vs: utterances[form].reference, ps: referenceProbs}),
+              predication: categorical({vs: utterances[form].predication, ps: predicationProbs})
+    }
+    }
+  })
+});
+
+
+// another idea, explicit utterance formulation from which we transition to reference and predication inference
+// var utterances = {
+//   positive: {subject: ["dog1", "dog", "that"],
+//               predicate: ["big", "big_dog1", "big_dog", "silence"]},
+//   negative:  {subject: ["dog1", "dog", "that"],
+//               predicate: ["small", "small_dog1", "small_dog", "silence"]}};
+
+// var referenceProbs = [1, 1, 1];
+// var predicationProbs = [1, 1, 1, 1]; // at this point reference and predication are not connected
+// var utterancePrior = cache(function(form){
+//   return Infer({
+//     model: function() {
+//       return {reference: categorical({vs: utterances[form].reference, ps: referenceProbs}),
+//               predication: categorical({vs: utterances[form].predication, ps: predicationProbs})
+//     }
+//     }
+//   })
+// });
+
+// i could also flip a subject / predicate variable and condition the meaning on that
+
+// var sampleUtterance = function(){
+//   return {
+//     reference:,
+//     predication:
+//   }
+// }
+
+var meaning = function(utterance, state, threshold) {
+  var propertyTruthVal = utterance.predication == "big" ? state.property > threshold : //? flip(0.9999) : flip(0.0001) :
+    utterance.predication == "small" ? state.property < threshold : //? flip(0.9999) : flip(0.0001) :
+    true
+  var referentTruthVal = utterance.reference == "dog" ? flip(1/3) :
+    utterance.reference == "silence" ? true:
+    state.referent == utterance.reference
+  referentTruthVal && propertyTruthVal
+}
+
+var classPrior = Infer({
+  model: function(){return uniformDraw(["sub", "super"])}
+});
+
+var literalListener = cache(function(utterance, comparisonClass) {
+  Infer({model: function(){
+    var adj = utterance.predication == "big" ? "positive" : "negative"
+    var threshold = utterance.predication == "silence" ? -99 :  sample(thresholdPrior(adj))
+    var state = {
+      referent: sample(statePrior["referent"]),
+      property: sample(statePrior["property"][comparisonClass])
+    }
+    var m = meaning(utterance, state, threshold);
+    condition(m);
+    return state;
+  }})
+}, 10000)
+
+// i have to assign different utilities to different utterances
+var speaker1 = cache(function(state, comparisonClass, form) {
+  Infer({model: function(){
+    var utterance = sample(utterancePrior(form))
+    var L0 = literalListener(utterance, comparisonClass)
+    var uttUtility = {
+      referential :  L0.score(state), // i actually need the marginal probability here?
+      predicative: (0 - L0.score(state)) // sketchy yet, but the idea is that the two utilities are complementary
+      // the actual representation is still defined through the maning function here though - subject / predicate NP var seems promising
+    }
+    var speakerUtility = uttUtility.referential + uttUtility.predicative
+    factor( alphas.s1 * speakerUtility )
+    return utterance
+  }})
+}, 10000)
+
+// following works
+// var speaker1 = cache(function(state, comparisonClass, form) {
+//   Infer({model: function(){
+//     var utterance = sample(utterancePrior(form))
+//     var L0 = literalListener(utterance, comparisonClass)
+//     factor( alphas.s1 * L0.score(state) )
+//     return utterance
+//   }})
+// }, 10000)
+//
+// var pragmaticListener = function({reference, predication}, syntax) {
+//   Infer({model: function(){
+//     var utterance = form + "_Adjective";
+//     var comparisonClass = sample(classPrior);
+//     var state = sample(statePrior["sub"]);
+//     var S1 = speaker1(state, comparisonClass, form);
+//     observe(S1, utterance);
+//     return comparisonClass
+//   }})
+// }
+// pragmaticListener('positive')
+// literalListener({reference: "dog1", predication: "big"}, "sub")
+
+// "That dog is big"
+// print(stateVals)
+// viz(stateProbs.super)
+// print(thresholdBins.negative)
+// viz(statePrior.property["super"])
+// sample(utterancePrior("negative"))
+// speaker1("dog1", "super", "positive")
+
+print(literalListener({reference: "dog1", predication: "small"}, "super").score({referent: "dog1", property: 1}))
+print(literalListener({reference: "dog1", predication: "big"}, "sub").score({referent: "dog1"}))
+// speaker1({referent: "dog1", property: 1}, "sub", "negative")

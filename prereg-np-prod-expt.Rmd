@@ -42,8 +42,12 @@ d_prod_warmup1 <- d_prod_warmup %>% group_by(submission_id) %>%
   filter( attempts > 4)
 # exclude those participants
 
+
+### NOT SURE WHICH TO KEEP DURING MERGE!!
+
 #d_prod_filt <- anti_join(d_prod_Native, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
 d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
+# d_prod_filt <- anti_join(d_prod_Native, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
 ```
 
 
@@ -97,7 +101,7 @@ d_prod_main_responseCat <- d_prod_main_valid %>%
   )
 ```
 
-``` {r}
+```{r}
 # predicative : 95
 # prenominal 94
 ```
@@ -121,6 +125,7 @@ ggplot(d_prod_main_responseCat.bs, aes(x = syntax,
   labs( y = "Proportion of basic-level responses", x = "") +
   ggthemes::theme_few()+
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) #+
+ # ggsave("figs/expt2-np-production.pdf", width = 5.5, height = 3.5)
   #ggtitle("The proportion of basic-level responses by syntactic condition")
 
 ggsave("figs/expt-np-prod-prereg-bars.pdf", width = 3.5, height = 3.5)
@@ -187,6 +192,9 @@ b.prod.lm.summary <- summary(b.prod.lm)
 write_csv(data.frame(b.prod.lm.summary[["fixed"]]) %>%
             mutate(Rowname = row.names(.)),
           path = "R_results_TeX/expt2_brm.csv")
+write_csv(data.frame(b.prod.lm.summary[["random"]]["target"]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt2_random_brm2.csv")
 ```
 
 ``` {r}
@@ -230,6 +238,7 @@ d_prod_main_responseCat %>%
   ggsave("figs/expt-np-production-by-item.pdf", width = 6, height = 3.5)
 
 ```
+
 ``` {r}
 # separate by size
 d_prod_big <- d_prod_main_responseCat %>% filter(size == "big")
@@ -276,6 +285,9 @@ lm.b.prod.pred <- brm(resp_cat ~  size_contr + (1 + size_contr | submission_id) 
                     family = "bernoulli",
                     control=list(adapt_delta=0.95))
 summary(lm.prod.subj)
-summary(lm.b.prod.pred)
+lm.b.prod.pred.summary <- summary(lm.b.prod.pred)
 summary(lm.prod.pred)
+write_csv(data.frame(lm.b.prod.pred.summary[["fixed"]]) %>%
+             mutate(Rowname = row.names(.)),
+           path = "R_results_TeX/expt2_predicate_brm.csv")
 ```

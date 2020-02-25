@@ -142,12 +142,13 @@ d_rate_main_full.bs %>%
   ggthemes::theme_few()+
   #facet_wrap(~order) +
   xlab("") + 
-  ylab("Sentence rating") #+
+  ylab("Sentence rating") +
   #ggtitle("Experiment 1: Syntax Rating")
 
 ggsave("figs/expt-syntax-rating-prereg-bars.pdf", width = 5, height = 3.5)
-#
 ```
+
+
 
 ``` {r contrasts}
 # contrast coding: explicitly numeric, to avoid strange behavior of random effects estimation
@@ -203,15 +204,22 @@ summary(lm.fit.full)
 ```
 
 
-``` {r lmer}
-# full model without presentation order main effect, it will be used in case the order effect is not significant 
-lm.fit <- lmer(response ~ syntax*NP + 
-                         (1 + syntax*NP | submission_id) + 
-                         (1 + syntax*NP  | item),
-                data = d_rate_main_full,
-                REML = F
-                )
-summary(lm.fit)
+``` {r bootstrap}
+#random-effects parameter estimates: these are parameterized as the relative Cholesky factors of each random effect term
+myFun <- function(.) {c(beta =getME(., "theta"))}
+myFun_fixed <- function(.) {c(beta = getME(., "beta"))} 
+# bootstrap 
+boo1 <- bootMer(lm.fit.full, myFun, nsim = 10)
+head(as.data.frame(boo1))
+boo2 <- bootMer(lm.fit.full, myFun_fixed, 10)
+head(as.data.frame(boo2))
+# index is the position of the effect of interest in boo1$t0
+bCI.subj.Intercept <- boot::boot.ci(boo1, index=1,  type="norm")
+bCI.subj.Intercept
+bCI.item.Intercept <- boot::boot.ci(boo1, index=11,  type="norm")
+bCI.item.Intercept
+
+#lm.rating.boot <- modelr::bootstrap(lm.fit.full, 10)
 ```
 
 ``` {r brm}
@@ -229,6 +237,10 @@ b.lm.fit.summary <- summary(b.lm.fit)
 write_csv(data.frame(b.lm.fit.summary[["fixed"]]) %>% 
             mutate(Rowname = row.names(.)), 
           path = "R_results_TeX/expt1_brm.csv")
+write_csv(data.frame(b.lm.fit.summary[["random"]]) %>% 
+            mutate(Rowname = row.names(.)), 
+          path = "R_results_TeX/expt1_random_brm.csv")
+
 myTable = cbind(tibble(Rowname = row.names(summary(b.lm.fit)[["fixed"]])), 
                 summary(b.lm.fit)[["fixed"]] %>% as_tibble())
 write_csv(myTable, path = "R_results_TeX/syntax-rating-brm.csv", col_names = T)
