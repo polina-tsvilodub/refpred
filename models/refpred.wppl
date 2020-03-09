@@ -72,18 +72,22 @@ var utterancePrior = cache(function(form){
   })
 });
 
-// var sampleUtterance = function(){
-//   return {
-//     reference:,
-//     predication:
-//   }
-// }
+var sampleUtterance = function(){
+  var subject = uniformDraw(["that", "that dog"])
+  var predicate = uniformDraw(["big", "big dog"])
+  return { subject, predicate }
+  }
+}
+
+var parseUtterance = function(utterance){
+  utterance.subject == "that" ? 
+}
 
 var meaning = function(utterance, state, threshold) {
-  var propertyTruthVal = utterance.predication == "big" ? state.property > threshold : //? flip(0.9999) : flip(0.0001) :
-    utterance.predication == "small" ? state.property < threshold : //? flip(0.9999) : flip(0.0001) :
+  var referentTruthVal = utterance.subject == "that" ? true : utterance.subject == state.referent
+  var propertyTruthVal = utterance.predicate == "big" ? state.property > threshold : //? flip(0.9999) : flip(0.0001) :
+    utterance.predicate == "small" ? state.property < threshold : //? flip(0.9999) : flip(0.0001) :
     true
-  var referentTruthVal = state.referent == utterance.reference
   referentTruthVal && propertyTruthVal
 }
 
@@ -93,7 +97,7 @@ var classPrior = Infer({
 
 var literalListener = cache(function(utterance, comparisonClass) {
   Infer({model: function(){
-    var adj = utterance.predication == "big" ? "positive" : "negative"
+    var adj = utterance.predicate == "big" ? "positive" : "negative"
     var threshold = adj == "silence" ? -99 :  sample(thresholdPrior(adj))
     var state = {
       referent: sample(statePrior["referent"]),
