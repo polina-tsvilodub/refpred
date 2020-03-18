@@ -200,14 +200,26 @@ var stateProbs = {
   }, stateVals)
 };
 
-var statePrior = {
-  referent: Categorical({vs:["dog1", "dog2", "dog3"], ps: [1,1,1]}),
-  property: {
-    sub: Categorical({vs: stateVals, ps: stateProbs.sub}),
-    super: Categorical({ vs: stateVals, ps: stateProbs.super})
-  }
-};
+// var statePrior = {
+//   referent: Categorical({vs:["dog1", "dog2", "dog3"], ps: [1,1,1]}),
+//   property: {
+//     sub: Categorical({vs: stateVals, ps: stateProbs.sub}),
+//     super: Categorical({ vs: stateVals, ps: stateProbs.super})
+//   }
+// };
 
+var generateStatePrior = cache(function(cc) {
+  return Infer({
+    model: function(){
+      return {
+//         referent: categorical({vs: ["dog1", "dog2", "dog3"], ps: [1,1,1] }),
+        referent: uniformDraw( ["dog1", "dog2", "dog3"] ),
+        property: categorical({vs: stateVals, ps: stateProbs[cc]})
+//         categorical({vs: stateVals, ps: stateProbs[cc]})
+      }
+    }
+  })
+});
 
 // // generate the uniform threshold prior
 var thresholdBins = cache(function(form, stateSupport){
@@ -226,15 +238,15 @@ var thresholdPrior = cache(function(form, stateSupport){
 // // they can either mention the subordiate category (e.g., for a gymnast),
 // // the superordinate category (i.e., for a person), or no category
 var utterances = {
-  positive: ["subject_dog1_big", "subject_dog_big", "predicate_dog1_big", "predicate_dog_big"],
-  negative: ["subject_dog1_small", "subject_dog_small", "predicate_dog1_small", "predicate_dog_small"]
+  positive: ["subject_dog1_positive", "subject_dog_positive", "predicate_dog1_positive", "predicate_dog_positive"],
+  negative: ["subject_dog1_negative", "subject_dog_negative", "predicate_dog1_negative", "predicate_dog_negative"]
 }
 
 var meaning = function(utterance, state, threshold) {
-  var propertyTruthVal = utterance.predication == "big" ? state.property > threshold : //? flip(0.9999) : flip(0.0001) :
-    utterance.predication == "small" ? state.property < threshold : //? flip(0.9999) : flip(0.0001) :
+  var propertyTruthVal = utterance.predication == "positive" ? state.property > threshold : //? flip(0.9999) : flip(0.0001) :
+    utterance.predication == "negative" ? state.property < threshold : //? flip(0.9999) : flip(0.0001) :
     true
-  var referentTruthVal = utterance.reference == "dog" ? true :
+  var referentTruthVal = utterance.reference == "dog" ? flip(0.3) :
     utterance.reference == "silence" ? true:
     state.referent == utterance.reference
   referentTruthVal && propertyTruthVal
@@ -251,7 +263,7 @@ var alpha = 5;
 var literalListener = cache(
   function(u, threshold, comparisonClass, subordinate) {
     Infer({model: function(){
-      var adj = u.split("_")[2] == "big" ? "positive" : "negative";
+//       var adj = u.split("_")[2];
       var utterance =  {reference: u.split("_")[0] == "subject" ? u.split("_")[1] : subordinate,
                         predication: u.split("_")[2]
                        };
@@ -261,20 +273,19 @@ var literalListener = cache(
       // otherwise, use whatever the pragmaticListener model passes in
       var cc = explicitCC == "dog" ?  "super" :
                explicitCC == "dog1" ? "sub" : explicitCC
-      var state = {
-        referent: sample(statePrior["referent"]),
-        property: cc == "super" ? sample(statePrior["property"].super) : sample(statePrior["property"].sub)
-      };
-
 //       var state = {
-//       referent: sample(statePrior["referent"]),
-//       property: sample(statePrior["property"][comparisonClass])
-//     }
-      var syntax = u.split("_")[0] == "subject" ? "super" : explicitCC == "dog1" ? "sub" : "super";
+//         referent: sample(statePrior["referent"]),
+//         property: cc == "super" ? sample(statePrior["property"].super) : sample(statePrior["property"].sub)
+//       };
+      var state = {referent: uniformDraw(),
+                   property: sample(generateStatePrior(cc))
+                  };
+//       var syntax = u.split("_")[0] == "subject" ? "super" : explicitCC == "dog1" ? "sub" : "super";
 //       var threshold = utterance.predication == "silence" ? -99 :  sample(thresholdPrior(adj, syntax))
       var m = meaning(utterance, state, threshold);
       condition(m);
       return {reference: state.referent, predication: state.property};
+//       return state;
     }})
   }, 10000 // limit cache size
 )
@@ -296,58 +307,38 @@ var uttUtility = {
   }, 10000 // limit cache size
 )
 
-// // var pragmaticListener = cache(function(utterance, subordinate) {
-// //   Infer({model: function(){
-// //     var form = utterance.split("_")[0];
-// //     var explicitCC = utterance.split("_")[1];
+var pragmaticListener = cache(function(utterance, subordinate) {
+  Infer({model: function(){
+    var form = utterance.split("_")[2];
+//     var statePrior = generateStatePrior(
+//       utterance.split("_")[1] == "dog1" ? 'sub' : 'super'); // this is incorrect, it needs to be the class to be expected on the size scale (low/medium/high)
+    var statePrior = generateStatePrior('sub') // assume that listener always knows the sub category of referent
+    var state = sample(statePrior);
+    var threshold = sample(thresholdPrior(form, _.uniq(map(function(s){return s.property}, statePrior.support() )) ))
+    // uncertainty about the comparison class (super vs. sub)
+    var c = sample(classPrior)
 
-// //     var statePrior = generateStatePrior(
-// //       subordinate
-// //     );
-// //     var state = sample(statePrior);
-// //     var threshold = sample(thresholdPrior(form, statePrior.support()))
-// //     // uncertainty about the comparison class (super vs. sub)
-// //     var c = sample(classPrior)
+    var S1 = speaker1(state, c, form, threshold, subordinate);
+    observe(S1, utterance);
+    return { comparisonClass: c, state: state }
+  }})
+}, 10000 // limit cache size
+                             )
 
-// //     var S1 = speaker1(state, threshold, c, form, subordinate);
-// //     observe(S1, utterance);
-// //     return { comparisonClass: c, state: state }
-// //   }})
-// // }, 10000 // limit cache size
-// //                              )
-
-// // the possible experiment conditions:
-// // you hear that someone is a member of a subordinate category
-// // then you are told that they are tall/short;
-// // // the task is to figure out the implicit comparison class
-// // var exptConditions = [
-// //   {utt: "positive_sub", form: "positive", sub: "high"},
-// //   {utt: "negative_null", form: "negative", sub: "high"},
-// //   {utt: "positive_null", form: "positive", sub: "middle"},
-// //   {utt: "negative_null", form: "negative", sub: "middle"},
-// //   {utt: "positive_null", form: "positive", sub: "low"},
-// //   {utt: "negative_null", form: "negative", sub: "low"}
-// // ];
-
-// // // generate structure predictions by mapping through the experiment conditions
-// // var L1predictions = map(function(stim){
-// //   var L1posterior = pragmaticListener(stim.utt, subParams[stim.sub])
-// //   return {
-// //     x: stim.form,
-// //     y: exp(marginalize(L1posterior, "comparisonClass").score("super")),
-// //     sub: stim.sub,
-// //     model: "L1"
-// //   }
-// // }, exptConditions)
-
-// // display("probability of superordinate comparison class (i.e., tall for all people)")
-// // viz.bar(L1predictions, {groupBy: 'sub'})
-
-// literalListener("subject_dog1_small", 0, "super", "dog2")
+// literalListener("subject_dog_positive", 0, "sub", "dog1")
 // literalListener("subject_dog1_big", 0.8, "super", "dog1")
-speaker1({referent: "dog1", property: 0.5}, "sub", "negative", 0.6, "dog1")
+// speaker1({referent: "dog1", property: 0}, "sub", "negative", 0.6, "dog1")
 // // print(thresholdBins["positive"].sub)
 // // print(thresholdBins["positive"].super)
 // // print(statePrior["property"].super.support())
 // // print(uniformDraw(thresholdBins["positive"].super))
 // // thresholdPrior("positive", "sub")
+
+// print(generateStatePrior('super')['property'].support())
+
+// pragmaticListener("subject_dog_positive", "dog1")
+// viz(listenerPosterior)
+// var statePrior = generateStatePrior('sub')
+// sample(thresholdPrior('negative', _.uniq(map(function(s){return s.property}, statePrior.support() )) ))
+viz(generateStatePrior('sub'))
+viz(generateStatePrior('super'))
