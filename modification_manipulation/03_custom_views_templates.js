@@ -109,7 +109,7 @@ const custom_free_paraphrase = function(config, startingTime) {
         <p class="magpie-view-question">${config.data[CT].text}</p>
       </section>
       <div class="picture" align="center">
-        <img src="${config.data[CT].pic}" >
+        <img src="${config.data[CT].target_picture}" >
       </div>
       <section class="magpie-text-container">
         <p class="magpie-view-question">${config.data[CT].utterance}</p>
@@ -118,7 +118,7 @@ const custom_free_paraphrase = function(config, startingTime) {
         <p class="magpie-view-question">${config.data[CT].question}</p>
       </section>
       <div class='magpie-view-answer-container'>
-      ${config.data[CT].sentence_left}
+      ${config.data[CT].paraphrase}
             <textarea name='textbox-input' rows=1 cols=15 class='textbox-input'/>
 
       </div>
@@ -151,7 +151,7 @@ const custom_free_paraphrase = function(config, startingTime) {
             let trial_data = {
                 trial_name: config.name,
                 trial_number: CT + 1,
-                question: config.data[CT].sentence_left.concat("..."),
+                question: config.data[CT].paraphrase.concat("..."),
                 response: textInput.val().trim(),
                 RT: RT
             };
