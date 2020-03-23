@@ -46,7 +46,8 @@ function create_view(items, syntactic_cond, target_size, syntax, contexts, num_t
       syntax: syntax[syntactic_cond[i]], // record the synactic condition  as string
       adj: items[contexts[i]][target_size[i]].adj, // record target size
       question: "What do you think is it " + items[contexts[i]][target_size[i]].adj + " relative to?", // task question
-      paraphrase: "It is " + items[contexts[i]][target_size[i]].adj + " relative to other " // paraphrase template
+      paraphrase: "It is " + items[contexts[i]][target_size[i]].adj + " relative to other ", // paraphrase template
+      reference: items[contexts[i]][target_size[i]].reference // the additional referential noun
     }
     expt_views.push(view);
   }
