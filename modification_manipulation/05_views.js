@@ -38,10 +38,10 @@ const thanks = magpieViews.view_generator("thanks", {
 const comp_class_warmup = custom_comp_class_warmup({
   name: 'comp_class_warmup',
   trials: 1,
-  context: "In the main trials you will be asked to rephrase something a person said. The utterance will contain a word that is <i>relative</i> and your task is to figure out what it is relative to. <br /> <br /> For example: <br /><br />",
+  context: "In the main trials you will be asked to rephrase something a person said. The utterance will contain a word that is <i>relative</i> and your task is to figure out what it is relative to. <br /> <br /> For example: <br />",
   sentence: "<b> Speaker A: \"The Empire State Building is tall.\"</b>",
   question: "<i>What do you think Speaker A meant? </i>",
-  sentence_left: "The Empire State Building is tall relative to other ",
+  paraphrase: "The Empire State Building is tall relative to other ",
   correct: "buildings, skyscrapers, houses, constructions (choose one)"
 });
 
@@ -74,7 +74,7 @@ const warmup1 = custom_textfield_warmup({
 const warmup2 = custom_textfield_warmup({
   name: 'warmup2',
   title: 'Labeling task',
-  trials: 3,
+  trials: 2,
   data: trial_info.text_insertion_warmup2,
 });
 
@@ -108,7 +108,7 @@ const custom_post_test = custom_post_test_view({
 const custom_intro = custom_intro_view({
   name: 'Intro',
   title: 'Welcome!',
-  picture1: '../../images/cpl.png',
+  picture1: 'images/cpl.png',
   trials: 1
 
 });
@@ -122,10 +122,9 @@ const context1 = magpieViews.view_generator("instructions",{
     Next, you will complete the main trials.
     <br/>
     <br/>
-    You and your friend watch groups of objects and talk about them.
+    Please rephrase the sentence a person said.
     <br />
     <br />
-
     Press the button 'Go to trials' to begin the main trials.
             `,
     buttonText: 'go to trials'

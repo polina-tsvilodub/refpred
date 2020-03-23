@@ -12,7 +12,7 @@ const target_size = _.shuffle([0,0,0,1,1,1])
 
 const syntax = ["subject", "predicate"]
 
-const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees", "fish"])
+const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
 console.log(contexts)
 // flips the coin if the big or the small referent gets the corresponding basic-level context (the other one gets respective subordinate context)
 // const context = function() {
@@ -28,7 +28,7 @@ console.log(contexts)
 
 ///////////////////////////
 //   adjust if needed
-const num_trials = 6
+const num_trials = 5
 //////////////////////////
 
 // creating views with all the necessary information
@@ -36,7 +36,7 @@ function create_view(items, syntactic_cond, target_size, syntax, contexts, num_t
   const expt_views = []
   for ( i = 0; i < num_trials; i ++) { // the iterator iterates over all the contexts and takes one target per context (either big or small)
     const view = {
-      context: items[contexts[i]][target_size[i]].context_sent +  "and you see the folowing:", // target_size indicates if the target is big or small within the given context
+      context: items[contexts[i]][target_size[i]].context_sent +  "and you see the following:", // target_size indicates if the target is big or small within the given context
       context_picture: items[contexts[i]][target_size[i]].context_picture, // context picture is chose (it is the same for both big and small targets)
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
       target_picture: items[contexts[i]][target_size[i]].target, // target picture, differs for bis and small target
@@ -104,21 +104,21 @@ const items = {
   birds: [
     {
      item: "eagle",
-     context_sent: "You visit your friend who works at a zoo ",
+     context_sent: "You visit your friend who works at an animal shelter ",
      context_picture: "images/bird-parade-basic.png",
      adj: "big ",
      target: "images/eagle.png",
-     utterances: ["That big eagle is a new exemplar", "That new exemplar is a big eagle"],
-     reference: "new exemplar"
+     utterances: ["That big eagle is a rescue", "That rescue is a big eagle"],
+     reference: "rescue"
    },
    {
     item: "hummingbird",
-    context_sent: "You visit your friend who works at a zoo ",
+    context_sent: "You visit your friend who works at an animal shelter ",
     context_picture: "images/bird-parade-basic.png",
     adj: "small ",
     target: "images/hummingbird.png",
-    utterances: ["That small hummingbird is a new exemplar", "That new exemplar is a small hummingbird"],
-    reference: "new exemplar"
+    utterances: ["That small hummingbird is a rescue", "That rescue is a small hummingbird"],
+    reference: "rescue"
    }
   ],
   fish: [
@@ -167,18 +167,18 @@ const items = {
      context_sent: "You and your friend walk to their cabin in a park for the first time. You want to memorize the path ",
      context_picture: "images/tree-parade-basic.png",
      adj: "big ",
-     target: "images/redwood.png",
-     utterances: ["That big redwood is a sign", "That sign is a big redwood"],
-     reference: "sign"
+     target: "images/redwood_sign.png",
+     utterances: ["That big redwood is a landmark", "That landmark is a big redwood"],
+     reference: "landmark"
    },
   {
    item: "bonsai",
    context_sent:  "You and your friend walk to their cabin in a park for the first time. You want to memorize the path ",
    context_picture: "images/tree-parade-basic.png",
    adj: "small ",
-   target: "images/bonsai.png",
-   utterances: ["That small bonsai is a sign", "That sign is a small bonsai"],
-   reference: "sign"
+   target: "images/bonsai_stick.png",
+   utterances: ["That small bonsai is a landmark", "That landmark is a small bonsai"],
+   reference: "landmark"
  }
  ]
 }
@@ -186,7 +186,7 @@ const items = {
 // warm-up trial information
 // a warm-up block contains the same targets that the following main block contains
 const warmup_trials = {dogs1: {
-  item: "dogs",
+  item: "dogs1",
   picture1: "warmup/chihuahua.jpg",
   picture2: "warmup/doberman.png",
   correct1: ["chihuahua"], // correct labels for the feedback
@@ -198,7 +198,7 @@ const warmup_trials = {dogs1: {
   question2: "These are both"
 },
 dogs2: {
-  item: "dogs",
+  item: "dogs2",
   picture1: "warmup/pug.jpg",
   picture2: "warmup/great-dane.jpg",
   correct1: ["pug"],
@@ -272,7 +272,7 @@ const trials = [
   {x:warmup_trials[contexts[2]], y:main_trials[2]},
   {x:warmup_trials[contexts[3]], y:main_trials[3]},
   {x:warmup_trials[contexts[4]], y:main_trials[4]},
-  {x:warmup_trials[contexts[5]], y:main_trials[5]}
+//  {x:warmup_trials[contexts[5]], y:main_trials[5]}
 ]
 
   const trial_info = {
@@ -288,8 +288,8 @@ const trials = [
     text_insertion_main2 :[
 
       trials[3].y,
-      trials[4].y,
-      trials[5].y
+      trials[4].y
+    //  trials[5].y
     ],
      text_insertion_warmup1: [
        // get the warmup trials corresponding to the main trials in the first main block
@@ -300,7 +300,7 @@ const trials = [
     text_insertion_warmup2: [
       // warm-up trials for second block
       trials[3].x,
-      trials[4].x,
-      trials[5].x
+      trials[4].x
+  //    trials[5].x
     ]
   };
