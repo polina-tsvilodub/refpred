@@ -3,9 +3,14 @@ Modification Manipulation Pilot
 Polina Tsvilodub
 30 03 2020
 
-``` r
-library(tidyverse)
-```
+We ran a pilot (n=36) for an NP modification manipulation experiment.
+Here, we disentangle the effects of noun modification (direct vs
+indirect) from the effect of the noun position (subject vs predicate) on
+comparison class inference. Participants inferred the comparison class
+(via free paraphrase) from the sentences ‘That {big, small} NP is a
+prize-winner’ or ‘That prize-winner is a {small, big} NP’
+(within-subject). We created nouns like ‘prize-winner’ for five context
+items (trees, 2 x dogs, flowers, birds).
 
     ## -- Attaching packages --------------------------------------------------------------------------- tidyverse 1.2.1 --
 
@@ -22,15 +27,7 @@ library(tidyverse)
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
-``` r
-library(tidyboot)
-```
-
     ## Warning: package 'tidyboot' was built under R version 3.5.3
-
-``` r
-library(brms)
-```
 
     ## Warning: package 'brms' was built under R version 3.5.3
 
@@ -41,10 +38,6 @@ library(brms)
     ## Loading 'brms' package (version 2.8.0). Useful instructions
     ## can be found by typing help('brms'). A more detailed introduction
     ## to the package is available through vignette('brms_overview').
-
-``` r
-library(lmerTest)
-```
 
     ## Loading required package: lme4
 
@@ -76,16 +69,6 @@ library(lmerTest)
     ##     step
 
 ``` r
-# read data
-#d_infer <- read_csv('../data/results_32_modification-manipulation-pilot.csv')
-```
-
-``` r
-# clean the data for github
-#d_infer_clean <- d_infer %>% subset( select = -c(startDate, hit_id, assignment_id, worker_id))
-
-#write_csv(d_infer_clean, '../data/results_32_modification_manipulation_pilot.csv')
-
 d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
 ```
 
@@ -105,6 +88,10 @@ d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
     ## )
 
     ## See spec(...) for full column specifications.
+
+7 participants were excluded for failing the warm-up tasks (1 test
+comparison class inference trial and 5 labeling trials) or reporting a
+native language other than English.
 
 ``` r
 # exclude participants who report difficulties
@@ -133,7 +120,6 @@ d_infer_warmup <- d_infer_Native %>%
 # excluding 6 participants
 d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
 d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
-#d_infer_filt1 <- d_infer_Native
 ```
 
 ``` r
@@ -149,10 +135,15 @@ d_infer_filt1 %>% count(syntax, adj)
     ## 4 subject   small    39
     ## 5 <NA>      <NA>    285
 
+The produced responses are categorized into basic-level and subordinate
+responses. There were 11 invalid responses (mostly, they were blank
+adjectives or referring to the human in the picture). Superordinate
+responses are collapsed with basic-level responses.
+
 ``` r
 d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
                                           (trial_name == "custom_main_text2")) %>%
-#  filter(submission_id != 1548) %>% filter(submission_id != 1549) %>%
+
   mutate(syntax = factor(syntax)
          ) %>%
   select(submission_id, trial_number, target, item, response, syntax,
@@ -173,9 +164,12 @@ d_infer_main_responseCat <- d_infer_valid %>%
     response_num = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
   )
-#d_infer_main_superordinate <- d_infer_main_responseCat %>%
- # filter(tolower(response) %in% c("things", "objects", "animal", "weeds", "plant"))
 ```
+
+## Subject vs. predicate NP position plot
+
+The proportion of inferred basic-level comparison classes is plotted
+by-syntax (subject vs. predicate) (n=29 participants).
 
 ``` r
 # plot
@@ -214,6 +208,12 @@ d_infer_main_responseCat.bs %>%
  # facet_grid(~context)  +
   #ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
 ```
+
+## By-item plot
+
+The overall effect is mainly driven by the big bird and flower items
+(eagle and sunflower) and a bit by the big tree (redwood) and the small
+bird (hummingbird) items.
 
 ``` r
 d_infer_main_responseCat %>%  
@@ -272,6 +272,11 @@ d_infer_main_responseCat %>% count( item, syntax)
 ``` r
 #d_infer_main_responseCat %>% count(item)
 ```
+
+## Stats
+
+Including random by-participant intercepts, we get a significant effect
+of syntax (dummy-coded) (p=0.04).
 
 ``` r
 # a simple model
