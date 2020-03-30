@@ -1,0 +1,161 @@
+---
+title: "Modification Manipulation Pilot"
+author: "Polina Tsvilodub"
+date: "30 03 2020"
+output: github_document
+---
+
+``` {r libraries}
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+```
+
+``` {r data}
+# read data
+#d_infer <- read_csv('../data/results_32_modification-manipulation-pilot.csv')
+
+```
+
+``` {r}
+# clean the data for github
+#d_infer_clean <- d_infer %>% subset( select = -c(startDate, hit_id, assignment_id, worker_id))
+
+#write_csv(d_infer_clean, '../data/results_32_modification_manipulation_pilot.csv')
+
+d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
+```
+
+``` {r filter}
+# exclude participants who report difficulties
+d_infer1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+
+d_infer_woGlitches <- d_infer1 # %>% subset( !(submission_id %in% c()))
+
+# exclude data from non-native English speakers and those where the language information is missing
+d_infer_woGlitches %>% distinct(languages) %>% View()
+d_infer_Native <- d_infer_woGlitches %>%
+  filter(grepl("en", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, adj, item, target, response, botresponse,
+         syntax, attempts, reference)
+
+# participants who do not get the comparison class warmup right
+d_infer_cc_warmup <- d_infer_Native %>% filter( trial_name == "comp_class_warmup") %>%
+  group_by(submission_id) %>% count() %>%
+  filter( n > 4 )
+
+# exclude participants who need more than 4 attempts per warmup
+d_infer_warmup <- d_infer_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 4)
+
+# excluding 6 participants
+d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
+d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
+#d_infer_filt1 <- d_infer_Native
+```
+
+``` {r}
+d_infer_filt1 %>% count(syntax, adj)
+```
+
+
+``` {r categorization}
+d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
+                                          (trial_name == "custom_main_text2")) %>%
+#  filter(submission_id != 1548) %>% filter(submission_id != 1549) %>%
+  mutate(syntax = factor(syntax)
+         ) %>%
+  select(submission_id, trial_number, target, item, response, syntax,
+        adj)
+
+# categorize responses
+d_infer_main %>% distinct(response) %>% View()
+# exclude invalid responses
+d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c( "human", "small", "place", "man", "little", "winner", "yes", "swifts", "size"))) # 11 responses excluded
+d_infer_main_responseCat <- d_infer_valid %>%
+  rowwise() %>%
+  mutate(  
+    response_cat =
+      ifelse( # do be extended dependent on responses provided
+        tolower(response) %in% c("birds", "bird","dog", "dogs", "fish","flower", "flowers","trees", "tree", "other dogs", "other flowers", "plant", "plants", "animals", "flowers in the garden", "all the other trees", 
+                                 "the other birds in the animal shelter", "all the other dogs at the dog park", "dogs at the dog show"), "basic", "subordinate"),
+
+    response_num = ifelse(response_cat == "basic", 1, 0),
+    response_label = "basic"
+  )
+#d_infer_main_superordinate <- d_infer_main_responseCat %>%
+ # filter(tolower(response) %in% c("things", "objects", "animal", "weeds", "plant"))
+```
+
+
+``` {r proportions plot}
+# plot
+bar.width = 0.8
+d_infer_main_responseCat %>%  
+  group_by(syntax) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
+
+
+d_infer_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses")
+ # ggtitle("Experiment 3: Comparison Class Inference")+
+ # facet_grid(~context)  +
+  #ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
+```
+``` {r}
+d_infer_main_responseCat %>%  
+  group_by(syntax, item, adj) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item
+
+
+d_infer_main_responseCat.bs.item %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
+                                         "Predicate NP\n(That prize-winner\n is a big NP)")),
+         size = factor(adj, level = c("big", "small"), labels = c("big", "small"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-item inferred Comparison Classes")+
+  facet_grid(item~size)
+
+```
+
+``` {r}
+d_infer_main_responseCat %>% count( item, syntax)
+#d_infer_main_responseCat %>% count(item)
+```
+
+``` {r}
+# a simple model
+
+d.infer.glm <- glmer(response_num ~ syntax + (1 | submission_id), # + (0 + syntax || item), 
+                     data = d_infer_main_responseCat,
+                     family = 'binomial')
+summary(d.infer.glm)
+```
