@@ -65,7 +65,7 @@ const items = {
      adj: "big",
      target: "images/doberman.png",
      // first array is subject  , second is predicate
-     utterances: ["That big doberman is a service animal", "That service animal is a big doberman."],
+     utterances: ["That big doberman is a service animal", "That service animal is a big doberman"],
      reference: "service animal" // critical utterances
    },
    // second set contains the subordinate context
