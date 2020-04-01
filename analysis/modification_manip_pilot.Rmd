@@ -15,6 +15,7 @@ library(tidyboot)
 library(brms)
 library(lmerTest)
 ```
+
 ``` {r}
 
 d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
@@ -159,4 +160,39 @@ d.infer.glm <- glmer(response_num ~ syntax + (1 | submission_id), # + (0 + synta
                      data = d_infer_main_responseCat,
                      family = 'binomial')
 summary(d.infer.glm)
+```
+
+``` {r}
+d.infer.brm <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + syntax | target ),
+                   data = d_infer_main_responseCat,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.98))
+
+summary(d.infer.brm)
+```
+
+``` {r}
+d.infer.brm.target <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + syntax | item ),
+                   data = d_infer_main_responseCat,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.99))
+
+summary(d.infer.brm.target)
+```
+
+``` {r}
+# contrast coded
+d_infer_main_responseCat <- d_infer_main_responseCat %>% rowwise() %>%
+  mutate(syntax_contr = ifelse(syntax == "subject", 0.5, -0.5))
+
+d.infer.brm.contr <- brm(response_num ~ syntax_contr + (1 + syntax_contr | submission_id ) + 
+                           (1 + syntax_contr | target ),
+                   data = d_infer_main_responseCat,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.9))
+
+summary(d.infer.brm.contr)
 ```
