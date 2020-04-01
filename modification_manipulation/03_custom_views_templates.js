@@ -494,7 +494,7 @@ const custom_post_test_view = function(config) {
               </select>
           </p>
           <p class = "magpie-view-text" >
-              <label for="fairprice">What do you think is a fair price for the work you did?</label>
+              <label for="fairprice">What do you think is a fair amount of compensation for your participation in this experiment?</label>
               <input type="number" name="fairprice" min="0" max="100" id="fairprice" step="0.01"/>
           </p>
           <p class = "magpie-view-text" >
@@ -547,7 +547,7 @@ const custom_intro_view = function(config) {
           </div>
           <section class="magpie-text-container">
             <p class="magpie-view-text"> Thank you for taking part in our study. We are studying how people talk about things around them. The study will take about 6-8 minutes.<br /> <br />
-          
+
             <p class="magpie-view-text" style="font-family:Courier New, Courier"> Please note: There will be multiple posted versions of this HIT (name:<b> Object Description Understanding - 111</b>) throughout the next few days.
             Please attempt only one HIT in this series. You will not be allowed to complete multiple HITs in this series. </br> </br>
             </p>

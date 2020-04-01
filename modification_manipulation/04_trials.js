@@ -45,10 +45,11 @@ function create_view(items, syntactic_cond, target_size, syntax, contexts, num_t
       target: items[contexts[i]][target_size[i]].item,
       syntax: syntax[syntactic_cond[i]], // record the synactic condition  as string
       adj: items[contexts[i]][target_size[i]].adj, // record target size
-      question: "What do you think is it " + items[contexts[i]][target_size[i]].adj + " relative to?", // task question
+      question: "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj + " relative to?", // task question
       paraphrase: "It is " + items[contexts[i]][target_size[i]].adj + " relative to other ", // paraphrase template
       reference: items[contexts[i]][target_size[i]].reference // the additional referential noun
     }
+
     expt_views.push(view);
   }
   return expt_views;
@@ -165,7 +166,7 @@ const items = {
   trees: [
     {
      item: "redwood",
-     context_sent: "You and your friend walk to their cabin in a park for the first time. You want to memorize the path ",
+     context_sent: "You and your friend walk to your friend's cabin in a park for the first time. You want to memorize the path ",
      context_picture: "images/tree-parade-basic.png",
      adj: "big ",
      target: "images/redwood_sign.png",
@@ -174,7 +175,7 @@ const items = {
    },
   {
    item: "bonsai",
-   context_sent:  "You and your friend walk to their cabin in a park for the first time. You want to memorize the path ",
+   context_sent:  "You and your friend walk to your friend's cabin in a park for the first time. You want to memorize the path ",
    context_picture: "images/tree-parade-basic.png",
    adj: "small ",
    target: "images/bonsai_stick.png",
@@ -189,7 +190,7 @@ const items = {
 const warmup_trials = {dogs1: {
   item: "dogs1",
   picture1: "warmup/chihuahua.jpg",
-  picture2: "warmup/doberman.png",
+  picture2: "warmup/doberman.jpg",
   correct1: ["chihuahua"], // correct labels for the feedback
   correct2: ["doberman"],
   correct3: ["dogs"],
@@ -213,7 +214,7 @@ dogs2: {
 birds: {
   item: "birds",
   picture1: "warmup/colibri.jpg",
-  picture2: "warmup/eagle.jpg",
+  picture2: "warmup/eagle.png",
   correct1: ["hummingbird"],
   correct2: ["eagle"],
   correct3: ["birds"],
@@ -225,7 +226,7 @@ birds: {
 flowers: {
   item: "flowers",
   picture1: "warmup/dandelion.jpg",
-  picture2: "warmup/sunflower.png",
+  picture2: "warmup/sunflower.jpg",
   correct1: ["dandelion"],
   correct2: ["sunflower"],
   correct3: ["flowers"],
