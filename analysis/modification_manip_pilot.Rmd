@@ -145,6 +145,32 @@ d_infer_main_responseCat.bs.item %>%
 
 ```
 
+## By-subject plot
+Participants seem to choose a strategy (mostly basic-level labels) and to stick to it throughout the experiment, showing low flexibility in adjusting the comparison class. 
+``` {r}
+d_infer_main_responseCat %>%  
+  group_by(syntax, submission_id) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj
+d_infer_main_responseCat.bs.subj %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject\n NP", 
+                                         "Predicate\n NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-subject inferred Comparison Classes")+
+  facet_wrap(~submission_id)
+```
+
 ``` {r}
 d_infer_main_responseCat %>% count( item, syntax)
 #d_infer_main_responseCat %>% count(item)
