@@ -62,7 +62,7 @@ const items = {
     {
      item: "doberman",
      context_sent: "You and your friend are at an animal training ground ",
-     context_picture: "images/dog-parade-basic.png",
+     context_picture: "images/dog-parade-doberman.png",
      adj: "big",
      target: "images/doberman.png",
      // first array is subject  , second is predicate
@@ -73,7 +73,7 @@ const items = {
    {
     item: "chihuahua",
     context_sent: "You and your friend are at an animal training ground ",
-    context_picture: "images/dog-parade-basic.png",
+    context_picture: "images/dog-parade-chihuahua.png",
     adj: "small",
     target: "images/chihuahua.png",
     // first array are utterances in predicate, second is subject utterances
@@ -87,7 +87,7 @@ const items = {
     {
      item: "great dane",
      context_sent: "You and your friend are at a pet show ",
-     context_picture: "images/dog-parade-basic2.png",
+     context_picture: "images/dog-parade-great-dane.png",
      adj: "big ",
      target: "images/great-dane.png",
      utterances: ["That big Great Dane is a prize-winner", "That prize-winner is a big Great Dane"],
@@ -96,7 +96,7 @@ const items = {
    {
     item: "pug",
     context_sent: "You and your friend are at a pet show ",
-    context_picture: "images/dog-parade-basic2.png",
+    context_picture: "images/dog-parade-pug.png",
     adj: "small ",
     target: "images/pug.png",
     utterances: ["That small pug is a prize-winner", "That prize-winner is a small pug"],
@@ -107,7 +107,7 @@ const items = {
     {
      item: "eagle",
      context_sent: "You visit your friend who works at an animal shelter ",
-     context_picture: "images/bird-parade-basic.png",
+     context_picture: "images/bird-parade-eagle.png",
      adj: "big ",
      target: "images/eagle.png",
      utterances: ["That big eagle is a rescue", "That rescue is a big eagle"],
@@ -116,7 +116,7 @@ const items = {
    {
     item: "hummingbird",
     context_sent: "You visit your friend who works at an animal shelter ",
-    context_picture: "images/bird-parade-basic.png",
+    context_picture: "images/bird-parade-hummingbird.png",
     adj: "small ",
     target: "images/hummingbird.png",
     utterances: ["That small hummingbird is a rescue", "That rescue is a small hummingbird"],
@@ -147,7 +147,7 @@ const items = {
   {
    item: "sunflower",
    context_sent: "You and your friend are at their garden ",
-   context_picture: "images/flower-parade-basic.png",
+   context_picture: "images/flower-parade-sunflower.png",
    adj: "big ",
    target: "images/sunflower.png",
    utterances: ["That big sunflower is a gift", "That gift is a big sunflower"],
@@ -156,7 +156,7 @@ const items = {
   {
    item: "dandelion",
    context_sent: "You and your friend are at their garden ",
-   context_picture: "images/flower-parade-basic.png",
+   context_picture: "images/flower-parade-dandelion.png",
    adj: "small ",
    target: "images/dandelion.png",
    utterances: ["That small dandelion is a gift", "That gift is a small dandelion"],
@@ -167,7 +167,7 @@ const items = {
     {
      item: "redwood",
      context_sent: "You and your friend walk to your friend's cabin in a park for the first time. You want to memorize the path ",
-     context_picture: "images/tree-parade-basic.png",
+     context_picture: "images/tree-parade-redwood.png",
      adj: "big ",
      target: "images/redwood_sign.png",
      utterances: ["That big redwood is a landmark", "That landmark is a big redwood"],
@@ -176,7 +176,7 @@ const items = {
   {
    item: "bonsai",
    context_sent:  "You and your friend walk to your friend's cabin in a park for the first time. You want to memorize the path ",
-   context_picture: "images/tree-parade-basic.png",
+   context_picture: "images/tree-parade-bonsai.png",
    adj: "small ",
    target: "images/bonsai_stick.png",
    utterances: ["That small bonsai is a landmark", "That landmark is a small bonsai"],
