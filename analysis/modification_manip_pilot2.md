@@ -22,7 +22,7 @@ prize-winner is a {small, big} NP’ (within-subject). We created nouns
 like ‘prize-winner’ for five context items (trees, 2 x dogs, flowers,
 birds).
 
-    ## -- Attaching packages -------------------------------------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --
+    ## -- Attaching packages ----------------------------------- tidyverse 1.2.1 --
 
     ## v ggplot2 3.1.0     v purrr   0.2.5
     ## v tibble  2.1.3     v dplyr   0.8.3
@@ -33,7 +33,7 @@ birds).
 
     ## Warning: package 'dplyr' was built under R version 3.5.3
 
-    ## -- Conflicts ----------------------------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+    ## -- Conflicts -------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -79,9 +79,9 @@ birds).
     ##     step
 
 ``` r
-#d_infer <- read_csv('../data/results_32_modification-manipulation-pilot2.csv')
+#d_infer <- read_csv('../data/results_32_modification-manipulation-pilot3.csv')
 #d_infer1 <- d_infer %>% subset( select = -c(worker_id, hit_id, assignment_id, startDate))
-#write_csv(d_infer1, '../data/results_32_modification_manipulation_pilot2.csv')
+#write_csv(d_infer1, '../data/results_32_modification_manipulation_pilot3.csv')
 
 d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot2.csv')
 ```
@@ -176,8 +176,8 @@ d_infer_main_responseCat <- d_infer_valid %>%
   mutate(  
     response_cat =
       ifelse( # do be extended dependent on responses provided
-        tolower(response) %in% c("birds", "bird","dog", "dogs", "fish","flower", "flowers","trees", "tree", "big dogs", "other dogs", "animals", "plants", 
-                                 "flowerrs", "tres"), "basic", "subordinate"),
+        tolower(response) %in% c("birds", "bird","dog", "dogs", "fish","flower", "flowers","trees", "tree", "big dogs", "other dogs", "animals", "plants","flowerrs", "tres"
+                               ), "basic", "subordinate"),
 
     response_num = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
@@ -241,7 +241,7 @@ d_infer_main_responseCat %>% count(item, adj, syntax)
 ## Subject vs. predicate NP position plot
 
 The proportion of inferred basic-level comparison classes is plotted
-by-syntax (subject vs. predicate) (n=31 participants). here seems to be
+by-syntax (subject vs. predicate) (n=31 participants). there seems to be
 no effect of syntax.
 
 ``` r
@@ -397,28 +397,28 @@ summary(d.infer.brm)
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 31) 
     ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    8.94      5.24     2.68    22.50
-    ## sd(syntaxsubject)                6.72      5.79     0.34    22.26
-    ## cor(Intercept,syntaxsubject)     0.20      0.54    -0.91     0.95
+    ## sd(Intercept)                    8.74      4.75     2.74    21.20
+    ## sd(syntaxsubject)                6.49      5.45     0.28    21.46
+    ## cor(Intercept,syntaxsubject)     0.22      0.54    -0.89     0.97
     ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1180 1.00
-    ## sd(syntaxsubject)                   810 1.00
-    ## cor(Intercept,syntaxsubject)       2275 1.00
+    ## sd(Intercept)                      1176 1.00
+    ## sd(syntaxsubject)                  1332 1.00
+    ## cor(Intercept,syntaxsubject)       2838 1.00
     ## 
     ## ~target (Number of levels: 10) 
     ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    2.93      2.68     0.10    10.16
-    ## sd(syntaxsubject)                7.44      5.64     0.67    21.91
-    ## cor(Intercept,syntaxsubject)    -0.28      0.51    -0.96     0.83
+    ## sd(Intercept)                    2.85      2.58     0.08     9.86
+    ## sd(syntaxsubject)                6.98      4.97     0.56    19.53
+    ## cor(Intercept,syntaxsubject)    -0.23      0.53    -0.96     0.87
     ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1112 1.00
-    ## sd(syntaxsubject)                  1111 1.00
-    ## cor(Intercept,syntaxsubject)       1406 1.00
+    ## sd(Intercept)                      1012 1.00
+    ## sd(syntaxsubject)                  1318 1.00
+    ## cor(Intercept,syntaxsubject)       1301 1.00
     ## 
     ## Population-Level Effects: 
     ##               Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
-    ## Intercept        10.91      6.18     3.63    26.92       1254 1.00
-    ## syntaxsubject     5.89      8.53    -5.86    28.32        753 1.00
+    ## Intercept        10.46      5.69     3.46    25.80       1201 1.00
+    ## syntaxsubject     5.50      7.63    -5.70    25.49       1651 1.00
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
     ## is a crude measure of effective sample size, and Rhat is the potential 

@@ -25,7 +25,7 @@ prize-winner is a {small, big} NP’ (within-subject). We created nouns
 like ‘prize-winner’ for five context items (trees, 2 x dogs, flowers,
 birds).
 
-    ## -- Attaching packages ------------------------------------ tidyverse 1.2.1 --
+    ## -- Attaching packages ----------------------------------------- tidyverse 1.2.1 --
 
     ## v ggplot2 3.1.0     v purrr   0.2.5
     ## v tibble  2.1.3     v dplyr   0.8.3
@@ -36,7 +36,7 @@ birds).
 
     ## Warning: package 'dplyr' was built under R version 3.5.3
 
-    ## -- Conflicts --------------------------------------- tidyverse_conflicts() --
+    ## -- Conflicts -------------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -80,14 +80,6 @@ birds).
     ## The following object is masked from 'package:stats':
     ## 
     ##     step
-
-``` r
-#d_infer <- read_csv('../data/results_32_modification-manipulation-pilot3.csv')
-#d_infer1 <- d_infer %>% subset( select = -c(worker_id, hit_id, assignment_id, startDate))
-#write_csv(d_infer1, '../data/results_32_modification_manipulation_pilot3.csv')
-
-d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot3.csv')
-```
 
     ## Parsed with column specification:
     ## cols(
@@ -136,6 +128,39 @@ d_infer_warmup <- d_infer_Native %>%
 d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
 d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
 ```
+
+Participants need more labeling warm-up trials for the tree and dog
+items (they correct their responses about 2 times), for both items it is
+mostly for the big targets.
+
+``` r
+# labeling warm-up trial analysis
+
+d_infer1 %>%
+  filter((trial_name == "warmup1") | (trial_name == "warmup2")) -> d_infer_label_warmup
+         
+d_infer_label_warmup %>% group_by(submission_id, item, response1, response2) %>% count() %>%
+  gather(key="responseNr", value="response", response1, response2) -> warmup.resps.counts.long
+warmup.resps.counts.long %>% group_by(submission_id, item) %>% count(response) -> warmup.resps.counts.long.subs
+warmup.resps.counts.long.subs %>% group_by(submission_id, item) %>%  count(item) %>% mutate(nr_super = n) %>% select(-n) -> warmup.resps.counts.long.supers
+warmup.resps.counts.long.final <- warmup.resps.counts.long.subs %>%
+  left_join(., warmup.resps.counts.long.supers)
+```
+
+    ## Joining, by = c("submission_id", "item")
+
+``` r
+warmup.resps.counts.long.final %>% group_by(item) %>% tidyboot_mean(column=nr_super) %>% select(-ci_lower, -ci_upper, - mean)
+```
+
+    ## # A tibble: 5 x 3
+    ##   item        n empirical_stat
+    ##   <chr>   <int>          <dbl>
+    ## 1 birds      81           2.36
+    ## 2 dogs1     106           3.13
+    ## 3 dogs2     101           3   
+    ## 4 flowers    90           2.64
+    ## 5 trees     117           3.51
 
 The numbers of size-syntax and item-syntax combinations are relatively
 balanced.
@@ -272,13 +297,7 @@ d_infer_main_responseCat.bs %>%
 
     ## Warning: Duplicated aesthetics after name standardisation: colour
 
-![](modification_manip_pilot2_files/figure-gfm/proportions%20plot-1.png)<!-- -->
-
-``` r
- # ggtitle("Experiment 3: Comparison Class Inference")+
- # facet_grid(~context)  +
-  #ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
-```
+![](modification_manip_pilot3_files/figure-gfm/proportions%20plot-1.png)<!-- -->
 
 ## By-item plot
 
@@ -318,7 +337,7 @@ d_infer_main_responseCat.bs.item %>%
 
     ## Warning: Duplicated aesthetics after name standardisation: colour
 
-![](modification_manip_pilot2_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](modification_manip_pilot3_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ## By-subject plot
 
@@ -357,7 +376,7 @@ d_infer_main_responseCat.bs.subj %>%
 
     ## Warning: Duplicated aesthetics after name standardisation: colour
 
-![](modification_manip_pilot2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](modification_manip_pilot3_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ## Stats
 
@@ -389,28 +408,103 @@ summary(d.infer.brm)
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 32) 
     ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    5.30      2.28     2.30    11.12
-    ## sd(syntaxsubject)                3.28      2.29     0.24     9.10
-    ## cor(Intercept,syntaxsubject)    -0.15      0.53    -0.95     0.85
+    ## sd(Intercept)                    5.48      2.35     2.21    11.55
+    ## sd(syntaxsubject)                3.42      2.40     0.25     9.27
+    ## cor(Intercept,syntaxsubject)    -0.18      0.52    -0.95     0.84
     ##                              Eff.Sample Rhat
-    ## sd(Intercept)                       992 1.00
-    ## sd(syntaxsubject)                   835 1.00
-    ## cor(Intercept,syntaxsubject)       2242 1.00
+    ## sd(Intercept)                      1111 1.00
+    ## sd(syntaxsubject)                   718 1.00
+    ## cor(Intercept,syntaxsubject)       2411 1.00
     ## 
     ## ~target (Number of levels: 10) 
     ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    0.92      0.83     0.03     3.11
-    ## sd(syntaxsubject)                2.70      2.20     0.14     8.44
-    ## cor(Intercept,syntaxsubject)    -0.14      0.56    -0.96     0.91
+    ## sd(Intercept)                    0.93      0.86     0.03     3.10
+    ## sd(syntaxsubject)                2.76      2.38     0.12     8.87
+    ## cor(Intercept,syntaxsubject)    -0.13      0.56    -0.95     0.92
     ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1515 1.00
-    ## sd(syntaxsubject)                   929 1.00
-    ## cor(Intercept,syntaxsubject)       1228 1.00
+    ## sd(Intercept)                      1416 1.00
+    ## sd(syntaxsubject)                   960 1.00
+    ## cor(Intercept,syntaxsubject)       1603 1.00
     ## 
     ## Population-Level Effects: 
     ##               Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
-    ## Intercept         4.02      1.82     1.46     8.55       1226 1.00
-    ## syntaxsubject     1.37      2.50    -2.76     7.74       1033 1.00
+    ## Intercept         4.16      1.99     1.39     9.15       1253 1.00
+    ## syntaxsubject     1.36      2.81    -3.12     7.98        760 1.00
+    ## 
+    ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
+    ## is a crude measure of effective sample size, and Rhat is the potential 
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
+
+Double the dataset to see the stats:
+
+``` r
+# simulate twise as much data
+d_infer_main_responseCat_double <- d_infer_main_responseCat %>%
+  rowwise() %>%
+  mutate(submission_id = paste(submission_id, "A", sep=''))
+
+d_infer_main_responseCat_double <- rbind(d_infer_main_responseCat, d_infer_main_responseCat_double)
+
+# stats on the doubled dataset
+d.infer.brm.double <- brm(response_num ~ syntax + 
+                            (1 + syntax | submission_id ) + 
+                            (1 + syntax | target ),
+                   data = d_infer_main_responseCat_double,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.9))
+```
+
+    ## Compiling the C++ model
+
+    ## recompiling to avoid crashing R session
+
+    ## Start sampling
+
+    ## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.9 may help. See
+    ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+
+    ## Warning: Examine the pairs() plot to diagnose sampling problems
+
+``` r
+summary(d.infer.brm.double)
+```
+
+    ## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.9 may help.
+    ## See http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: response_num ~ syntax + (1 + syntax | submission_id) + (1 + syntax | target) 
+    ##    Data: d_infer_main_responseCat_double (Number of observations: 320) 
+    ## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+    ##          total post-warmup samples = 4000
+    ## 
+    ## Group-Level Effects: 
+    ## ~submission_id (Number of levels: 64) 
+    ##                              Estimate Est.Error l-95% CI u-95% CI
+    ## sd(Intercept)                    4.91      1.80     2.54     9.50
+    ## sd(syntaxsubject)                2.45      1.60     0.12     6.43
+    ## cor(Intercept,syntaxsubject)    -0.23      0.52    -0.96     0.83
+    ##                              Eff.Sample Rhat
+    ## sd(Intercept)                       443 1.01
+    ## sd(syntaxsubject)                   371 1.01
+    ## cor(Intercept,syntaxsubject)       2031 1.00
+    ## 
+    ## ~target (Number of levels: 10) 
+    ##                              Estimate Est.Error l-95% CI u-95% CI
+    ## sd(Intercept)                    1.30      1.00     0.06     3.83
+    ## sd(syntaxsubject)                3.93      2.15     1.08     9.42
+    ## cor(Intercept,syntaxsubject)    -0.27      0.47    -0.93     0.79
+    ##                              Eff.Sample Rhat
+    ## sd(Intercept)                       659 1.01
+    ## sd(syntaxsubject)                   947 1.00
+    ## cor(Intercept,syntaxsubject)        922 1.01
+    ## 
+    ## Population-Level Effects: 
+    ##               Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+    ## Intercept         3.89      1.55     1.80     7.62        530 1.00
+    ## syntaxsubject     1.35      2.21    -2.64     6.51       1346 1.01
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
     ## is a crude measure of effective sample size, and Rhat is the potential 
