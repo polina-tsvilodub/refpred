@@ -1,0 +1,91 @@
+---
+title: "Modification Manipulation Pilots 1-3 Exploratory Analyses"
+author: "Polina Tsvilodub"
+date: "09 04 2020"
+output: github_document
+---
+
+For an exploratory analysis, the categorized data from all three noun modification manipulation pilots is pooled. 
+``` {r libraries, echo=F, warnings=F, include=F}
+
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+```
+
+``` {r echo=F, warnings=F, include=F}
+pilot1 <- read_csv('../data/results_32_modification_manipulation_pilot1_tidy.csv')
+pilot2 <- read_csv('../data/results_32_modification_manipulation_pilot2_tidy.csv')
+pilot3 <- read_csv('../data/results_32_modification_manipulation_pilot3_tidy.csv')
+
+all_pilots <- rbind(pilot1, pilot2) %>% rbind(., pilot3)
+```
+
+``` {r}
+bar.width = 0.8
+
+all_pilots %>%
+  group_by(syntax) %>%
+  tidyboot_mean(column = response_num) -> all_pilots.bs
+
+
+all_pilots.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses")
+  
+```
+
+``` {r}
+all_pilots %>%  
+  group_by(syntax, item, adj) %>%
+  tidyboot_mean(column = response_num) -> all_pilots.bs.item
+
+
+all_pilots.bs.item %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
+                                         "Predicate NP\n(That prize-winner\n is a big NP)")),
+         size = factor(adj, level = c("big", "small"), labels = c("big", "small"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-item inferred Comparison Classes")+
+  facet_grid(item~size)
+
+```
+A Bayesian model with random by-item and by-subject intercepts and random syntax slope-effects and fixed effects of syntax (deviation coded) and experiment (dummy-coded):
+``` {r}
+all_pilots <- all_pilots %>%
+  mutate(pilot_nr = factor(pilot_nr))
+
+d.infer.full.brm <- brm(response_num ~ syntax_dev + pilot_nr + 
+                          (1 + syntax_dev | submission_id ) + 
+                          (1 + syntax_dev | target ),
+                   data = all_pilots,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.99))
+
+summary(d.infer.full.brm)
+```

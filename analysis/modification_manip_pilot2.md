@@ -83,7 +83,7 @@ birds).
 #d_infer1 <- d_infer %>% subset( select = -c(worker_id, hit_id, assignment_id, startDate))
 #write_csv(d_infer1, '../data/results_32_modification_manipulation_pilot3.csv')
 
-d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot2.csv')
+d_infer2 <- read_csv('../data/results_32_modification_manipulation_pilot2.csv')
 ```
 
     ## Parsed with column specification:
@@ -109,38 +109,38 @@ labeling trials) or reporting a native language other than English
 
 ``` r
 # exclude participants who report difficulties
-d_infer1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+d_infer2 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
 
-d_infer_woGlitches <- d_infer1 # %>% subset( !(submission_id %in% c()))
+d_infer_woGlitches2 <- d_infer2 # %>% subset( !(submission_id %in% c()))
 
 # exclude data from non-native English speakers and those where the language information is missing
-d_infer_woGlitches %>% distinct(languages) %>% View()
-d_infer_Native <- d_infer_woGlitches %>%
+d_infer_woGlitches2 %>% distinct(languages) %>% View()
+d_infer_Native2 <- d_infer_woGlitches2 %>%
   filter(grepl("en", languages, ignore.case = T)) %>%
   select(submission_id, trial_name, trial_number, adj, item, target, response, botresponse,
          syntax, attempts, reference)
 
 # participants who do not get the comparison class warmup right
-d_infer_cc_warmup <- d_infer_Native %>% filter( trial_name == "comp_class_warmup") %>%
+d_infer_cc_warmup2 <- d_infer_Native2 %>% filter( trial_name == "comp_class_warmup") %>%
   group_by(submission_id) %>% count() %>%
   filter( n > 4 )
 
 # exclude participants who need more than 4 attempts per warmup
-d_infer_warmup <- d_infer_Native %>%
+d_infer_warmup2 <- d_infer_Native2 %>%
   filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
   group_by(submission_id) %>%
   filter(attempts > 4)
 
 # excluding 6 participants
-d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
-d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
+d_infer_filt2 <- anti_join(d_infer_Native2, d_infer_warmup2, by = c("submission_id"))
+d_infer_filt2 <- anti_join(d_infer_filt2, d_infer_cc_warmup2, by = c("submission_id"))
 ```
 
 The numbers of size-syntax and item-syntax combinations are relatively
 balanced.
 
 ``` r
-d_infer_filt1 %>% count(syntax, adj)
+d_infer_filt2 %>% count(syntax, adj)
 ```
 
     ## # A tibble: 5 x 3
@@ -159,7 +159,7 @@ class). Superordinate responses are collapsed with basic-level
 responses.
 
 ``` r
-d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
+d_infer_main2 <- d_infer_filt2 %>% filter((trial_name == "custom_main_text1")|
                                           (trial_name == "custom_main_text2")) %>%
 
   mutate(syntax = factor(syntax)
@@ -168,10 +168,10 @@ d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
         adj)
 
 # categorize responses
-d_infer_main %>% distinct(response) %>% View()
+d_infer_main2 %>% distinct(response) %>% View()
 # exclude invalid responses
-d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c( "gifts", "landmarks", "service animals"))) # 3 responses excluded
-d_infer_main_responseCat <- d_infer_valid %>%
+d_infer_valid2 <- d_infer_main2 %>% subset(., !(tolower(response) %in% c( "gifts", "landmarks", "service animals"))) # 3 responses excluded
+d_infer_main_responseCat2 <- d_infer_valid2 %>%
   rowwise() %>%
   mutate(  
     response_cat =
@@ -185,7 +185,7 @@ d_infer_main_responseCat <- d_infer_valid %>%
 ```
 
 ``` r
-d_infer_main_responseCat %>% count( item, syntax)
+d_infer_main_responseCat2 %>% count( item, syntax)
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
@@ -209,7 +209,7 @@ d_infer_main_responseCat %>% count( item, syntax)
 ```
 
 ``` r
-d_infer_main_responseCat %>% count(item, adj, syntax)
+d_infer_main_responseCat2 %>% count(item, adj, syntax)
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
@@ -247,15 +247,15 @@ no effect of syntax.
 ``` r
 # plot
 bar.width = 0.8
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat2 %>%  
   group_by(syntax) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs2
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
 
 ``` r
-d_infer_main_responseCat.bs %>%
+d_infer_main_responseCat.bs2 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
@@ -293,15 +293,15 @@ flower item (sunflower) showed the predicted behavior in the previous
 experiment, but not in this one.
 
 ``` r
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat2 %>%  
   group_by(syntax, item, adj) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item2
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
 
 ``` r
-d_infer_main_responseCat.bs.item %>%
+d_infer_main_responseCat.bs.item2 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
@@ -333,15 +333,15 @@ to stick to it throughout the experiment, showing low flexibility in
 adjusting the comparison class.
 
 ``` r
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat2 %>%  
   group_by(syntax, submission_id) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj2
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
 
 ``` r
-d_infer_main_responseCat.bs.subj %>%
+d_infer_main_responseCat.bs.subj2 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject\n NP", 
@@ -372,8 +372,13 @@ no effect of syntax, the Bayesian model with maximal random effects
 shows a tendency towards the predicted effect.
 
 ``` r
-d.infer.brm <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + syntax | target ),
-                   data = d_infer_main_responseCat,
+# deviation coded syntax
+d_infer_main_responseCat2 <- d_infer_main_responseCat2 %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax == "subject", 1, -1))
+
+d.infer.brm <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
+                   data = d_infer_main_responseCat2,
                    family = "bernoulli",
                    cores = 4,
                    control = list(adapt_delta = 0.95))
@@ -389,36 +394,36 @@ summary(d.infer.brm)
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax + (1 + syntax | submission_id) + (1 + syntax | target) 
-    ##    Data: d_infer_main_responseCat (Number of observations: 152) 
+    ## Formula: response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + (1 + syntax_dev | target) 
+    ##    Data: d_infer_main_responseCat2 (Number of observations: 152) 
     ## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
     ##          total post-warmup samples = 4000
     ## 
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 31) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    8.74      4.75     2.74    21.20
-    ## sd(syntaxsubject)                6.49      5.45     0.28    21.46
-    ## cor(Intercept,syntaxsubject)     0.22      0.54    -0.89     0.97
-    ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1176 1.00
-    ## sd(syntaxsubject)                  1332 1.00
-    ## cor(Intercept,syntaxsubject)       2838 1.00
+    ##                           Estimate Est.Error l-95% CI u-95% CI Eff.Sample
+    ## sd(Intercept)                12.60      7.06     3.93    30.10       1110
+    ## sd(syntax_dev)                3.52      2.89     0.17    10.75        947
+    ## cor(Intercept,syntax_dev)    -0.04      0.56    -0.94     0.93       2510
+    ##                           Rhat
+    ## sd(Intercept)             1.01
+    ## sd(syntax_dev)            1.00
+    ## cor(Intercept,syntax_dev) 1.00
     ## 
     ## ~target (Number of levels: 10) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    2.85      2.58     0.08     9.86
-    ## sd(syntaxsubject)                6.98      4.97     0.56    19.53
-    ## cor(Intercept,syntaxsubject)    -0.23      0.53    -0.96     0.87
-    ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1012 1.00
-    ## sd(syntaxsubject)                  1318 1.00
-    ## cor(Intercept,syntaxsubject)       1301 1.00
+    ##                           Estimate Est.Error l-95% CI u-95% CI Eff.Sample
+    ## sd(Intercept)                 3.62      3.16     0.20    11.76        879
+    ## sd(syntax_dev)                5.27      3.78     0.61    14.56        925
+    ## cor(Intercept,syntax_dev)     0.02      0.54    -0.93     0.91       1053
+    ##                           Rhat
+    ## sd(Intercept)             1.01
+    ## sd(syntax_dev)            1.01
+    ## cor(Intercept,syntax_dev) 1.00
     ## 
     ## Population-Level Effects: 
-    ##               Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
-    ## Intercept        10.46      5.69     3.46    25.80       1201 1.00
-    ## syntaxsubject     5.50      7.63    -5.70    25.49       1651 1.00
+    ##            Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+    ## Intercept     16.43      8.78     5.50    38.53       1068 1.01
+    ## syntax_dev     0.37      4.01    -8.45     8.40       1159 1.00
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
     ## is a crude measure of effective sample size, and Rhat is the potential 

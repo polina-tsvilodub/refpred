@@ -103,7 +103,8 @@ d_infer_main_responseCat <- d_infer_valid %>%
                                ), "basic", "subordinate"),
 
     response_num = ifelse(response_cat == "basic", 1, 0),
-    response_label = "basic"
+    response_label = "basic",
+    pilot_nr = 3
   )
 ```
 
@@ -209,34 +210,21 @@ d_infer_main_responseCat.bs.subj %>%
 ## Stats
 
 Bayesian stats with maximal random effects:  
+
 ``` {r}
-d.infer.brm <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + syntax | target ),
+# deviation coding syntax
+d_infer_main_responseCat <- d_infer_main_responseCat %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax=="subject", 1, -1))
+#write_csv(d_infer_main_responseCat, '../data/results_32_modification_manipulation_pilot3_tidy.csv')
+
+d.infer.brm.dev <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
                    data = d_infer_main_responseCat,
                    family = "bernoulli",
                    cores = 4,
                    control = list(adapt_delta = 0.95))
 
-summary(d.infer.brm)
+summary(d.infer.brm.dev)
 ```
 
 
-Double the dataset to see the stats: 
-``` {r}
-# simulate twise as much data
-d_infer_main_responseCat_double <- d_infer_main_responseCat %>%
-  rowwise() %>%
-  mutate(submission_id = paste(submission_id, "A", sep=''))
-
-d_infer_main_responseCat_double <- rbind(d_infer_main_responseCat, d_infer_main_responseCat_double)
-
-# stats on the doubled dataset
-d.infer.brm.double <- brm(response_num ~ syntax + 
-                            (1 + syntax | submission_id ) + 
-                            (1 + syntax | target ),
-                   data = d_infer_main_responseCat_double,
-                   family = "bernoulli",
-                   cores = 4,
-                   control = list(adapt_delta = 0.9))
-
-summary(d.infer.brm.double)
-```

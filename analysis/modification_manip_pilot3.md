@@ -25,7 +25,7 @@ prize-winner is a {small, big} NP’ (within-subject). We created nouns
 like ‘prize-winner’ for five context items (trees, 2 x dogs, flowers,
 birds).
 
-    ## -- Attaching packages ----------------------------------------- tidyverse 1.2.1 --
+    ## -- Attaching packages ----------------------------------- tidyverse 1.2.1 --
 
     ## v ggplot2 3.1.0     v purrr   0.2.5
     ## v tibble  2.1.3     v dplyr   0.8.3
@@ -36,7 +36,7 @@ birds).
 
     ## Warning: package 'dplyr' was built under R version 3.5.3
 
-    ## -- Conflicts -------------------------------------------- tidyverse_conflicts() --
+    ## -- Conflicts -------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -383,7 +383,12 @@ d_infer_main_responseCat.bs.subj %>%
 Bayesian stats with maximal random effects:
 
 ``` r
-d.infer.brm <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + syntax | target ),
+# deviation coding syntax
+d_infer_main_responseCat <- d_infer_main_responseCat %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax=="subject", 1, -1))
+
+d.infer.brm.dev <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
                    data = d_infer_main_responseCat,
                    family = "bernoulli",
                    cores = 4,
@@ -395,116 +400,41 @@ d.infer.brm <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + 
     ## Start sampling
 
 ``` r
-summary(d.infer.brm)
+summary(d.infer.brm.dev)
 ```
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax + (1 + syntax | submission_id) + (1 + syntax | target) 
+    ## Formula: response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + (1 + syntax_dev | target) 
     ##    Data: d_infer_main_responseCat (Number of observations: 160) 
     ## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
     ##          total post-warmup samples = 4000
     ## 
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 32) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    5.48      2.35     2.21    11.55
-    ## sd(syntaxsubject)                3.42      2.40     0.25     9.27
-    ## cor(Intercept,syntaxsubject)    -0.18      0.52    -0.95     0.84
-    ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1111 1.00
-    ## sd(syntaxsubject)                   718 1.00
-    ## cor(Intercept,syntaxsubject)       2411 1.00
+    ##                           Estimate Est.Error l-95% CI u-95% CI Eff.Sample
+    ## sd(Intercept)                 5.51      2.48     2.36    11.66        622
+    ## sd(syntax_dev)                1.93      1.45     0.14     5.81        717
+    ## cor(Intercept,syntax_dev)    -0.30      0.51    -0.97     0.78       2025
+    ##                           Rhat
+    ## sd(Intercept)             1.01
+    ## sd(syntax_dev)            1.00
+    ## cor(Intercept,syntax_dev) 1.00
     ## 
     ## ~target (Number of levels: 10) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    0.93      0.86     0.03     3.10
-    ## sd(syntaxsubject)                2.76      2.38     0.12     8.87
-    ## cor(Intercept,syntaxsubject)    -0.13      0.56    -0.95     0.92
-    ##                              Eff.Sample Rhat
-    ## sd(Intercept)                      1416 1.00
-    ## sd(syntaxsubject)                   960 1.00
-    ## cor(Intercept,syntaxsubject)       1603 1.00
+    ##                           Estimate Est.Error l-95% CI u-95% CI Eff.Sample
+    ## sd(Intercept)                 1.11      0.98     0.05     3.74        844
+    ## sd(syntax_dev)                1.28      1.14     0.04     4.25        702
+    ## cor(Intercept,syntax_dev)     0.10      0.57    -0.93     0.96       1923
+    ##                           Rhat
+    ## sd(Intercept)             1.00
+    ## sd(syntax_dev)            1.00
+    ## cor(Intercept,syntax_dev) 1.00
     ## 
     ## Population-Level Effects: 
-    ##               Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
-    ## Intercept         4.16      1.99     1.39     9.15       1253 1.00
-    ## syntaxsubject     1.36      2.81    -3.12     7.98        760 1.00
-    ## 
-    ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
-    ## is a crude measure of effective sample size, and Rhat is the potential 
-    ## scale reduction factor on split chains (at convergence, Rhat = 1).
-
-Double the dataset to see the stats:
-
-``` r
-# simulate twise as much data
-d_infer_main_responseCat_double <- d_infer_main_responseCat %>%
-  rowwise() %>%
-  mutate(submission_id = paste(submission_id, "A", sep=''))
-
-d_infer_main_responseCat_double <- rbind(d_infer_main_responseCat, d_infer_main_responseCat_double)
-
-# stats on the doubled dataset
-d.infer.brm.double <- brm(response_num ~ syntax + 
-                            (1 + syntax | submission_id ) + 
-                            (1 + syntax | target ),
-                   data = d_infer_main_responseCat_double,
-                   family = "bernoulli",
-                   cores = 4,
-                   control = list(adapt_delta = 0.9))
-```
-
-    ## Compiling the C++ model
-
-    ## recompiling to avoid crashing R session
-
-    ## Start sampling
-
-    ## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.9 may help. See
-    ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-
-    ## Warning: Examine the pairs() plot to diagnose sampling problems
-
-``` r
-summary(d.infer.brm.double)
-```
-
-    ## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.9 may help.
-    ## See http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-
-    ##  Family: bernoulli 
-    ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax + (1 + syntax | submission_id) + (1 + syntax | target) 
-    ##    Data: d_infer_main_responseCat_double (Number of observations: 320) 
-    ## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
-    ##          total post-warmup samples = 4000
-    ## 
-    ## Group-Level Effects: 
-    ## ~submission_id (Number of levels: 64) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    4.91      1.80     2.54     9.50
-    ## sd(syntaxsubject)                2.45      1.60     0.12     6.43
-    ## cor(Intercept,syntaxsubject)    -0.23      0.52    -0.96     0.83
-    ##                              Eff.Sample Rhat
-    ## sd(Intercept)                       443 1.01
-    ## sd(syntaxsubject)                   371 1.01
-    ## cor(Intercept,syntaxsubject)       2031 1.00
-    ## 
-    ## ~target (Number of levels: 10) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI
-    ## sd(Intercept)                    1.30      1.00     0.06     3.83
-    ## sd(syntaxsubject)                3.93      2.15     1.08     9.42
-    ## cor(Intercept,syntaxsubject)    -0.27      0.47    -0.93     0.79
-    ##                              Eff.Sample Rhat
-    ## sd(Intercept)                       659 1.01
-    ## sd(syntaxsubject)                   947 1.00
-    ## cor(Intercept,syntaxsubject)        922 1.01
-    ## 
-    ## Population-Level Effects: 
-    ##               Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
-    ## Intercept         3.89      1.55     1.80     7.62        530 1.00
-    ## syntaxsubject     1.35      2.21    -2.64     6.51       1346 1.01
+    ##            Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+    ## Intercept      4.75      2.14     1.83    10.20        602 1.01
+    ## syntax_dev    -0.08      1.31    -3.04     2.41        932 1.00
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
     ## is a crude measure of effective sample size, and Rhat is the potential 

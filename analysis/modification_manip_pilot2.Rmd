@@ -36,7 +36,7 @@ library(lmerTest)
 #d_infer1 <- d_infer %>% subset( select = -c(worker_id, hit_id, assignment_id, startDate))
 #write_csv(d_infer1, '../data/results_32_modification_manipulation_pilot3.csv')
 
-d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot2.csv')
+d_infer2 <- read_csv('../data/results_32_modification_manipulation_pilot2.csv')
 ```
 
 5 participants were excluded for failing the warm-up task ( n=3 for the
@@ -45,37 +45,37 @@ labeling trials) or reporting a native language other than English
 
 ``` {r filter}
 # exclude participants who report difficulties
-d_infer1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+d_infer2 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
 
-d_infer_woGlitches <- d_infer1 # %>% subset( !(submission_id %in% c()))
+d_infer_woGlitches2 <- d_infer2 # %>% subset( !(submission_id %in% c()))
 
 # exclude data from non-native English speakers and those where the language information is missing
-d_infer_woGlitches %>% distinct(languages) %>% View()
-d_infer_Native <- d_infer_woGlitches %>%
+d_infer_woGlitches2 %>% distinct(languages) %>% View()
+d_infer_Native2 <- d_infer_woGlitches2 %>%
   filter(grepl("en", languages, ignore.case = T)) %>%
   select(submission_id, trial_name, trial_number, adj, item, target, response, botresponse,
          syntax, attempts, reference)
 
 # participants who do not get the comparison class warmup right
-d_infer_cc_warmup <- d_infer_Native %>% filter( trial_name == "comp_class_warmup") %>%
+d_infer_cc_warmup2 <- d_infer_Native2 %>% filter( trial_name == "comp_class_warmup") %>%
   group_by(submission_id) %>% count() %>%
   filter( n > 4 )
 
 # exclude participants who need more than 4 attempts per warmup
-d_infer_warmup <- d_infer_Native %>%
+d_infer_warmup2 <- d_infer_Native2 %>%
   filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
   group_by(submission_id) %>%
   filter(attempts > 4)
 
 # excluding 6 participants
-d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
-d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
+d_infer_filt2 <- anti_join(d_infer_Native2, d_infer_warmup2, by = c("submission_id"))
+d_infer_filt2 <- anti_join(d_infer_filt2, d_infer_cc_warmup2, by = c("submission_id"))
 
 ```
 
 The numbers of size-syntax and item-syntax combinations are relatively balanced.
 ``` {r}
-d_infer_filt1 %>% count(syntax, adj)
+d_infer_filt2 %>% count(syntax, adj)
 ```
 
 The produced responses are categorized into basic-level and subordinate
@@ -85,7 +85,7 @@ class). Superordinate responses are collapsed with basic-level
 responses.
 
 ``` {r categorization}
-d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
+d_infer_main2 <- d_infer_filt2 %>% filter((trial_name == "custom_main_text1")|
                                           (trial_name == "custom_main_text2")) %>%
 
   mutate(syntax = factor(syntax)
@@ -94,10 +94,10 @@ d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
         adj)
 
 # categorize responses
-d_infer_main %>% distinct(response) %>% View()
+d_infer_main2 %>% distinct(response) %>% View()
 # exclude invalid responses
-d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c( "gifts", "landmarks", "service animals"))) # 3 responses excluded
-d_infer_main_responseCat <- d_infer_valid %>%
+d_infer_valid2 <- d_infer_main2 %>% subset(., !(tolower(response) %in% c( "gifts", "landmarks", "service animals"))) # 3 responses excluded
+d_infer_main_responseCat2 <- d_infer_valid2 %>%
   rowwise() %>%
   mutate(  
     response_cat =
@@ -106,17 +106,19 @@ d_infer_main_responseCat <- d_infer_valid %>%
                                ), "basic", "subordinate"),
 
     response_num = ifelse(response_cat == "basic", 1, 0),
-    response_label = "basic"
+    response_label = "basic",
+    pilot_nr = 2
   )
+
 ```
 
 ``` {r}
-d_infer_main_responseCat %>% count( item, syntax)
+d_infer_main_responseCat2 %>% count( item, syntax)
 #d_infer_main_responseCat %>% count(item)
 ```
 
 ``` {r}
-d_infer_main_responseCat %>% count(item, adj, syntax)
+d_infer_main_responseCat2 %>% count(item, adj, syntax)
 ```
 
 
@@ -126,12 +128,12 @@ The proportion of inferred basic-level comparison classes is plotted by-syntax (
 ``` {r proportions plot}
 # plot
 bar.width = 0.8
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat2 %>%  
   group_by(syntax) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs2
 
 
-d_infer_main_responseCat.bs %>%
+d_infer_main_responseCat.bs2 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
@@ -161,12 +163,12 @@ might be not very salient, the big tree item (redwood) and the big
 flower item (sunflower) showed the predicted behavior in the previous
 experiment, but not in this one.
 ``` {r}
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat2 %>%  
   group_by(syntax, item, adj) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item2
 
 
-d_infer_main_responseCat.bs.item %>%
+d_infer_main_responseCat.bs.item2 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
@@ -194,12 +196,12 @@ Participants seem to choose a strategy (mostly basic-level labels) and
 to stick to it throughout the experiment, showing low flexibility in
 adjusting the comparison class. 
 ``` {r}
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat2 %>%  
   group_by(syntax, submission_id) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj2
 
 
-d_infer_main_responseCat.bs.subj %>%
+d_infer_main_responseCat.bs.subj2 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject\n NP", 
@@ -226,8 +228,14 @@ Bayesian stats with maximal random effects: Whereas visually we observe
 no effect of syntax, the Bayesian model with maximal random effects
 shows a tendency towards the predicted effect.
 ``` {r}
-d.infer.brm <- brm(response_num ~ syntax + (1 + syntax | submission_id ) + (1 + syntax | target ),
-                   data = d_infer_main_responseCat,
+# deviation coded syntax
+d_infer_main_responseCat2 <- d_infer_main_responseCat2 %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax == "subject", 1, -1))
+#write_csv(d_infer_main_responseCat2, '../data/results_32_modification_manipulation_pilot2_tidy.csv')
+
+d.infer.brm <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
+                   data = d_infer_main_responseCat2,
                    family = "bernoulli",
                    cores = 4,
                    control = list(adapt_delta = 0.95))

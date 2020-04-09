@@ -12,64 +12,8 @@ prize-winner’ or ‘That prize-winner is a {small, big} NP’
 (within-subject). We created nouns like ‘prize-winner’ for five context
 items (trees, 2 x dogs, flowers, birds).
 
-    ## -- Attaching packages --------------------------------------------------------------------------- tidyverse 1.2.1 --
-
-    ## v ggplot2 3.1.0     v purrr   0.2.5
-    ## v tibble  2.1.3     v dplyr   0.8.3
-    ## v tidyr   0.8.2     v stringr 1.3.1
-    ## v readr   1.1.1     v forcats 0.3.0
-
-    ## Warning: package 'tibble' was built under R version 3.5.3
-
-    ## Warning: package 'dplyr' was built under R version 3.5.3
-
-    ## -- Conflicts ------------------------------------------------------------------------------ tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-    ## Warning: package 'tidyboot' was built under R version 3.5.3
-
-    ## Warning: package 'brms' was built under R version 3.5.3
-
-    ## Loading required package: Rcpp
-
-    ## Warning: package 'Rcpp' was built under R version 3.5.3
-
-    ## Loading 'brms' package (version 2.8.0). Useful instructions
-    ## can be found by typing help('brms'). A more detailed introduction
-    ## to the package is available through vignette('brms_overview').
-
-    ## Loading required package: lme4
-
-    ## Loading required package: Matrix
-
-    ## 
-    ## Attaching package: 'Matrix'
-
-    ## The following object is masked from 'package:tidyr':
-    ## 
-    ##     expand
-
-    ## 
-    ## Attaching package: 'lme4'
-
-    ## The following object is masked from 'package:brms':
-    ## 
-    ##     ngrps
-
-    ## 
-    ## Attaching package: 'lmerTest'
-
-    ## The following object is masked from 'package:lme4':
-    ## 
-    ##     lmer
-
-    ## The following object is masked from 'package:stats':
-    ## 
-    ##     step
-
 ``` r
-d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
+d_infer1_1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
 ```
 
     ## Parsed with column specification:
@@ -95,35 +39,35 @@ native language other than English.
 
 ``` r
 # exclude participants who report difficulties
-d_infer1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+d_infer1_1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
 
-d_infer_woGlitches <- d_infer1 # %>% subset( !(submission_id %in% c()))
+d_infer_woGlitches1 <- d_infer1_1 # %>% subset( !(submission_id %in% c()))
 
 # exclude data from non-native English speakers and those where the language information is missing
-d_infer_woGlitches %>% distinct(languages) %>% View()
-d_infer_Native <- d_infer_woGlitches %>%
+d_infer_woGlitches1 %>% distinct(languages) %>% View()
+d_infer_Native1 <- d_infer_woGlitches1 %>%
   filter(grepl("en", languages, ignore.case = T)) %>%
   select(submission_id, trial_name, trial_number, adj, item, target, response, botresponse,
          syntax, attempts, reference)
 
 # participants who do not get the comparison class warmup right
-d_infer_cc_warmup <- d_infer_Native %>% filter( trial_name == "comp_class_warmup") %>%
+d_infer_cc_warmup1 <- d_infer_Native1 %>% filter( trial_name == "comp_class_warmup") %>%
   group_by(submission_id) %>% count() %>%
   filter( n > 4 )
 
 # exclude participants who need more than 4 attempts per warmup
-d_infer_warmup <- d_infer_Native %>%
+d_infer_warmup1 <- d_infer_Native1 %>%
   filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
   group_by(submission_id) %>%
   filter(attempts > 4)
 
 # excluding 6 participants
-d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
-d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
+d_infer_filt1_1 <- anti_join(d_infer_Native1, d_infer_warmup1, by = c("submission_id"))
+d_infer_filt1_1 <- anti_join(d_infer_filt1_1, d_infer_cc_warmup1, by = c("submission_id"))
 ```
 
 ``` r
-d_infer_filt1 %>% count(syntax, adj)
+d_infer_filt1_1 %>% count(syntax, adj)
 ```
 
     ## # A tibble: 5 x 3
@@ -141,7 +85,7 @@ adjectives or referring to the human in the picture). Superordinate
 responses are collapsed with basic-level responses.
 
 ``` r
-d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
+d_infer_main1 <- d_infer_filt1_1 %>% filter((trial_name == "custom_main_text1")|
                                           (trial_name == "custom_main_text2")) %>%
 
   mutate(syntax = factor(syntax)
@@ -150,10 +94,10 @@ d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
         adj)
 
 # categorize responses
-d_infer_main %>% distinct(response) %>% View()
+d_infer_main1 %>% distinct(response) %>% View()
 # exclude invalid responses
-d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c( "human", "small", "place", "man", "little", "winner", "yes", "swifts", "size"))) # 11 responses excluded
-d_infer_main_responseCat <- d_infer_valid %>%
+d_infer_valid1 <- d_infer_main1 %>% subset(., !(tolower(response) %in% c( "human", "small", "place", "man", "little", "winner", "yes", "swifts", "size"))) # 11 responses excluded
+d_infer_main_responseCat1 <- d_infer_valid1 %>%
   rowwise() %>%
   mutate(  
     response_cat =
@@ -174,15 +118,15 @@ by-syntax (subject vs. predicate) (n=29 participants).
 ``` r
 # plot
 bar.width = 0.8
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat1 %>%  
   group_by(syntax) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs1
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
 
 ``` r
-d_infer_main_responseCat.bs %>%
+d_infer_main_responseCat.bs1 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
@@ -216,15 +160,15 @@ The overall effect is mainly driven by the big bird and flower items
 bird (hummingbird) items.
 
 ``` r
-d_infer_main_responseCat %>%  
+d_infer_main_responseCat1 %>%  
   group_by(syntax, item, adj) %>%
-  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item1
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
 
 ``` r
-d_infer_main_responseCat.bs.item %>%
+d_infer_main_responseCat.bs.item1 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
@@ -249,8 +193,47 @@ d_infer_main_responseCat.bs.item %>%
 
 ![](modification_manip_pilot_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
+## By-subject plot
+
+Participants seem to choose a strategy (mostly basic-level labels) and
+to stick to it throughout the experiment, showing low flexibility in
+adjusting the comparison class.
+
 ``` r
-d_infer_main_responseCat %>% count( item, syntax)
+d_infer_main_responseCat1 %>%  
+  group_by(syntax, submission_id) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj1
+```
+
+    ## Warning: Grouping rowwise data frame strips rowwise nature
+
+``` r
+d_infer_main_responseCat.bs.subj1 %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject\n NP", 
+                                         "Predicate\n NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-subject inferred Comparison Classes")+
+  facet_wrap(~submission_id)
+```
+
+    ## Warning: Duplicated aesthetics after name standardisation: colour
+
+![](modification_manip_pilot_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+d_infer_main_responseCat1 %>% count( item, syntax)
 ```
 
     ## Warning: Grouping rowwise data frame strips rowwise nature
@@ -275,43 +258,60 @@ d_infer_main_responseCat %>% count( item, syntax)
 
 ## Stats
 
-Including random by-participant intercepts, we get a significant effect
-of syntax (dummy-coded) (p=0.04).
-
 ``` r
-# a simple model
+# deviation coded syntax 
+d_infer_main_responseCat1 <- d_infer_main_responseCat1 %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax == "subject", 1, -1))
 
-d.infer.glm <- glmer(response_num ~ syntax + (1 | submission_id), # + (0 + syntax || item), 
-                     data = d_infer_main_responseCat,
-                     family = 'binomial')
-summary(d.infer.glm)
+d.infer.brm <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
+                   data = d_infer_main_responseCat1,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.98))
 ```
 
-    ## Generalized linear mixed model fit by maximum likelihood (Laplace
-    ##   Approximation) [glmerMod]
-    ##  Family: binomial  ( logit )
-    ## Formula: response_num ~ syntax + (1 | submission_id)
-    ##    Data: d_infer_main_responseCat
+    ## Compiling the C++ model
+
+    ## Start sampling
+
+``` r
+summary(d.infer.brm)
+```
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + (1 + syntax_dev | target) 
+    ##    Data: d_infer_main_responseCat1 (Number of observations: 134) 
+    ## Samples: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+    ##          total post-warmup samples = 4000
     ## 
-    ##      AIC      BIC   logLik deviance df.resid 
-    ##     72.0     80.7    -33.0     66.0      131 
+    ## Group-Level Effects: 
+    ## ~submission_id (Number of levels: 29) 
+    ##                           Estimate Est.Error l-95% CI u-95% CI Eff.Sample
+    ## sd(Intercept)                 7.22      4.34     1.59    17.55        774
+    ## sd(syntax_dev)                4.88      3.56     0.36    13.60        719
+    ## cor(Intercept,syntax_dev)    -0.21      0.52    -0.97     0.82       1315
+    ##                           Rhat
+    ## sd(Intercept)             1.00
+    ## sd(syntax_dev)            1.00
+    ## cor(Intercept,syntax_dev) 1.00
     ## 
-    ## Scaled residuals: 
-    ##     Min      1Q  Median      3Q     Max 
-    ## -4.6609  0.0116  0.0595  0.0618  1.1401 
+    ## ~target (Number of levels: 10) 
+    ##                           Estimate Est.Error l-95% CI u-95% CI Eff.Sample
+    ## sd(Intercept)                 2.44      2.39     0.09     8.45       1579
+    ## sd(syntax_dev)                3.73      2.99     0.16    11.48       1305
+    ## cor(Intercept,syntax_dev)    -0.10      0.58    -0.97     0.95       1276
+    ##                           Rhat
+    ## sd(Intercept)             1.00
+    ## sd(syntax_dev)            1.00
+    ## cor(Intercept,syntax_dev) 1.00
     ## 
-    ## Random effects:
-    ##  Groups        Name        Variance Std.Dev.
-    ##  submission_id (Intercept) 25.97    5.096   
-    ## Number of obs: 134, groups:  submission_id, 29
+    ## Population-Level Effects: 
+    ##            Estimate Est.Error l-95% CI u-95% CI Eff.Sample Rhat
+    ## Intercept     12.78      6.78     4.49    28.29        596 1.00
+    ## syntax_dev     2.76      3.88    -4.19    11.89       1031 1.00
     ## 
-    ## Fixed effects:
-    ##               Estimate Std. Error z value Pr(>|z|)  
-    ## (Intercept)      5.360      3.135   1.710   0.0873 .
-    ## syntaxsubject    3.341      1.661   2.011   0.0444 *
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Correlation of Fixed Effects:
-    ##             (Intr)
-    ## syntaxsbjct 0.625
+    ## Samples were drawn using sampling(NUTS). For each parameter, Eff.Sample 
+    ## is a crude measure of effective sample size, and Rhat is the potential 
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
