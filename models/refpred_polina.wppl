@@ -213,7 +213,7 @@ var generateStatePrior = cache(function(cc) {
     model: function(){
       return {
 //         referent: categorical({vs: ["dog1", "dog2", "dog3"], ps: [1,1,1] }),
-        referent: uniformDraw( ["dog1", "dog2", "dog3"] ),
+//        referent: uniformDraw( ["dog1", "dog2", "dog3"] ),
         property: categorical({vs: stateVals, ps: stateProbs[cc]})
 //         categorical({vs: stateVals, ps: stateProbs[cc]})
       }
@@ -340,5 +340,5 @@ var pragmaticListener = cache(function(utterance, subordinate) {
 // viz(listenerPosterior)
 // var statePrior = generateStatePrior('sub')
 // sample(thresholdPrior('negative', _.uniq(map(function(s){return s.property}, statePrior.support() )) ))
-viz(generateStatePrior('sub'))
-viz(generateStatePrior('super'))
+generateStatePrior('sub')
+//viz(generateStatePrior('super'))

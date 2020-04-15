@@ -55,7 +55,7 @@ myvars["nFailedCCWarmUp"] = d_infer_cc_warmup %>% distinct(submission_id) %>% co
 #myvars["nFailedMains"] = d_catch_main_counts %>% distinct(submission_id) %>% count() %>% .$n
 
 myvars = as_tibble(myvars)
-write_csv(myvars, path = "R_results_TeX/myvars-infer.csv", col_names = T)
+#write_csv(myvars, path = "R_results_TeX/myvars-infer.csv", col_names = T)
 ```
 
 
@@ -572,9 +572,9 @@ d_infer_contextSub <- d_infer_main_responseCat %>%
 # does not converge
 lm.infer.context.basic <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub  +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
-                        (1 + syntax_contr + NP_basic + NP_sub +
-                        syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
-                        (1 + syntax_contr + NP_basic + NP_sub +
+                        (1 | submission_id) +  #syntax_contr + NP_basic + NP_sub +
+                      #  syntax_contr:NP_basic + syntax_contr:NP_sub || submission_id) +
+                        (0 + #syntax_contr + NP_basic + NP_sub +
                         syntax_contr:NP_basic + syntax_contr:NP_sub || item),
                       data = d_infer_contextBasic,
                       family = "binomial",
@@ -766,6 +766,22 @@ b.infer.subset <- brm(response_num ~ syntax_contr + NP_treatment + context_sub  
                       control = list(adapt_delta = 0.9))
 summary(b.infer.subset)
 ```
+
+
+``` {r}
+# subset by syntactic condition within context to test effect of NP
+d_infer_contextBasic_subject <- d_infer_contextBasic %>% filter(condition == 'predicative')
+lm.infer.basicContext.subj <- glmer(response_num ~ NP_basic + NP_sub + 
+                                      (0 + NP_sub + NP_basic || submission_id) +
+                                      (0 + NP_sub + NP_basic || item),
+                                    data = d_infer_contextBasic_subject,
+                                    family = 'binomial',
+                                    REML = F,
+                                    control=glmerControl(optimizer="bobyqa",
+                                                         optCtrl=list(maxfun=2e5)))
+summary(lm.infer.basicContext.subj)
+```
+
 
 Assuming NO interaction with context
 
