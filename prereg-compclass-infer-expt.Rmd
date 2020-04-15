@@ -128,8 +128,51 @@ d_infer_main_responseCat.bs %>%
   ylab("Proportion of basic-level responses")+
  # ggtitle("Experiment 3: Comparison Class Inference")+
   facet_grid(~context)  +
-  ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
+  #ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
 ```
+### MH analysis
+
+#### Subjects who only give basic-level responses
+```{r}
+d_infer_main_responseCat %>%
+  group_by(submission_id) %>%
+  summarize(prop_basic = mean(response_num)) %>%
+  ungroup() %>%
+  group_by(prop_basic) %>%
+  count()
+
+d_infer_main_responseCat %>%
+  group_by(submission_id) %>%
+  summarize(prop_basic = mean(response_num)) %>%
+  filter(prop_basic == 1) %>%
+  pull(submission_id) -> ids_all_basic
+```
+#### By item plot: basic-context, subordinate-NP
+
+```{r}
+d_infer_main_responseCat %>%
+  #filter(!(submission_id %in% ids_all_basic)) %>%
+  filter(NP == "subordinate", context == "basic") %>%
+  group_by( context, NP, condition, target_size, item) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_item_bs_basic_subNP
+```
+
+
+```{r}
+
+ggplot(d_infer_main_item_bs_basic_subNP %>%
+         ungroup() %>%
+         mutate(condition = factor(condition, levels = c("predicative", "prenominal"),
+                                   labels = c("Subject NP", "Predicate NP"))), aes( x = condition, y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(), color = 'black', alpha = 0.3)+
+  geom_linerange(position = position_dodge())+
+  facet_grid(item ~ target_size)
+
+ggsave("~/Desktop/expt3_basicContext_subNP_byItem.pdf", width = 6, height =6)
+```
+
+
+
 
 
 ``` {r}
