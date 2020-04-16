@@ -18,7 +18,7 @@ const instructions = magpieViews.view_generator("instructions", {
             <br />
             In the following warm-up trials, you will see pictures of objects.
             First, you will see example trials where the objects are labeled.
-            Then you will be asked to complete similar trials and fill-in object labels yourself. You will be given feedback on your labels.
+            Then you will be asked to complete similar trials and provide object labels yourself. You will be given feedback on your labels.
             <br />
             <br />
             By pressing the button 'Go to Trials' you begin the first warm-up round.
