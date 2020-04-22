@@ -35,7 +35,7 @@ $("document").ready(function() {
             // Possible deployment methods are:
             // "debug" and "directLink"
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
-            deployMethod: "MTurkSandbox",
+            deployMethod: "MTurk",
             contact_email: "tessler@mit.edu",
             prolificURL: "https://app.prolific.ac/submissions/complete?cc=SAMPLE1234"
         },
@@ -45,8 +45,8 @@ $("document").ready(function() {
         progress_bar: {
             in: [
                 // list the view-names of the views for which you want a progress bar
-                warmup1.name,
-                warmup2.name,
+                // warmup1.name,
+                // warmup2.name,
                 custom_main_text1.name,
                 custom_main_text2.name
             ],
