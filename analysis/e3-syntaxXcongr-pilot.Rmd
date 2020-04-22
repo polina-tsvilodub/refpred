@@ -68,6 +68,7 @@ d_filter <- anti_join(d_filter, d_failed_label_warmup, by = c("submission_id"))
 ``` {r count}
 d_filter %>% count(adj_cond, syntax)
 d_filter %>% count(adj_cond, syntax, target_size)
+d_filter %>% count(adj_cond, target, syntax)
 ```
 ## Categorizing data
 The data from n = 49 participants is categorized into subordinate and basic-level responses; superordinate responses are collapsed with the basic-level. 20 invalid responses (5.1%) are excluded. 
@@ -95,6 +96,15 @@ There are 7 participants (14%) providing subordinate reponses only and 5 who pro
 ``` {r}
 d_main_responseCat %>% group_by(submission_id) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% count(mean) 
 ```
+``` {r switchers}
+d_main_responseCat %>% group_by(submission_id, adj_cond) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(adj_cond, mean) %>% filter(((congruent == 1) ) & ( (incongruent == 0)))
+```
+``` {r switchers}
+d_main_responseCat %>% filter(adj_cond == "congruent") %>% group_by(submission_id, syntax) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(syntax, mean) %>% filter((subj == pred))
+
+d_main_responseCat %>% filter(adj_cond == "congruent") %>% group_by(submission_id, syntax) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(syntax, mean) %>% filter(!(((subj ==1) & (pred == 1)) | ((subj == 0) & (pred == 0))))
+```
+
 ## By-congruence plot of syntactic conditions
 
 We observe a big main effect of congruence and an effect of syntax in the congruent condition.   
