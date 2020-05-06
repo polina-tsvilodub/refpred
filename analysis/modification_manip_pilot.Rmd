@@ -100,21 +100,21 @@ d_infer_main_responseCat1 %>%
 d_infer_main_responseCat.bs1 %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
-                            labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
+                            labels = c(  "Subject NP\n(That big Great Dane\n is a prize-winner)", "Predicate NP\n(That prize-winner\n is a big Great Dane)"))) %>%
   ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black', fill = 'white',
            alpha = 0.5, color = 'black', size = 0.5) +
   geom_linerange(position = position_dodge(bar.width), size = 0.5) +
   ggthemes::theme_few()+
   xlab("") +
-  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
-        #legend.title = element_text(size = 7), 
+  theme(legend.position = c(0.88, 0.84),legend.text = element_text(size = 4),
+        legend.title = element_text(size = 4), 
         legend.key.size = unit(0.5,"line"))+
   scale_y_continuous(breaks = c(0, 0.5, 1))+
-  ylab("Proportion of basic-level responses")
- # ggtitle("Experiment 3: Comparison Class Inference")+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("Experiment 4 Pilot: Direct Modification")
  # facet_grid(~context)  +
-  #ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
+  ggsave("amlap_expt4_double_mod2.pdf", width = 4.5, height = 4.5)
 ```
 ## By-item plot
 
@@ -191,9 +191,13 @@ d.infer.brm <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id )
                    data = d_infer_main_responseCat1,
                    family = "bernoulli",
                    cores = 4,
-                   control = list(adapt_delta = 0.98))
+                   control = list(adapt_delta = 0.99))
 
 summary(d.infer.brm)
+
+d.infer.brm.samples <- posterior_samples(d.infer.brm)
+head(d.infer.brm.samples)
+mean(d.infer.brm.samples$b_syntax_dev > 0)
 ```
 
 

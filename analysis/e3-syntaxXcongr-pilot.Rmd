@@ -213,3 +213,17 @@ lm.e3.pilot.congr <- brm(response_num ~ syntax_dev  +
                    cores = 4)
 summary(lm.e3.pilot.congr)
 ```
+
+Polina playing around with brm syntax:
+``` {r}
+lm.e3.pilot.congr.addInfo <- brm(response_num | trials(1) ~ syntax_dev  + 
+                     (1 + syntax_dev | submission_id) +
+                     (1 + syntax_dev | target),
+                   data = d_main_responseCat_congr,
+                   family = "binomial",
+                   control = list(adapt_delta = 0.9),
+                   iter = 1000,
+                   cores = 4)
+summary(lm.e3.pilot.congr.addInfo)
+
+```
