@@ -16,9 +16,6 @@ const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // ,
 console.log(contexts)
 const synt_adj0 = _.shuffle(["congr_subj", "congr_pred", "congr_subj", "congr_pred"]);
 console.log(synt_adj0)
-const synt_adj_add =  _.shuffle(["congr_".concat(_.shuffle(["subj", "pred"])[0]), "incongr_".concat(_.shuffle(["subj", "pred"])[0])])[0].toString();
-// console.log(synt_adj_add)
-const synt_adj = _.shuffle(synt_adj0.concat(synt_adj_add));
 // console.log(synt_adj)
 const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_subj", "congr_subj"]);
 console.log("Filler conditions:", filler_cond)
@@ -46,12 +43,12 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       ref_np: items[contexts[i]][target_size[i]].reference
     }
     // modify utterance etc depending on specific condition
-    if (synt_adj[i].split("_")[0] == "congr") {
+    if (synt_adj0[i].split("_")[0] == "congr") {
 
       view.adj = items[contexts[i]][target_size[i]].adj_congr;
       view.adj_cond = "congruent";
 
-      if (synt_adj[i].split("_")[1] == "subj") {
+      if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
         view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][target_size[i]].adj_congr + " " + items[contexts[i]][target_size[i]].item + " is a " + items[contexts[i]][target_size[i]].reference + ".</b>";
         view.question = "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj_congr + " relative to?";
@@ -66,7 +63,7 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
     } else { // incongruent condition
       view.adj = items[contexts[i]][target_size[i]].adj_incongr;
       view.adj_cond = "incongruent";
-      if (synt_adj[i].split("_")[1] == "subj") {
+      if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
         view.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][target_size[i]].adj_incongr + " " + items[contexts[i]][target_size[i]].item + " is a " + items[contexts[i]][target_size[i]].reference + ".</b>";
         view.question = "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj_incongr + " relative to?";
@@ -93,7 +90,7 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
     const filler_size = check_size(target_size[i])
     const filler = {
       trial_type: "filler",
-      context: items[contexts[i]][filler_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
+      context: "You and your friend see the following:", // target_size indicates if the target is big or small within the given context
       context_picture: items[contexts[i]][filler_size].context_picture_filler, // context picture is chose (it is the same for both big and small targets)
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
       target_picture: items[contexts[i]][filler_size].target_filler, // target picture, differs for bis and small target
