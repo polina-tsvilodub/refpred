@@ -319,6 +319,12 @@ const warmup_trials = {
     text: "Your turn! Please label the pictures below.",
     question1: "This is a ",
     question3: "This is a "
+  },
+  ref: {
+    item: "dogs1",
+    picture1: "warmup/beagle_service.png",
+    picture2: "warmup/doberman_service.png",
+    question: " <br> These are service animals."
   }
 },
 dogs2: {
@@ -341,7 +347,13 @@ dogs2: {
   text: "Your turn! Please label the pictures below.",
   question1: "This is a ",
   question3: "This is a "
-  }
+},
+ref: {
+  item: "dogs2",
+  picture1: "warmup/pug_prize.png",
+  picture2: "warmup/great-dane_prize.png",
+  question:" <br>These are prize-winners."
+}
 },
 birds: {
   train: {
@@ -363,7 +375,13 @@ birds: {
   text: "Your turn! Please label the pictures below.",
   question1: "This is a ",
   question3: "This is an "
-  }
+},
+ref: {
+  item: "birds",
+  picture1: "warmup/hummingbird_rescue.png",
+  picture2: "warmup/eagle_rescue.png",
+  question: " <br> These are rescues."
+}
 },
 flowers: {
   train: {
@@ -385,7 +403,13 @@ flowers: {
   text: "Your turn! Please label the pictures below.",
   question1: "This is a ",
   question3: "This is a "
-  }
+},
+ref: {
+  item: "flowers",
+  picture1: "warmup/dandelion_gift.png",
+  picture2: "warmup/sunflower_gift.png",
+  question: " <br> These are gifts."
+}
 },
 // fish: {
 //   train: {
@@ -429,7 +453,13 @@ trees: {
   text: "Your turn! Please label the pictures below.",
   question1: "This is a ",
   question3: "This is a "
-  }
+},
+ref: {
+  item: "trees",
+  picture1: "warmup/redwood_landmark.png",
+  picture2: "warmup/tree_landmark.png",
+  question: " <br> These are landmarks."
+}
 }
 }
 
@@ -471,7 +501,7 @@ const trials = [
      text_insertion_warmup1: [
        // get the warmup trials corresponding to the main trials in the first main block
        trials[0].x,
-       trials[1].x,
+       trials[1].x
        // trials[2].x
     ],
     text_insertion_warmup2: [
@@ -479,7 +509,17 @@ const trials = [
       trials[2].x,
       trials[3].x
   //    trials[5].x
+    ],
+    ref_warmup1: [
+      trials[0].x,
+      trials[1].x
+    ],
+    ref_warmup2: [
+      trials[2].x,
+      trials[3].x
     ]
+
+
   };
 
 console.log("Unshuffled trial order:", trial_info.text_insertion_main1)

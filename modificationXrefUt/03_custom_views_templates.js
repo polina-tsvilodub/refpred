@@ -245,6 +245,62 @@ const custom_comp_class_warmup = function(config, startingTime) {
 return view;
 };
 
+const custom_ref_warmup = function(config, startingTime) {
+  const view = {
+    name: config.name,
+    CT: 0,
+    trials: config.trials,
+    render: function(CT, magpie, startingTime) {
+      $("main").html(`<div class='magpie-view'>
+      <h1 class='magpie-view-title'>Warm-up trials</h1>
+
+
+    <div style="width:100%;height:300px;">
+     <div style="width:50%;height:100%;float:left;position:relative;align:center;">
+        <div style="position:absolute;bottom:0;right:40px;">
+          <div class="picture"  align="center" >
+            <img src="${config.data[CT].ref.picture1}">
+          </div>
+
+        </div>
+    </div>
+    <div style="width:50%;height:100%;float:right; position:relative;align:center;">
+      <div style="position:absolute;bottom:0;left:40px;">
+          <div  class="picture" align="center" >
+            <img src="${config.data[CT].ref.picture2}">
+          </div>
+
+      </div>
+      </div>
+
+
+    </div>
+
+
+    <div class='magpie-view-text-container' >
+
+      <p id='1' class='magpie-view-question' >${config.data[CT].ref.question} </p>
+
+    </div>
+
+
+
+    <div  class='magpie-view-answer-container'>
+      <p class = 'correct-answer4 magpie-nodisplay'>Please enter the correct labels to proceed</p>
+    </div>
+          <button id='next' class='magpie-view-button '>next</button>
+    </div>  `);
+
+      $('#next').hide().delay(3500).show(0);
+
+      $("#next").on("click", function(){
+        magpie.findNextView();
+      })
+    }
+  }
+  return view;
+}
+
 
 // labelling warm-up trials warm-up views
 const custom_textfield_warmup = function(config, startingTime) {

@@ -87,6 +87,20 @@ const warmup2 = custom_textfield_warmup({
   data: trial_info.text_insertion_warmup2,
 });
 
+// referential noun warm-ups
+const ref1 = custom_ref_warmup({
+  name: "ref1",
+  title: "Warm-up trial",
+  trials: 2,
+  data: _.shuffle(trial_info.ref_warmup1)
+})
+
+const ref2 = custom_ref_warmup({
+  name: "ref2",
+  title: "Warm-up trial",
+  trials: 2,
+  data: _.shuffle(trial_info.ref_warmup2)
+})
 
 // speaker and listeneers names to be sampled from for the botcaptcha
 var speaker = _.sample(["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles"]);
