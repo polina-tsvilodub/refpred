@@ -1,0 +1,110 @@
+---
+title: "Double Modification Ref Utility with Fillers"
+author: "Polina Tsvilodub"
+date: "07 05 2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lmerTest)
+library(brms)
+library(tidyboot)
+```
+
+
+``` {r data, echo=FALSE, warnings=FALSE, include=FALSE}
+d_mod_filler <- read_csv('../data/results_35_modification-refUt-filler-pilot.csv')
+d_mod_filler_clean <- d_mod_filler %>% select(-worker_id, -hit_id, -startDate, -assignment_id)
+#write_csv(d_mod_filler_clean, '../data/results_35_modXrefUt_pilot1.csv')
+d_mod_ref <- read_csv('../data/results_35_modXrefUt_pilot1.csv')
+```
+## Data Exclusion
+
+Four participants are excluded for not reporting their native language. One is excluded for failing labeling trials (mostly due to typos).
+```{r clean}
+# exclude participants who report glitches
+d_mod_ref %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+d_modRef_woGlitches <- d_mod_ref 
+
+# exclude non-native English speakers
+d_modRef_woGlitches %>% distinct(languages) %>% View()
+
+d_modRef_Native <- d_modRef_woGlitches %>% 
+  filter(grepl("en", languages, ignore.case = T)) 
+
+# cleaning warm-up trials
+# comparison class paraphrase trial
+d_failed_cc_warmup <- d_modRef_Native %>% 
+  filter( trial_name == "comp_class_warmup") %>%
+  group_by(submission_id) %>% count() %>%
+  filter( n > 4 )
+d_failed_label_warmup <- d_modRef_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 4)
+d_label_warmup_more1 <- d_modRef_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 1) %>% ungroup() %>% 
+  select(submission_id, picture1, response1, picture2, response2, attempts)
+# check where and why people need more than one attempt 
+# d_Native %>% 
+#filter((trial_name == "warmup1") | (trial_name == "warmup2")) %>% #semi_join(., d_label_warmup_more1, by=c("submission_id")) %>% #select(submission_id, picture1, response1, picture2, response2, attempts) %>% View()
+d_modRef_filter <- anti_join(d_modRef_Native, d_failed_cc_warmup, by = c("submission_id"))
+d_modRef_filter <- anti_join(d_modRef_filter, d_failed_label_warmup, by = c("submission_id"))
+```
+
+The number of conditions we collected data for is relatively balanced. 
+``` {r count}
+d_modRef_filter %>% count(adj_cond, syntax)
+d_modRef_filter %>% count(adj_cond, syntax, target_size)
+d_modRef_filter %>% count(adj_cond, target, syntax)
+```
+
+## Response Classification
+
+Data from n = 41 is classified into basic-level and subordinate responses. 9 (4 %) invalid responses where participants fail to establish correct reference or produce nonsense are excluded. 
+``` {r}
+d_modRef_main <- d_modRef_filter %>% filter((trial_name == "custom_main_text1") |
+                                (trial_name == "custom_main_text2")) %>%
+  select(submission_id, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type )
+
+
+d_modRef_main %>% distinct(response) %>% View()
+
+d_modRef_excludeN2 <- d_modRef_main %>% 
+  subset(., !(tolower(response) %in% c("prize-winner", "gifts", "rescues", "prizes",
+                                       "landmarks", "prizewinners", "service animals", "prize winnders", "service dogs", "prize winners")))
+
+(nrow(d_modRef_main) - nrow(d_modRef_excludeN2))/nrow(d_modRef_main)
+
+d_modRef_valid <- d_modRef_excludeN2 %>% 
+  subset(., !(tolower(response) %in% c("everything", "big", "human")))
+
+d_modRef_main_responseCat <- d_modRef_valid %>% 
+  mutate(response_cat = ifelse(
+    tolower(response) %in% c("flowers", "flower", "trees", "tree",  "birds", "bird",  "dogs", "dog", "plants", "other trees" ), "basic", "subordinate"
+  ),
+  response_num = ifelse(response_cat == "basic", 1, 0)
+  )
+```
+
+```{r plot, echo=FALSE}
+bar.width = 0.8
+d_modRef_main_responseCat %>%  
+  group_by(syntax, trial_type) %>%
+  tidyboot_mean(column = response_num) -> d_modRef_main_responseCat.bs
+
+d_modRef_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  facet_grid(~trial_type)
+```

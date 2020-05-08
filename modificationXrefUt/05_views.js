@@ -13,12 +13,12 @@ const instructions = magpieViews.view_generator("instructions", {
             The experiment consists of two rounds, each having a few warm-up trials before the main trials start.
             <br />
             <br />
-            In the first warm-up trial, you will have to rephrase a sentence someone says.
-            <br />
-            <br />
             In the following warm-up trials, you will see pictures of objects.
             First, you will see example trials where the objects are labeled.
             Then you will be asked to complete similar trials and provide object labels yourself. You will be given feedback on your labels.
+            <br />
+            <br />
+            In the last warm-up trial, you will have to rephrase a sentence someone says.
             <br />
             <br />
             By pressing the button 'Go to Trials' you begin the first round.
