@@ -14,8 +14,8 @@ library(tidyboot)
 
 
 ``` {r data, echo=FALSE, warnings=FALSE, include=FALSE}
-d_mod_filler <- read_csv('../data/results_35_modification-refUt-filler-pilot.csv')
-d_mod_filler_clean <- d_mod_filler %>% select(-worker_id, -hit_id, -startDate, -assignment_id)
+#d_mod_filler <- read_csv('../data/results_35_modification-refUt-filler-pilot.csv')
+#d_mod_filler_clean <- d_mod_filler %>% select(-worker_id, -hit_id, -startDate, -assignment_id)
 #write_csv(d_mod_filler_clean, '../data/results_35_modXrefUt_pilot1.csv')
 d_mod_ref <- read_csv('../data/results_35_modXrefUt_pilot1.csv')
 ```
@@ -90,6 +90,19 @@ d_modRef_main_responseCat <- d_modRef_valid %>%
   )
 ```
 
+``` {r}
+d_modRef_matchNP <- d_modRef_main %>%
+  subset(., !(tolower(response) %in% c("everything", "big", "human"))) %>%
+  mutate(
+    NP_match = ifelse(
+      tolower(response) %in% c("prize-winner", "gifts", "rescues", "prizes",
+                          "landmarks", "prizewinners", "service animals", "prize winnders", "service dogs", "prize winners", "flowers", "flower", "trees", "tree",  "birds", "bird",  "dogs", "dog", "plants", "other trees"), "nonmatch", "match"
+    ), 
+    response_numMatch = ifelse(NP_match == "nonmatch", 1, 0)
+  )
+  
+```
+
 ```{r plot, echo=FALSE}
 bar.width = 0.8
 d_modRef_main_responseCat %>%  
@@ -107,4 +120,25 @@ d_modRef_main_responseCat.bs %>%
   scale_y_continuous(breaks = c(0, 0.5, 1))+
   ylab("Proportion of basic-level responses") +
   facet_grid(~trial_type)
+```
+```{r plot, echo=FALSE}
+bar.width = 0.8
+d_modRef_matchNP %>%  
+  group_by(syntax, trial_type) %>%
+  tidyboot_mean(column = response_numMatch) -> d_modRef_match_responseCat.bs
+
+d_modRef_match_responseCat.bs %>%
+  ungroup() %>%
+  #filter(trial_type == "critical") %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of responses \nnot matching critical NP") +
+  ggtitle('Direct Modification Pilot 5' ) +
+  facet_grid(~trial_type)
+ggsave('modificationXrefUt_by-trialType.png', height = 3, width = 5)
 ```
