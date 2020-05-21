@@ -6,6 +6,7 @@ output: github_document
 ---
 
 For an exploratory analysis, the categorized data from all three noun modification manipulation pilots is pooled. 
+
 ``` {r libraries, echo=F, warnings=F, include=F}
 
 library(tidyverse)
@@ -19,7 +20,7 @@ pilot1 <- read_csv('../data/results_32_modification_manipulation_pilot1_tidy.csv
 pilot2 <- read_csv('../data/results_32_modification_manipulation_pilot2_tidy.csv')
 pilot3 <- read_csv('../data/results_32_modification_manipulation_pilot3_tidy.csv')
 
-all_pilots <- rbind(pilot1, pilot2) %>% rbind(., pilot3)
+all_pilots <- rbind(pilot1, pilot2, pilot3)
 ```
 
 ``` {r}
@@ -88,4 +89,70 @@ d.infer.full.brm <- brm(response_num ~ syntax_dev + pilot_nr +
                    control = list(adapt_delta = 0.99))
 
 summary(d.infer.full.brm)
+```
+## Pilots 1 - 5
+In this section, data from 5 pilots is pooled. To do so, only the congruent condition data is subsetted from the fourth pilot; and only the critical trials (i.e. direct-modification data) from the fifth pilot are included. 
+
+``` {r}
+pilot4 <- read_csv('../data/results_34_modXcongr_pilot1_tidy.csv') %>% 
+  filter(adj_cond == "congruent") %>%
+  mutate(pilot_nr = 4,
+         syntax_dev = ifelse(syntax == "subj", 1, -1),
+         syntax = ifelse(syntax == "subj", "subject", "predicate")) %>%
+  select(-context_picture, -target_size, -adj_cond, -response_cat)
+pilot5 <- read_csv('../data/results_35_modXrefUt_pilot1_nonMatchClassified_tidy.csv') %>% filter(trial_type == "critical") %>% 
+  mutate(response_num = response_numMatch,
+         pilot_nr = 5,
+         syntax_dev = ifelse(syntax == "subj", 1, -1),
+         syntax = ifelse(syntax == "subj", "subject", "predicate")) %>%
+  select(-context_picture, -target_size, -adj_cond, -trial_type, -NP_match, -response_numMatch)
+
+all5_pilots <- rbind(
+  all_pilots %>% select(-response_cat, -response_label), 
+  pilot4 ,
+  pilot5
+)
+```
+
+Full dataset plot by-syntax:
+``` {r}
+bar.width = 0.8
+
+all5_pilots %>%
+  group_by(syntax) %>%
+  tidyboot_mean(column = response_num) -> all5_pilots.bs
+
+
+all5_pilots.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of responses\n not matching NP") +
+  ggtitle("E4 Direct Modification Pilots 1-5")
+
+```
+
+## Pilot 1-5 stats
+``` {r}
+all5_pilots <- all5_pilots %>%
+  mutate(pilot_nr = factor(pilot_nr))
+
+d.mod.full5.brm <- brm(response_num ~ syntax_dev + pilot_nr + 
+                          (1 + syntax_dev | submission_id ) + 
+                          (1 + syntax_dev | target ),
+                   data = all5_pilots,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.99))
+
+summary(d.mod.full5.brm)
 ```

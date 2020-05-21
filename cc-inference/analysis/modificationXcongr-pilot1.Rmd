@@ -77,7 +77,7 @@ Data from n = 41 is classified into basic-level and subordinate responses. 9 (4 
 ``` {r}
 d_main <- d_filter %>% filter((trial_name == "custom_main_text1") |
                                 (trial_name == "custom_main_text2")) %>%
-  select(submission_id, context_picture, response, target_size, adj, syntax, target, item, adj_cond )
+  select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond )
 
 
 d_main %>% distinct(response) %>% View()
@@ -91,6 +91,7 @@ d_main_responseCat <- d_valid %>%
   ),
   response_num = ifelse(response_cat == "basic", 1, 0)
   )
+#write_csv(d_main_responseCat, '../data/results_34_modXcongr_pilot1_tidy.csv')
 ```
 
 There are 8 participants (20%) who produce basic-level responses only. This is a higher rate than in the original cogsci Experiment 3 or in the syntax-congruence E3 pilot. This means that the presence of the second noun decreases the salience of the incongruent trials and that the participants are more confused by this complex syntactic frame. 

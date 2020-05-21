@@ -68,9 +68,10 @@ Data from n = 41 is classified into basic-level and subordinate responses. 9 (4 
 ``` {r}
 d_modRef_main <- d_modRef_filter %>% filter((trial_name == "custom_main_text1") |
                                 (trial_name == "custom_main_text2")) %>%
-  select(submission_id, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type )
+  select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type )
+```
 
-
+``` {r}
 d_modRef_main %>% distinct(response) %>% View()
 
 d_modRef_excludeN2 <- d_modRef_main %>% 
@@ -100,7 +101,7 @@ d_modRef_matchNP <- d_modRef_main %>%
     ), 
     response_numMatch = ifelse(NP_match == "nonmatch", 1, 0)
   )
-  
+write_csv(d_modRef_matchNP, '../data/results_35_modXrefUt_pilot1_nonMatchClassified_tidy.csv')  
 ```
 
 ```{r plot, echo=FALSE}
@@ -121,6 +122,7 @@ d_modRef_main_responseCat.bs %>%
   ylab("Proportion of basic-level responses") +
   facet_grid(~trial_type)
 ```
+
 ```{r plot, echo=FALSE}
 bar.width = 0.8
 d_modRef_matchNP %>%  
@@ -141,4 +143,67 @@ d_modRef_match_responseCat.bs %>%
   ggtitle('Direct Modification Pilot 5' ) +
   facet_grid(~trial_type)
 ggsave('modificationXrefUt_by-trialType.png', height = 3, width = 5)
+```
+
+```{r by-item match, echo=FALSE}
+bar.width = 0.8
+d_modRef_matchNP %>%  
+  group_by(syntax, target, trial_type) %>%
+  tidyboot_mean(column = response_numMatch) -> d_modRef_match_responseCat.byItem
+
+d_modRef_match_responseCat.byItem %>%
+  ungroup() %>%
+  #filter(trial_type == "critical") %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subj NP", "Pred NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of responses \nnot matching critical NP") +
+  ggtitle('Direct Modification Pilot 5' ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        strip.text.y = element_text(angle = 90)) +
+  facet_grid(trial_type~target, scales = "free")
+ggsave('modificationXrefUt_by-ItemXTrial.png', height = 3, width = 9)
+```
+
+``` {r}
+
+d_modRef_matchNP %>%  
+  group_by(syntax, submission_id, trial_type) %>%
+  tidyboot_mean(column = response_numMatch) %>%
+  ungroup() %>%
+  #filter(trial_type == "critical") %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subj NP", "Pred NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of responses \nnot matching critical NP") +
+  ggtitle('Direct Modification Pilot 5' ) +
+  theme(strip.text = element_text(size=5),
+        strip.background = element_rect(size = 1)) +
+  facet_wrap(submission_id~trial_type, ncol=8, scales = "free")
+ggsave('modificationXrefUt_by-SubjXTrial.png', height = 5, width = 8)
+
+```
+
+### stats
+``` {r}
+d_modRef_matchNP %>%
+  mutate(syntax_dev = ifelse(syntax == "subj", 1, -1)) %>%
+  filter(trial_type == "critical") -> d_modRef_critical
+d.mod.refUt.brm <- brm(
+  response_numMatch ~ syntax_dev + (1 + syntax_dev | submission_id) +
+    (1 + syntax_dev | target),
+  data = d_modRef_critical,
+  family = "bernoulli",
+  cores = 4,
+  control=list(adapt_delta=0.95)
+)
+summary(d.mod.refUt.brm)
 ```
