@@ -117,18 +117,19 @@ d_infer_main_responseCat.bs %>%
                      labels = c("basic", '"one"', "subordinate"))) %>%
   ggplot(., aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
-           alpha = 0.5, color = 'black', size = 1) +
+            color = 'black', size = 1) +
   geom_linerange(position = position_dodge(bar.width), size = 1) +
   ggthemes::theme_few()+
   xlab("") +
-  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
-        #legend.title = element_text(size = 7), 
+  theme(legend.position = c(0.88, 0.82), legend.text = element_text(size = 9),
+        legend.title = element_text(size = 9), 
         legend.key.size = unit(0.5,"line"))+
   scale_y_continuous(breaks = c(0, 0.5, 1))+
+  scale_fill_grey() +
   ylab("Proportion of basic-level responses")+
- # ggtitle("Experiment 3: Comparison Class Inference")+
-  facet_grid(~context)  +
-  #ggsave("figs/expt3-cc-inference.pdf", width = 7.5, height = 3.5)
+  ggtitle("Experiment 3: Comparison Class Inference")+
+  facet_grid(~context)  
+  #ggsave("figs/amlap_expt3-cc-inference.pdf", width = 7.5, height = 3.5)
 ```
 ### MH analysis
 
@@ -171,8 +172,57 @@ ggplot(d_infer_main_item_bs_basic_subNP %>%
 ggsave("~/Desktop/expt3_basicContext_subNP_byItem.pdf", width = 6, height =6)
 ```
 
+### Number of switchers
+``` {r}
+d_infer_main_responseCat %>% filter((context=='basic') & (NP == 'subordinate')) %>% group_by(submission_id, condition) %>% count() %>% spread(condition, n) %>% filter(!(is.na(predicative) | is.na(prenominal))) %>% summarise(sum = predicative + prenominal) %>% summarize(mean = mean(sum))
+#summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(condition, mean) %>% filter(!(((predicative == 1) & (prenominal == 1)) | ((predicative == 0 ) & (prenominal == 0)))) %>%
+filter(!(is.na(predicative) | is.na(prenominal)))
+```
+
+``` {r}
+# some general analytics
+d_infer_main_responseCat %>% filter(context == "basic") %>% count(condition, pic)
+
+d_infer_main_responseCat %>% filter((context=='basic') & (NP == 'subordinate')) %>% group_by(submission_id) %>% summarise(mean = mean(response_num)) %>% summarise(mean(mean))
+```
+#### Full by-item plot
+```{r}
+bar.width = 0.8
+d_infer_main_responseCat %>%  
+  mutate(target = gsub("images/", "", pic),
+         target = gsub(".png", "", target)) %>%
+  group_by( context, NP, condition, target) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.full.byItem
 
 
+d_infer_main_responseCat.full.byItem %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, levels = c( "predicative", "prenominal"),
+                            labels = c(  "Subj NP", "Pred NP")),
+         context = factor(context, levels = c("basic", "subordinate"),
+                          labels = c("Basic Context","Subordinate Context")),
+         NP = factor(NP, levels = c("basic", "one", "subordinate"),
+                     labels = c("basic", '"one"', "subordinate"))) %>%
+  ggplot(., aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+            color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(bar.width), size = 1) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.82), legend.text = element_text(size = 9),
+        legend.title = element_text(size = 9), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  scale_fill_grey() +
+  ylab("Proportion of basic-level responses")+
+  ggtitle("Experiment 3: Comparison Class Inference")+
+  facet_wrap(context~target, ncol = 6 )  
+ggsave('figs/cogsci-e3-full-byItem.png', height = 5, width = 8)
+```
+#### By-adjective plot
+```{r}
+
+```
 
 
 ``` {r}
@@ -656,6 +706,13 @@ b.context.basic <- brm(response_num ~ syntax_contr + NP_basic + NP_sub  +
                       cores = 3)
 summary(b.context.basic)
 
+# post cogsci stats
+b.context.basic.posterior_samples <- posterior_samples(b.context.basic)
+mean(b.context.basic.posterior_samples$`b_syntax_contr:NP_sub` > 0)
+mean(b.context.basic.posterior_samples$b_NP_basic - b.context.basic.posterior_samples$b_NP_sub > 0  )
+mean(b.context.basic.posterior_samples$b_NP_basic - b.context.basic.posterior_samples$b_NP_sub)
+quantile(b.context.basic.posterior_samples$b_NP_basic - b.context.basic.posterior_samples$b_NP_sub, probs = c(0.025, 0.975))
+
 # sub context
 b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub +
                         syntax_contr:NP_basic + syntax_contr:NP_sub +
@@ -665,9 +722,17 @@ b.context.sub <- brm(response_num ~ syntax_contr + NP_basic + NP_sub +
                         syntax_contr:NP_basic + syntax_contr:NP_sub || item),
                         data = d_infer_contextSub,
                       family = "bernoulli",
-                     cores = 4)
+                     chains = 3,
+                     cores = 3)
 
 summary(b.context.sub)
+# post cogsci stats
+b.context.sub.posterior_samples <- posterior_samples(b.context.sub)
+
+mean(b.context.sub.posterior_samples$`b_syntax_contr:NP_sub` > 0)
+mean(b.context.sub.posterior_samples$b_NP_basic - b.context.sub.posterior_samples$b_NP_sub > 0  )
+mean(b.context.sub.posterior_samples$b_NP_basic - b.context.sub.posterior_samples$b_NP_sub)
+quantile(b.context.sub.posterior_samples$b_NP_basic - b.context.sub.posterior_samples$b_NP_sub, probs = c(0.025, 0.975))
 ```
 
 
@@ -682,15 +747,16 @@ d_infer_contextBasic_one <- d_infer_contextBasic %>%
   filter(NP == "one")
 
 # these model should all run
-lm.basic.sub <- glmer(response_num ~ syntax_contr +
+brm.basic.sub <- brm(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
                       data = d_infer_contextBasic_sub,
-                      family = "binomial",
-                      REML = F,
-                      control=glmerControl(optimizer="bobyqa",
-                            optCtrl=list(maxfun=2e5))
+                      family = "bernoulli",
+                      cores = 4,
+                      control = list(adapt_delta = 0.999)
                       )
+
+summary(brm.basic.sub)
 lm.basic.basic <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
@@ -711,13 +777,29 @@ lm.basic.one <- glmer(response_num ~ syntax_contr +
                       )
 summary(lm.basic.sub)
 ```
+``` {r}
+# subest by NP across contexts
+d_infer_NPsub <- d_infer_main_responseCat %>%
+  filter(NP == "subordinate")
+
+brm.NPsub.2cont <- brm( response_num ~ syntax_contr + context_sub + 
+                        (1 + syntax_contr + context_sub | submission_id)+
+                        (1 + syntax_contr + context_sub | item),
+                      data = d_infer_NPsub,
+                      family = "bernoulli",
+                      cores = 4,
+                      control = list(adapt_delta = 0.99)
+  
+) 
+summary(brm.NPsub.2cont)
+```
 
 ``` {r}
 # subordinate context, subset by NP
 d_infer_contextSub_sub <- d_infer_contextSub %>%
   filter(NP == "subordinate")
 d_infer_contextSub_basic <- d_infer_contextSub %>%
-  filter(NP = "basic")
+  filter(NP == "basic")
 d_infer_contextSub_one <- d_infer_contextSub %>%
   filter(NP == "one")
 
@@ -730,6 +812,17 @@ lm.sub.sub <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+
+brm.sub.sub <- brm(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextSub_sub,
+                      family = "bernoulli",
+                      control=list(adapt_delta=0.99),
+                   cores = 4
+                      )
+summary(brm.sub.sub)
+
 lm.sub.basic <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),
@@ -739,6 +832,17 @@ lm.sub.basic <- glmer(response_num ~ syntax_contr +
                       control=glmerControl(optimizer="bobyqa",
                             optCtrl=list(maxfun=2e5))
                       )
+
+brm.sub.basic <- brm(response_num ~ syntax_contr +
+                        (1 + syntax_contr | submission_id)+
+                        (1 + syntax_contr | item),
+                      data = d_infer_contextSub_basic,
+                      family = "bernoulli",
+                      control=list(adapt_delta=0.99),
+                   cores = 4
+                      )
+summary(brm.sub.basic)
+
 lm.sub.one <- glmer(response_num ~ syntax_contr +
                         (1 + syntax_contr | submission_id)+
                         (1 + syntax_contr | item),

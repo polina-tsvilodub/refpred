@@ -8,12 +8,12 @@ library(brms)
 library(lmerTest)
 ```
 
-``` {r data}
+``` {r data, warnings = FALSE}
 # read the data
 d_prod <- rbind( read_csv('./data/results_28_prereg-NP-prod-subj.csv') ,
                  read_csv('./data/results_29_prereg-NP-prod-pred.csv')%>%
                    select(-`X40`))
-#d_clean <-
+
 
 ```
 
@@ -25,10 +25,10 @@ d_prod_woGlitch <- subset(d_prod, !(submission_id %in% c(1214)))
 # exclude data from non-native English speakers and those where the language information is missing
 
 d_prod_woGlitch %>% distinct(languages)
-#d_prod_Native <- d_prod_woGlitch %>%
+d_prod_Native <- d_prod_woGlitch #%>%
 
 #d_prod %>% distinct(languages)
-d_prod_filt <- d_prod %>%
+d_prod_filt <- d_prod_Native %>%
   filter(grepl("eng", languages, ignore.case = T)) %>% # excluded 14 participants
   select(submission_id, trial_name, trial_number, attempts, size, item, botresponse, response,
          condition,  picture, target) %>%
@@ -111,7 +111,8 @@ d_prod_main_responseCat <- d_prod_main_valid %>%
 d_prod_main_responseCat %>%
   group_by(syntax, response_label) %>%
   tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
-  ungroup() %>%
+
+ungroup() %>%
   mutate(syntax = factor(syntax,
                          levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
                          labels= c( "Subject NP\n(That __ is big.)", "Predicate NP\n(That's a big __.)"))
@@ -120,15 +121,47 @@ d_prod_main_responseCat %>%
 ggplot(d_prod_main_responseCat.bs, aes(x = syntax,
              y = mean, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(0.8),  color = 'black', size = 1,
+           fill= 'white') +
+  geom_linerange(position = position_dodge(0.8), size=1.2) +
+  labs( y = "Proportion of basic-level responses", x = "") +
+  ggthemes::theme_few()+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+ # ggsave("figs/expt2-np-production.pdf", width = 5.5, height = 3.5)
+  ggtitle("Experiment 2: NP Production") -> E2.fig
+
+ggsave("figs/amlap_expt-np-prod-prereg-bars.pdf", width = 3.5, height = 3.5)
+```
+
+## Post-cogsci analyses 
+``` {r}
+d_prod_main_responseCat %>%
+  group_by(submission_id) %>%
+  summarize(prop_basic = mean(resp_cat)) %>%
+  ungroup() %>%
+  group_by(prop_basic) %>%
+  count()
+```
+``` {r}
+d_prod_main_responseCat %>%
+  group_by(syntax, target) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
+  ungroup() %>%
+  mutate(syntax = factor(syntax,
+                         levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
+                         labels= c( "Subject NP\n(That __ is big.)", "Predicate NP\n(That's a big __.)"))
+  ) -> d_prod_main_responseCat.item
+
+ggplot(d_prod_main_responseCat.item, aes(x = syntax,
+             y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8),  color = 'black', size = 1,
            fill= 'grey89') +
   geom_linerange(position = position_dodge(0.8), size=1.2) +
   labs( y = "Proportion of basic-level responses", x = "") +
   ggthemes::theme_few()+
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) #+
- # ggsave("figs/expt2-np-production.pdf", width = 5.5, height = 3.5)
-  #ggtitle("The proportion of basic-level responses by syntactic condition")
-
-ggsave("figs/expt-np-prod-prereg-bars.pdf", width = 3.5, height = 3.5)
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  facet_wrap(~target)
+             
+ggsave("./data/expt2_byItem.pdf", height = 6, width = 6)
 
 ```
 
