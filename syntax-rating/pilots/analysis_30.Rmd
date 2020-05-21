@@ -1,0 +1,205 @@
+--- 
+  title: "Syntax rating 30 participants"
+author: "Polina Tsvilodub"
+date: "09/12/2019"
+output: github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+
+```
+
+``` {r}
+library(tidyboot)
+library(tidyverse)
+library(lme4)
+library(brms)
+```
+
+``` {r}
+d_rating <- read_csv("./../data/results_14_syntax-rating_30.csv")
+
+glimpse(d_rating)
+
+d_rating_comments <- d_rating %>% select(problems, comments) %>% distinct() %>% View()
+
+```
+## Filtering data
+n = 30
+1 participant excluded as non-native speaker, n = 29 is analysed.  
+``` {r}
+d_rating %>% distinct(d_rating$languages) %>% View()
+d_rating_filter <- d_rating %>% filter(grepl("en", languages, ignore.case = T))
+ # 
+d_rating_warmup <- d_rating_filter %>% filter(trial_name == "custom_warmup")
+d_rating_main <- d_rating_filter %>% filter((trial_name == "custom_slider1") | (trial_name == "custom_slider2"))
+```
+
+```{r}
+d_rate_main <- d_rate_main %>% mutate(np = factor(np, levels= c(0,1), 
+                                                      labels = c("sub", "super")), 
+                 sentence_order = factor(sentence_order, levels= c("0|1", "1|0"),
+                                         labels = c("prenom_pred", "pred_prenom")),
+                 target_size = factor(target_size, levels = c(0,1), 
+                                      labels = c("big", "small")),
+                 congruence = factor(congruence, levels = c(0, 1), 
+                                     labels = c("congr", "incongr")))
+```
+## Visualising mean rating of first slider by NP 
+we are looking at response1 only, it corresponds to the first condition. 
+On the left we see the mean rating of prenominal syntax given subordinate or superordinate label. As expected, it is endorsed for superordinate NPs since the targets are big / small instances of their basic - level category. 
+On the right we see the rating of the predicative syntax given subordinate or superordinate NP (as expected, similar rating).
+
+Graphs below collapse judgement by NP condition.
+``` {r}
+# deprecated: comparing prenominal to predicative -> half of patricipants to other half 
+# d_main %>%  group_by(np, sentence_order) %>% tidyboot_mean(column = response1) %>% 
+  ungroup() %>%
+  ggplot(aes(x = np, y = mean, ymin = ci_lower, ymax = ci_upper, fill = sentence_order)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))
+```
+## Visualising mean rating on second slider by NP
+On the left we see mean rating of predicative syntax. It is rather endorsed for superordinate NPs.
+On the right we see the mean rating of prenominal syntax. The endorsement surprisingly equals for both NP conditions.
+In total, second slider responses should equal to the first slider responses but they do not, there seems to be a strong priming by first slider in direction of truth value judgement.  
+``` {r}
+d_rating_main %>%  group_by(np, sentence_order) %>% tidyboot_mean(column = response2) %>% 
+  ungroup() %>%
+  ggplot(aes(x = np, y = mean, ymin = ci_lower, ymax = ci_upper, fill = sentence_order)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))
+```
+
+``` {r}
+d_rating_main %>%  group_by(np, sentence_order, congruence) %>% tidyboot_mean(column = response1) %>% 
+  ungroup() %>%
+  ggplot(aes(x = np, y = mean, ymin = ci_lower, ymax = ci_upper, fill = sentence_order))+
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) +
+  facet_wrap(~congruence)
+```
+
+``` {r}
+d_rating_main %>%  group_by(np, sentence_order, congruence) %>% tidyboot_mean(column = response2) %>% 
+  ungroup() %>%
+  ggplot(aes(x = np, y = mean, ymin = ci_lower, ymax = ci_upper, fill = sentence_order))+
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) +
+  facet_wrap(~congruence)
+```
+## Analysis by syntax conditions order
+Trying to collapse the same condition to one mean 
+``` {r}
+d_main_pred_prenom_pred <- d_rate_main %>% filter(sentence_order == "pred_prenom")  %>%
+  select(submission_id, np, congruence, response1, target_size, trial_number, item) %>% mutate(condition = "pred")
+d_main_pred_prenom_prenom <- d_rate_main %>% filter(sentence_order == "pred_prenom") %>%
+  select(submission_id, np, congruence, response1 = response2, target_size, trial_number, item) %>% 
+  mutate(condition = "prenom")
+d_main_prenom_pred_prenom <- d_rate_main %>% filter(sentence_order == "prenom_pred") %>%
+  select(submission_id, np, congruence, response1, target_size, trial_number, item) %>% mutate(condition = "prenom")
+d_main_prenom_pred_pred <- d_rate_main %>% filter(sentence_order == "prenom_pred") %>%
+  select(submission_id, np, congruence, response1 = response2, target_size, trial_number, item) %>% 
+  mutate(condition = "pred")
+
+# subset data frames
+rating_prenom <- rbind(d_main_pred_prenom_prenom, d_main_prenom_pred_prenom)
+rating_pred <- rbind(d_main_pred_prenom_pred, d_main_prenom_pred_pred)
+d_full_long <- rbind(rating_pred, rating_prenom)
+
+rating_prenom %>% group_by(np, congruence) %>% tidyboot_mean(column = response1) %>%
+  ungroup() %>%
+  ggplot(aes(x = np, y = mean, fill = congruence, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))+ 
+  ggtitle("Mean ratings in prenominal condition")
+
+d_full_long %>% group_by(np, congruence) %>% tidyboot_mean(column = response1) %>%
+  ungroup() %>%
+  ggplot(aes(x = np, y = mean, fill = congruence, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))+ 
+  ggtitle("Mean ratings in predicative condition")
+```
+
+
+## Side-by-side comparison of the NP - syntax effects
+```{r}
+d_full_long %>% group_by(np, congruence, condition) %>% 
+  tidyboot_mean(column = response1) %>%  ungroup() %>%
+  mutate(condition = factor(condition, levels = c("pred", "prenom"), labels = c("That NP is big", "That's a big NP")),
+         congruence = factor(congruence, levels = c("congr", "incongr"), labels = c("big great dane", "small great dane")),
+         np = factor(np, levels = c("sub", "super"), labels = c("great dane", "dog"))) %>% 
+  ggplot(aes(x = condition, y = mean, fill = np, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))+ 
+  facet_wrap(~congruence) +
+  xlab("syntactic condition") + 
+  ylab("mean rating") +
+  ggtitle("Mean ratings by syntactic condition")
+```
+
+## Side-by-side comparison of NP, target size and syntax effects
+There seem to be no inconsistencies in the ratings for the different sizes. 
+```{r}
+d_full_long %>% group_by(np, congruence, condition, target_size) %>% 
+  
+  tidyboot_mean(column = response1) %>%  ungroup() %>%
+  mutate(condition = factor(condition, levels = c("pred", "prenom"), labels = c("That NP is big", "That's a big NP")),
+         congruence = factor(congruence, levels = c("congr", "incongr"), labels = c("big great dane", "small great dane")),
+         np = factor(np, levels = c("sub", "super"), labels = c("great dane", "dog"))) %>% 
+  ggplot(aes(x = condition, y = mean, fill = congruence, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))+ 
+  facet_grid(target_size~np) +
+  ggtitle("Mean ratings by syntactic condition for different sizes")
+```
+## By-subject consistency 
+``` {r}
+d_full_long %>%  group_by(condition, submission_id, trial_number, np, congruence) %>% tidyboot_mean(column = response1) %>% 
+  ungroup() %>%
+  ggplot(aes(x = trial_number, y = mean, fill = np, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8)) +
+  facet_grid(condition~congruence)+
+  ggtitle("Mean rating in single trials within participants")
+
+```
+
+## By-item consistency
+
+Sunflower, eagle, swordfish, bonsai seem to be not sensitive towards syntactic manipulation; hummingbird has a very low rating in general
+
+``` {r}
+d_full_long %>% group_by(np, congruence, condition, item) %>% 
+  tidyboot_mean(column = response1) %>%  ungroup() %>%
+  mutate(np = factor(np, levels = c("sub", "super"), labels = c("great dane", "dog"))) %>% 
+  ggplot(aes(x = condition, y = mean, fill = congruence, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8)) +
+  geom_linerange(position = position_dodge(0.8))+ 
+  facet_grid(item~np) + coord_flip() +
+  ggtitle("Mean ratings by syntactic condition in single items")
+
+```
+## Stats 
+``` {r}
+lm.fit <- lmer(response1 ~ condition * np * congruence + (1 | submission_id) + (1 | item), data = d_full_long)
+summary(lm.fit)
+```
+
+``` {r}
+library(lmerTest)
+# fit brm to pnly congruent trials 
+d_full_long_congruent <- d_full_long %>% filter(congruence == "congr") %>% mutate(condition = ifelse(condition == "pred", -1, 1),
+                                                                                  np = ifelse(np == "super", -1, 1))
+blm.fit <- glmer(response1 ~ condition*np + (1 +condition*np | submission_id) + (1 + condition*np|item), data = d_full_long_congruent, REML = F )
+summary(blm.fit)
+```
+
+``` {r}
+# playground
+df <- data.frame(pledge = c("yes", "no"),
+                s = c(424, 5416),
+                n = c(777, 9072))
+get_prior(s|trials(n) ~ pledge, family=binomial(link="identity"), data = df)
+```
