@@ -1,0 +1,276 @@
+---
+title: "Comparison Class Elicitation Pilot"
+author: "MH Tessler"
+date: "7/29/2019"
+output: github_document
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+#Experiment outline 
+This script analyses the data from a comparison class elicitation pilot experiment (n=24). The goal of the pilot is to get a first impression of the design efficacy and a preliminary test of the hypothesis. 
+In a between-subject design we manipulate the syntactic frame in which the subjects elicit the comparison class with respect to size of a target obejct: "That X is big" (predicative condition) and "That's a big X" (prenominal condition). We use both adjectives 'big' and 'small', depending on the target. The targets are chosen such that they are obviously big (or small) members of their superordinate category, but normal-sized for their subordinate category. A stimulus consists of a context group, for example different-sized dogs (superordinate category), and the target, a normal-sized great dane (a big dog) or a normal-sized chihuahua (a small dog) (subordinate categories). 
+
+Due to  syntactic frame manipulation, the participans are expected to use different comparison classes (superordinate labels versus subordinate labels of the target) in order to communicate the situation presented to them in the stimulus. 
+
+We expect _more superordinate labels to occur in the prenominal condition_, since the NP restricts the comparison class more strongly to the category used in the NP. In contrast, we expect _a similar proportion of superordinate and subordinate labels in the predicative condition_, since the comparison class is less restricted.
+
+
+### Procedure
+The experiment is devided into two blocks, each consisting of three warm-up and three main trials, such that subjects can easily memorize target category labels. 
+The warm-up trials are a simple labeling task. The subjects see pictures of two members of the same superordinate category, for example two dogs, each being a different subordinate, and a text box asking for a common label (the superordinate label is expected). The task is to label the pictures. The goal of this task to motivate speakers to produce subordinate category labels and to familiarize them with the target labels, since the warm-up trial pictures include the main trial target pictures. They were given feedback on the labels and could proceed only after correcting the entered answer to the suggested one. 
+
+The main trials set the situationsl context via an object parade picture. Then the participants see an additional parade member, the target object, which they are supposed to point out to a friend.  
+
+The syntactic structure of the reponse is the main condition (prenominal versus predicative, randomly sampled between-subject), the size of the target in comparison to the superordinate class is also randomly sampled (within-subject). The pairings of the target and the adjective are constant: i. e. if the target is a chihuahua, the sentence always includes the adjective "small", if it is a great dane, it would always be "big". 
+
+
+```{r} 
+library(tidyverse)
+library(kableExtra)
+contexts <- data.frame("Superordinate" = c( "small target", "big target"), "Dogs"=c("chihuahua", "great dane"), "Fish"=c("swordfish", "goldfish"), "Primates"=c("gorilla", "spider monkey"), "Birds"=c("swan", "hummingbird"), "Flowers"=c("sunflower", "daisy"), "Trees"=c("redwood", "bonsai"), stringsAsFactors = F)
+
+knitr::kable(contexts, align = "c",  padding= 2, caption = "Overview of contexts and targets") %>% kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+## Data analysis
+```{r}
+#library(tidyverse)
+library(tidyboot)
+
+# read in data
+d <- read_csv('./../data/results_4_comparison-class-production_24.csv')
+
+#first look at the data
+glimpse(d)
+
+# comments
+d_comments <- d %>%
+  distinct(submission_id, problems, comments, fairprice)
+
+```
+
+The design seems to work, no technical issues occured. 
+The participants recruited via MTurk were paid $1.10. 
+
+
+##Spliting data into main and warm-up, excluding participants
+```{r}
+# make sure how participants indicate their native language 
+# sometimes participants use only "en" or "eng" for english
+# excluded non-native speakers 
+d %>% distinct(d$languages) %>% glimpse()
+d_filt <- d %>% 
+  filter(grepl("English", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, question1, question2, response, response1, response2, response3, correct1, correct2, correct3, picture, context_picture)
+
+glimpse(d_filt)
+
+# extract main trials 
+d_main <- d_filt %>% 
+  filter(trial_name == "main") %>%
+  select(submission_id, trial_number, question1, question2, response, picture, context_picture)
+
+# extract warm-up trials 
+d_warmup <- d_filt %>% filter(trial_name =="warmup") %>% 
+  select(submission_id, trial_number, response1, correct1, response2, correct2, response3, correct3)
+
+# NB: in the warmup trials, trial_number includes two distinct trials (first block, second block), i.e. trial_number 1 is both the first warm-up view of the first and the second warm-up block
+d_warmup %>%
+  group_by(submission_id, trial_number, correct3) %>%
+  count() %>%
+  ungroup() %>%
+  tidyboot_mean(column = n) # calculate mean of attempts participants needed for the warm-up completion
+```
+On average, participants had to re-enter the labels twice per two warm-up views, meaning that they corrected they initial answer once to proceed to the next view. 
+
+## Categorizing the data 
+
+```{r}
+# question1 and question2 are the sentence parts coded in the experiment 
+
+d_main_responseCat <- d_main %>%
+  rowwise() %>%
+  mutate(
+    question2 = ifelse(is.na(question2), "X", question2), # rewrite NAs as X
+    condition = ifelse(question2 == "X", "prenominal", "predicative"), # categorize condition
+    size = ifelse(
+      ((question1 == "That's a small") || (question2 == "is small.")), # categorize size
+      "small",
+      "big")
+    ) %>%
+  mutate( # categorize responses 
+    response_cat = ifelse(
+      response %in% c("ape", "primate", "bird", "dog", "fish", "flower", "monkey", "tree"), "super", "sub"),
+    response_num = ifelse(response_cat == "sub", 1, 0),
+    response_label = "sub"
+  )
+```
+
+## Proportion of subordinate responses by condition 
+
+The proportion of subordinate responses is the dependent variable we test by manipulating the syntactic condition: "That's a big X" (prenominal) versus "That X is big" (predicative). The results confirm our expectations that participants use more subordinate labels in the predicative condition.
+```{r}
+d_main_summary <- d_main_responseCat %>%
+  group_by(condition, response_label) %>%
+  tidyboot_mean(column = response_num) %>% # calculate proportion of subordinate labels in the different conditions 
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big")))
+
+ggplot(d_main_summary, aes(x = condition, fill = condition,
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge())+
+  geom_linerange(position = position_dodge())+
+  labs( y = "Proportion subordinate responses")+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+```
+
+## Stats
+
+```{r}
+library(lme4)
+lm.rs <- glmer(response_num ~ condition + (1 | submission_id) + 
+        (1 + condition | picture), data = d_main_responseCat, family = 'binomial')
+
+summary(lm.rs)
+```
+
+"effect coding" condition to get more veridical estimate of item variability
+
+```{r}
+cond_numeric <- ifelse(d_main_responseCat$condition=="prenominal", 1, -1)
+
+lm.rsnum <- glmer(response_num ~ cond_numeric + (1 | submission_id) + 
+        (1 + cond_numeric | picture), data = d_main_responseCat, family = 'binomial')
+summary(lm.rsnum)
+
+# removing the by-item intercept (0 + cond_numeric | picture) reduces the estimate of by-item variability to 0. it may be just that the by-item variability is small, and the model is having a hard time estimating that small number.
+```
+
+
+## Proportion of subordinate labels in big vs. small trials 
+
+We check if there is any proportional difference between the trials with different target size. The size does not seem to have a significant effect.  
+
+```{r}
+d_main_summary_bySize <- d_main_responseCat %>%
+  group_by(condition, size, response_label) %>%
+  tidyboot_mean(column = response_num) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big")))
+
+ggplot(d_main_summary_bySize, aes(x = size, fill = condition,
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8), width = 0.8)+
+  geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+```
+
+
+## Consistency of choosing a response category by subject
+
+Do participants switch between superordinate and subordinate labels within the experiment?  Confirming our expectations, the subjects in the predicative rather stick to the subordinate labels throughout the trials. 
+```{r}
+d_main_responseCat %>%
+  group_by(submission_id, condition, response_label) %>%
+  ##group_by(picture, condition, response_label) %>%
+  #group_by(picture, response_label) %>%
+  summarize(n_sub_responses = sum(response_num)) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition,
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X (prenominal)", "That X is big (predicative)"))) %>%
+  ggplot(., aes( x = n_sub_responses ))+
+  geom_bar()+
+  xlab("number of subordinate responses")+
+  ylab('number of participants')+
+  facet_wrap(~condition)
+```
+
+
+## Consistency of choosing a response category by item
+
+```{r}
+d_main_responseCat.itemConsistency <- d_main_responseCat %>%
+  group_by(picture, response_label) %>%
+  summarize(n_sub_responses = sum(response_num),
+            n = n(),
+            prop = n_sub_responses / n) %>%
+  ungroup() 
+
+
+d_main_responseCat.itemConsistency %>%
+  ggplot(., aes( x = prop ))+
+  geom_histogram()+
+  xlab("proportion subordinate responses")+
+  ylab('number of items')
+```
+
+```{r}
+d_main_responseCat.itemConsistency[with(d_main_responseCat.itemConsistency, order(prop)), ] %>%
+  select(picture, prop, n_sub_responses, n) %>%
+  kable()
+```
+
+
+## Proportion of subordinate responses by item (context)
+For each context, there is a pair of targets (a big and a small one). The targets seem to elicit different proportions of subordinate lables. The most effective ones seem to be the swan, the chihuahua and the bonsai. However, the results are not robust due to a small sample size. 
+```{r}
+d_main_responseCat %>% count(context_picture, condition) %>% glimpse()
+
+d_main_responseCat %>%
+  group_by(context_picture, condition,  response_label) %>%
+  summarize(n_sub_responses = sum(response_num)) %>%
+  ungroup() %>%
+  mutate(context_picture = factor(context_picture, 
+                            levels = c("images/bird-parade-small.png", "images/bird-parade.png", "images/dog_parade_small.png", "images/dog_parade.png", "images/fish-parade.png", "images/flower-parade-small.png", "images/flower-parade.png", "images/monkey-parade-small.png", "images/monkey-parade.png", "images/tree-parade.png"),
+                            labels= c("birds_small", "birds_big", "dogs_small", "dogs_big", "fish_small_big", "flowers_small", "flowers_big", "monkeys_small", "monkeys_big", "trees_small_big"))) %>%
+  ggplot(., aes( x = n_sub_responses, fill=condition ))+
+  geom_bar(position = position_dodge())+
+  facet_wrap(~context_picture)
+
+# the fish and tree plots show both trials with small and big targets
+
+
+```
+## Proportions of subordinate responses depending on trial number
+```{r}
+
+d_main_responseCat %>% 
+  group_by(trial_number, condition, response_label) %>%
+  tidyboot_mean(column = response_num) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))) %>%
+
+# big and small indicate the adjective actually used 
+ggplot(., aes(x = trial_number,  
+                           y = mean))+
+  geom_col(position = position_dodge(0.8), width = 0.8)+
+  #geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  facet_wrap(~condition) + ggtitle("Proportion of subordinate responses in each trial number")
+```
+
+
+## Issues, Suggestions, Discussion
+The pilot data supports our hypothesis. 
+
+For the main experiment, a few improvements and suggestions might be incorporated. 
+
+The variable coding the experiment script will be improved to avoid the mutations here in the analysis. Furthermore, the primates trial will be altered to be consistent between monkeys and apes. The label 'primates' will also be included as a correct answer in the warm-up trials. Further trials might be included. 
+
+To make sure the choice of subordinate labels is not confounded with other effects, we could run an experiment with warm-up tagets different from the main targets. Yet participants might not know the subordinate labels in the main trials.
+A possibility to improve that is to use photos instead of cartoons. 
+
+Additionally, we suggest another experiment including main trials where target pictures are paired with 'forced', more surprising / informative adjectives for their respective subordinate category, e. g. 'big chihuahua' and 'small great dane'. 
