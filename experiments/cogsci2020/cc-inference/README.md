@@ -6,7 +6,7 @@ The experiment can be viewed [here](https://prereg-cc-inf.netlify.com/), the OSF
 In this experiment, participants indicate the comparison class they inferred by paraphrasing a sentence about an object in context (it is a free production Experiment).
 
 The experiment has a two-by-three-by-two within-subject design and takes about ten minutes.
-We manipulate the context of the object, the type of the NP and the syntax of the critical sentence (12 condiitons within-subject).
+We manipulate the context of the object, the type of the NP and the syntax of the critical sentence (12 conditions within-subject).
 The context provides either the basic-level or the subordinate category of the object; the noun phrase of the critical sentence is either the basic-level category label, the subordinate category label of the object or the underspecified 'one'; the noun phrase can be in the subject or the predicate position. For example, the sentences could be "That's a big dog.", "That's a big great dane." or "That's a big one." (predicate condition); or "that dog is big" etc. (subject condition). The number of trials for a balanced number of every condition should be a multiple of 12.
 
 There is a comprehension check trial followed by two blocks of three warm-up and six main trials each, for a total of 12 main trials per participant.
