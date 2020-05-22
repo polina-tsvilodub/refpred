@@ -1,0 +1,229 @@
+---
+title: "E3: Syntax X Congruence Modification Pilot"
+author: "Polina Tsvilodub"
+date: "19 04 2020"
+output: github_document
+---
+
+In this pilot (n = 54), we explore the combined effects of syntax and congruence, i.e. we manipulate the NP position (subject NP vs. predicate NP) and if the adjective matches the general expectations about the size of the target subordinate category relative to its basic-level category (congruent - matching expectation, 'big Great Dane'; incongruent - mismatching expectations, 'small Great Dane') (both factors within-subjects).
+
+The presence of incongruent trials might draw participants' attention to the potential flexibility of comparison classes. This might make them more sensitive to the syntactic manipulation in the congruent trials. So we expect a stronger effect of syntax in congruent conditions (compared to the orignial Experiment 3). However, the syntax effect might be an additional effect operating on top of world knowledge, so we might expect a weak(er) effect of syntax in incongruent conditions. 
+
+Participants complete a paraphrase warm-up trial and two blocks a four labeling warm-up trials and four main comparison class paraphrase trials (with a total of 8 main trials).
+Each warm-up trial consists of a click-through trial where participants see one of the subordinate members which later appears in the respective basic-level context and read its subordinate label (i.e. 'That is a Great Dane'); and a labeling trial where they have to provide the subordinate label for the other subordinate member which later appears in the context. The basic-level labeling task was removed to decrease the overall basic-level bias. 
+We use 8 items (2x dogs, 1x flowers, 3x birds, 1x trees, 1x fish), among which six were used in the original Experiment 3, one was used in the NP production experiment and one is new.  
+
+On the main trials, participants read 'You and your friend see the following:', see a big context picture and read below: "Your friend goes ahead of you and you see the following:". Below they see the target picture, displaying the friend next to the referent (small relative to the context picture (creating the distance cover story)). Then the critical utterance appears.  Participants are asked to paraphrase the utterance. 
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lmerTest)
+library(brms)
+library(tidyboot)
+```
+
+
+``` {r data, echo=FALSE, warnings=FALSE, include=FALSE}
+#d_e3pilot <- read_csv('../data/results_33_e3-syntaxXcongruence-pilot1.csv')
+#d_e3pilot_clean <- d_e3pilot %>% select(-worker_id, -hit_id, -startDate, -assignment_id)
+#write_csv(d_e3pilot_clean, '../data/results_33_e3_syntaxXcongreunce_pilot1.csv')
+d_e3pilot <- read_csv('../data/results_33_e3_syntaxXcongreunce_pilot1.csv')
+```
+
+## Experiment 3: Syntax X Congruence Pilot  
+
+Two participants are excluded for not reporting their native language. Three are excluded for failing labeling trials (mostly due to typos).
+```{r clean}
+# exclude participants who report glitches
+d_e3pilot %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+d_woGlitches <- d_e3pilot 
+
+# exclude non-native English speakers
+d_woGlitches %>% distinct(languages) %>% View()
+d_Native <- d_woGlitches %>% 
+  filter(grepl("e", languages, ignore.case = T)) 
+
+# cleaning warm-up trials
+# comparison class paraphrase trial
+d_failed_cc_warmup <- d_Native %>% 
+  filter( trial_name == "comp_class_warmup") %>%
+  group_by(submission_id) %>% count() %>%
+  filter( n > 4 )
+d_failed_label_warmup <- d_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 4)
+d_label_warmup_more1 <- d_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 1) %>% ungroup() %>% 
+  select(submission_id, picture1, response1, picture2, response2, attempts)
+# check where and why people need more than one attempt 
+# d_Native %>% 
+#filter((trial_name == "warmup1") | (trial_name == "warmup2")) %>% #semi_join(., d_label_warmup_more1, by=c("submission_id")) %>% #select(submission_id, picture1, response1, picture2, response2, attempts) %>% View()
+d_filter <- anti_join(d_Native, d_failed_cc_warmup, by = c("submission_id"))
+d_filter <- anti_join(d_filter, d_failed_label_warmup, by = c("submission_id"))
+```
+
+``` {r count}
+d_filter %>% count(adj_cond, syntax)
+d_filter %>% count(adj_cond, syntax, target_size)
+d_filter %>% count(adj_cond, target, syntax)
+```
+## Categorizing data
+The data from n = 49 participants is categorized into subordinate and basic-level responses; superordinate responses are collapsed with the basic-level. 20 invalid responses (5.1%) are excluded. 
+``` {r}
+d_main <- d_filter %>% filter((trial_name == "custom_main_text1") |
+                                (trial_name == "custom_main_text2")) %>%
+  select(submission_id, context_picture, response, target_size, adj, syntax, target, item, adj_cond )
+
+
+d_main %>% distinct(response) %>% View()
+
+d_valid <- d_main %>% 
+  subset(., !(tolower(response) %in% c("nkghfghgfh", "good", "love", "like", "king", "lovely", "friend", "cousin", "father", "sworn", "sword", "ducks", "snake")))
+
+d_main_responseCat <- d_valid %>% 
+  mutate(response_cat = ifelse(
+    tolower(response) %in% c("flowers", "flower", "trees", "tree", "brd", "birds", "bird", "fish", "dogs", "dog", "plants", "large fish", "large mammals", "fishes"), "basic", "subordinate"
+  ),
+  response_num = ifelse(response_cat == "basic", 1, 0)
+  )
+```
+
+There are 7 participants (14%) providing subordinate reponses only and 5 who provide basic-level responses only (10%).
+
+``` {r}
+d_main_responseCat %>% group_by(submission_id) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% count(mean) 
+```
+``` {r switchers}
+d_main_responseCat %>% group_by(submission_id, adj_cond) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(adj_cond, mean) %>% filter(((congruent == 1) ) & ( (incongruent == 0)))
+```
+``` {r switchers}
+d_main_responseCat %>% filter(adj_cond == "congruent") %>% group_by(submission_id, syntax) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(syntax, mean) %>% filter((subj == pred))
+
+d_main_responseCat %>% filter(adj_cond == "congruent") %>% group_by(submission_id, syntax) %>% summarize(mean = mean(response_num)) %>% ungroup() %>% group_by(submission_id) %>% spread(syntax, mean) %>% filter(!(((subj ==1) & (pred == 1)) | ((subj == 0) & (pred == 0))))
+```
+
+## By-congruence plot of syntactic conditions
+
+We observe a big main effect of congruence and an effect of syntax in the congruent condition.   
+```{r plot, echo=FALSE}
+bar.width = 0.8
+d_main_responseCat %>%  
+  group_by(syntax, adj_cond) %>%
+  tidyboot_mean(column = response_num) -> d_main_responseCat.bs
+
+d_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP")),
+         adj_cond = factor(adj_cond, levels= c("congruent", "incongruent"), labels = c("congruent (big Great Dane)", "incongruent (small Great Dane)"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  facet_grid(~adj_cond)
+```
+## By-item plot
+
+Overall the items behave quite heterogeneously in the different conditions. 6 out of 16 items show the opposite of the expected pattern in the congruent condition (i.e. more basic-level inferences in the predicate NP condition). 
+In the incongruent condition, for 5 out of the 16 items more basic-level responses are inferred in the predicate than in the subject condition. 
+
+``` {r by-item, echo = FALSE}
+d_main_responseCat %>% group_by(syntax, adj_cond, target) %>%
+  tidyboot_mean(column = response_num) -> d_main_responseCat.byItem
+
+d_main_responseCat.byItem %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject", "Predicate"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  facet_wrap(target~adj_cond)
+  
+#ggsave('e3-syntaxXcongruence-pilot1-byItem.pdf', height = 8, width = 8)
+```
+
+## By-subject plot
+
+
+Overall participants show more flexibility in their comparison class inferences compared to previous pilots. 
+12 out of 47 participants (24%) provide basic-level or subordinate responses only. 6 out of 47 participants (13%) produced only basic-level responses in the congruent condition, and only subordinate responses in the incongruent condition. 
+
+
+``` {r by-subject}
+d_main_responseCat %>% group_by(syntax, adj_cond, submission_id) %>%
+  tidyboot_mean(column = response_num) -> d_main_responseCat.bySubj
+
+d_main_responseCat.bySubj %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject", "Predicate"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  facet_wrap(submission_id~adj_cond)
+  
+#ggsave('e3-syntaxXcongruence-pilot1-bySubj.pdf', height = 8, width = 8)
+```
+
+## Stats
+
+Both predictors are deviation-coded. A Bayesian model with maixmal random effects structure:
+
+``` {r stats}
+# deviation coding
+d_main_responseCat <- d_main_responseCat %>% 
+  mutate(syntax_dev = ifelse(syntax == "subj", 1, -1),
+         adj_cond_dev = ifelse(adj_cond == "congruent", 1, -1))
+lm.e3.pilot <- brm(response_num ~ syntax_dev * adj_cond_dev + 
+                     (1 + adj_cond_dev * syntax_dev | submission_id) +
+                     (1 + adj_cond_dev * syntax_dev | target),
+                   data = d_main_responseCat,
+                   family = "bernoulli",
+                   control = list(adapt_delta = 0.9),
+                   iter = 1000, 
+                   cores = 4)
+summary(lm.e3.pilot)
+```
+
+
+An exploratory model of the congruent condition only: 
+
+``` {r congr stats}
+d_main_responseCat_congr <- d_main_responseCat %>% filter(adj_cond == "congruent")
+
+lm.e3.pilot.congr <- brm(response_num ~ syntax_dev  + 
+                     (1 + syntax_dev | submission_id) +
+                     (1 + syntax_dev | target),
+                   data = d_main_responseCat_congr,
+                   family = "bernoulli",
+                   control = list(adapt_delta = 0.9),
+                   iter = 1000,
+                   cores = 4)
+summary(lm.e3.pilot.congr)
+```
+
+Polina playing around with brm syntax:
+``` {r}
+lm.e3.pilot.congr.addInfo <- brm(response_num | trials(1) ~ syntax_dev  + 
+                     (1 + syntax_dev | submission_id) +
+                     (1 + syntax_dev | target),
+                   data = d_main_responseCat_congr,
+                   family = "binomial",
+                   control = list(adapt_delta = 0.9),
+                   iter = 1000,
+                   cores = 4)
+summary(lm.e3.pilot.congr.addInfo)
+
+```
