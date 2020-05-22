@@ -14,7 +14,7 @@
     * text: string - the text to be displayed in this view
     * title: string - the title of this view
 
-    * More about the properties and functions of the wrapping views - https://babe-project.github.io/babe-docs/01_designing_experiments/01_template_views/#wrapping-views
+    * More about the properties and functions of the wrapping views - https://magpie-project.github.io/magpie-docs/01_designing_experiments/01_template_views/#wrapping-views
 
 */
 
@@ -36,7 +36,7 @@ const botcaptcha = custom_botcaptcha({
 
 
 // For most tasks, you need instructions views
-const instructions = babeViews.view_generator("instructions",{
+const instructions = magpieViews.view_generator("instructions", {
     trials: 1,
     name: 'instrucions',
     title: 'Instructions',
@@ -82,7 +82,7 @@ const custom_intro = custom_intro_view({
 
 });
 // The 'thanks' view is crucial; never delete it; it submits the results!
-const thanks = babeViews.view_generator("thanks", {
+const thanks = magpieViews.view_generator("thanks", {
     trials: 1,
     name: 'thanks',
     title: 'Thank you for taking part in this experiment!',
@@ -119,7 +119,7 @@ const warmup_trials3 = custom_textfield_warmup({
 //  }
 });
 
-const context1 = babeViews.view_generator("instructions",{
+const context1 = magpieViews.view_generator("instructions",{
     trials: 1,
     name: 'instructions',
     title: 'Instructions',
@@ -135,7 +135,7 @@ const context1 = babeViews.view_generator("instructions",{
             `,
     buttonText: 'go to trials'
 });
-const context2 = babeViews.view_generator("instructions",{
+const context2 = magpieViews.view_generator("instructions",{
     trials: 1,
     name: 'instructions',
     title: 'Instructions',
@@ -148,7 +148,7 @@ const context2 = babeViews.view_generator("instructions",{
     buttonText: 'go to trials'
 });
 
-const context3 = babeViews.view_generator("instructions",{
+const context3 = magpieViews.view_generator("instructions",{
     trials: 1,
     name: 'instructions',
     title: 'Instructions',
