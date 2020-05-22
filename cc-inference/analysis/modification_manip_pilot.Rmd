@@ -1,0 +1,203 @@
+---
+title: "Modification Manipulation Pilot"
+author: "Polina Tsvilodub"
+date: "30 03 2020"
+output: github_document
+---
+
+We ran a pilot (n=36) for an NP modification manipulation experiment. Here, we disentangle the effects of noun modification (direct vs indirect) from the effect of the noun position (subject vs predicate) on comparison class inference. 
+Participants inferred the comparison class (via free paraphrase) from the sentences 'That {big, small} NP is a prize-winner' or 'That prize-winner is a {small, big} NP' (within-subject). We created nouns like 'prize-winner' for five context items (trees, 2 x dogs, flowers, birds).
+
+``` {r libraries, echo=F, warnings=F, include=F}
+
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+```
+
+``` {r}
+
+d_infer1_1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
+```
+7 participants were excluded for failing the warm-up tasks (1 test comparison class inference trial and 5 labeling trials) or reporting a native language other than English.
+
+``` {r filter}
+# exclude participants who report difficulties
+d_infer1_1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+
+d_infer_woGlitches1 <- d_infer1_1 # %>% subset( !(submission_id %in% c()))
+
+# exclude data from non-native English speakers and those where the language information is missing
+d_infer_woGlitches1 %>% distinct(languages) %>% View()
+d_infer_Native1 <- d_infer_woGlitches1 %>%
+  filter(grepl("en", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, adj, item, target, response, botresponse,
+         syntax, attempts, reference)
+
+# participants who do not get the comparison class warmup right
+d_infer_cc_warmup1 <- d_infer_Native1 %>% filter( trial_name == "comp_class_warmup") %>%
+  group_by(submission_id) %>% count() %>%
+  filter( n > 4 )
+
+# exclude participants who need more than 4 attempts per warmup
+d_infer_warmup1 <- d_infer_Native1 %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 4)
+
+# excluding 6 participants
+d_infer_filt1_1 <- anti_join(d_infer_Native1, d_infer_warmup1, by = c("submission_id"))
+d_infer_filt1_1 <- anti_join(d_infer_filt1_1, d_infer_cc_warmup1, by = c("submission_id"))
+
+```
+
+``` {r}
+d_infer_filt1_1 %>% count(syntax, adj)
+```
+The produced responses are categorized into basic-level and subordinate responses. There were 11 invalid responses (mostly, they were blank adjectives or referring to the human in the picture).
+Superordinate responses are collapsed with basic-level responses. 
+
+``` {r categorization}
+d_infer_main1 <- d_infer_filt1_1 %>% filter((trial_name == "custom_main_text1")|
+                                          (trial_name == "custom_main_text2")) %>%
+
+  mutate(syntax = factor(syntax)
+         ) %>%
+  select(submission_id, trial_number, target, item, response, syntax,
+        adj)
+
+# categorize responses
+d_infer_main1 %>% distinct(response) %>% View()
+# exclude invalid responses
+d_infer_valid1 <- d_infer_main1 %>% subset(., !(tolower(response) %in% c( "human", "small", "place", "man", "little", "winner", "yes", "swifts", "size"))) # 11 responses excluded
+d_infer_main_responseCat1 <- d_infer_valid1 %>%
+  rowwise() %>%
+  mutate(  
+    response_cat =
+      ifelse( # do be extended dependent on responses provided
+        tolower(response) %in% c("birds", "bird","dog", "dogs", "fish","flower", "flowers","trees", "tree", "other dogs", "other flowers", "plant", "plants", "animals", "flowers in the garden", "all the other trees", 
+                                 "the other birds in the animal shelter", "all the other dogs at the dog park", "dogs at the dog show"), "basic", "subordinate"),
+
+    response_num = ifelse(response_cat == "basic", 1, 0),
+    response_label = "basic",
+    pilot_nr = 1
+  )
+
+```
+
+## Subject vs. predicate NP position plot
+
+The proportion of inferred basic-level comparison classes is plotted by-syntax (subject vs. predicate) (n=29 participants).
+``` {r proportions plot}
+# plot
+bar.width = 0.8
+d_infer_main_responseCat1 %>%  
+  group_by(syntax) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs1
+
+
+d_infer_main_responseCat.bs1 %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big Great Dane\n is a prize-winner)", "Predicate NP\n(That prize-winner\n is a big Great Dane)"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black', fill = 'white',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),legend.text = element_text(size = 4),
+        legend.title = element_text(size = 4), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("Experiment 4 Pilot: Direct Modification")
+ # facet_grid(~context)  +
+  ggsave("amlap_expt4_double_mod2.pdf", width = 4.5, height = 4.5)
+```
+## By-item plot
+
+The overall effect is mainly driven by the big bird and flower items (eagle and sunflower) and a bit by the big tree (redwood) and the small bird (hummingbird) items.
+``` {r}
+d_infer_main_responseCat1 %>%  
+  group_by(syntax, item, adj) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item1
+
+
+d_infer_main_responseCat.bs.item1 %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
+                                         "Predicate NP\n(That prize-winner\n is a big NP)")),
+         size = factor(adj, level = c("big", "small"), labels = c("big", "small"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-item inferred Comparison Classes")+
+  facet_grid(item~size)
+
+```
+
+## By-subject plot
+Participants seem to choose a strategy (mostly basic-level labels) and to stick to it throughout the experiment, showing low flexibility in adjusting the comparison class. 
+``` {r}
+d_infer_main_responseCat1 %>%  
+  group_by(syntax, submission_id) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj1
+d_infer_main_responseCat.bs.subj1 %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject\n NP", 
+                                         "Predicate\n NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-subject inferred Comparison Classes")+
+  facet_wrap(~submission_id)
+```
+
+``` {r}
+d_infer_main_responseCat1 %>% count( item, syntax)
+#d_infer_main_responseCat %>% count(item)
+```
+
+## Stats
+
+``` {r}
+# deviation coded syntax 
+d_infer_main_responseCat1 <- d_infer_main_responseCat1 %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax == "subject", 1, -1))
+#write_csv(d_infer_main_responseCat1, '../data/results_32_modification_manipulation_pilot1_tidy.csv')
+
+d.infer.brm <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
+                   data = d_infer_main_responseCat1,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.99))
+
+summary(d.infer.brm)
+
+d.infer.brm.samples <- posterior_samples(d.infer.brm)
+head(d.infer.brm.samples)
+mean(d.infer.brm.samples$b_syntax_dev > 0)
+```
+
+
