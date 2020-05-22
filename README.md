@@ -4,7 +4,7 @@ This repository contains all materials for the project on comparison class infer
 
 ## Experiments
 
-The experiment folder contain all experiment files for this project. You can look at the experiments and preregistrations for CogSci 2020 [here](https://tinyurl.com/rcsyz9f). To run an experiment locally, clone the repo, navigate to the subdirectory of the respective experiment and run `npm install` on the command line (requires node.js). All the experiments were created from the [magpie departure-point](https://github.com/magpie-ea/magpie-departure-point)
+The experiment folder contain all experiment files for this project. You can look at the experiments and preregistrations for CogSci 2020 [here](https://tinyurl.com/rcsyz9f). To run an experiment locally, clone the repo, navigate to the subdirectory of the respective experiment and run `npm install` on the command line (requires node.js). Then open the `index.html` file. All the experiments were created from the [magpie departure-point](https://github.com/magpie-ea/magpie-departure-point)
 
 #### Cogsci2020
 
