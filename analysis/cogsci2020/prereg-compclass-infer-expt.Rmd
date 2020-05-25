@@ -9,7 +9,7 @@ library(lmerTest)
 
 ``` {r data}
 # read data
-d_infer <- read_csv('./data/results_30_prereg-cc-inf.csv')
+d_infer <- read_csv('./../../data/cogsci2020/results_30_prereg-cc-inf.csv')
 
 ```
 
@@ -110,13 +110,13 @@ d_infer_main_responseCat %>%
 d_infer_main_responseCat.bs %>%
   ungroup() %>%
   mutate(condition = factor(condition, levels = c( "predicative", "prenominal"),
-                            labels = c(  "Subject NP\n(That NP is big)", "Predicate NP\n(That's a big NP)")),
+                            labels = c(  "Subject N\n(That N is big)", "Predicate N\n(That's a big N)")),
          context = factor(context, levels = c("basic", "subordinate"),
                           labels = c("Basic-Level Context","Subordinate-Level Context")),
-         NP = factor(NP, levels = c("basic", "one", "subordinate"),
+         Noun = factor(NP, levels = c("basic", "one", "subordinate"),
                      labels = c("basic", '"one"', "subordinate"))) %>%
-  ggplot(., aes(x=condition, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+  ggplot(., aes(x=condition, y = mean, fill = Noun, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, alpha = 0.5, color= 'black',
             color = 'black', size = 1) +
   geom_linerange(position = position_dodge(bar.width), size = 1) +
   ggthemes::theme_few()+
@@ -125,11 +125,11 @@ d_infer_main_responseCat.bs %>%
         legend.title = element_text(size = 9), 
         legend.key.size = unit(0.5,"line"))+
   scale_y_continuous(breaks = c(0, 0.5, 1))+
-  scale_fill_grey() +
+  #scale_fill_grey() +
   ylab("Proportion of basic-level responses")+
-  ggtitle("Experiment 3: Comparison Class Inference")+
+  #ggtitle("Experiment 3: Comparison Class Inference")+
   facet_grid(~context)  
-  #ggsave("figs/amlap_expt3-cc-inference.pdf", width = 7.5, height = 3.5)
+  ggsave("figs/expt3-cc-inference-revised.pdf", width = 5, height = 3.5)
 ```
 ### MH analysis
 

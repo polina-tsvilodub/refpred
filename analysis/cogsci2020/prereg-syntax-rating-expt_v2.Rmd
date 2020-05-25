@@ -11,8 +11,8 @@ library(readr)
 
 ``` {r}
 # read the data
-d_rate <- read_csv('./data/results_27_syntax-rating-prereg-80_cleaned.csv')
-d_rate_second <- read_csv('./data/results_27_syntax-rating-prereg-29_cleaned.csv')
+d_rate <- read_csv('./../../data/cogsci2020/results_27_syntax-rating-prereg-80_cleaned.csv')
+d_rate_second <- read_csv('./../../data/cogsci2020/results_27_syntax-rating-prereg-29_cleaned.csv')
 
 d_rate_second <- d_rate_second[!(names(d_rate_second) %in% c("worker_id", "hit_id", "assignment_id"))]
 #write_csv(d_rate_second, '../data/results_27_syntax-rating-prereg-29_cleaned.csv')
@@ -124,33 +124,35 @@ d_rate_main_full %>%
 d_rate_main_full.bs %>%
   ungroup() %>%
   mutate(syntax = factor(syntax, levels = c("subject", "predicate"),
-                         labels = c("Subject NP\n(That NP is big.)", "Predicate NP\n(That's a big NP.)"))) %>%
-  ggplot(., aes(x = syntax, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+                         labels = c("Subject N\n(That N is big.)", "Predicate N\n(That's a big N.)")),
+         Noun = factor(NP)) %>%
+  ggplot(., aes(x = syntax, y = mean, fill = Noun, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(bar.width), 
            width = bar.width, alpha = 0.3, color = 'black', size = 1) +
   geom_point(data = d_rate_main_full %>% 
-               group_by(submission_id, syntax, NP) %>%
+               mutate(Noun=factor(NP))%>%
+               group_by(submission_id, syntax, Noun) %>%
                summarize(subj_mean = mean(response)) %>%
                ungroup() %>%
                mutate(syntax = factor(syntax, levels = c("subject", "predicate"),
-                         labels = c("Subject NP\n(That NP is big.)", "Predicate NP\n(That's a big NP.)"))), 
+                         labels = c("Subject N\n(That N is big.)", "Predicate N\n(That's a big N.)"))), 
              position = position_jitterdodge(dodge.width = bar.width, jitter.width = 0.1),
-             inherit.aes = F, aes(x = syntax, y = subj_mean, color = NP, fill = NP),
+             inherit.aes = F, aes(x = syntax, y = subj_mean, color = Noun, fill = Noun),
              #shape = 21,
              alpha = 0.5)+
   geom_linerange(position = position_dodge(bar.width), size = 1.2) +
   ggthemes::theme_few()+
-  theme(legend.position = c(0.5, 0.12),legend.text = element_text(size = 7),
-        legend.title = element_text(size = 7), 
+  theme(legend.text = element_text(size = 9),
+        legend.title = element_text(size = 9), 
         legend.key.size = unit(0.5,"line")) +
   #facet_wrap(~order) +
   xlab("") + 
-  ylab("Sentence rating") +
-  scale_fill_grey() + 
-  scale_colour_grey()+
-  ggtitle("Experiment 1: Syntax Rating") -> E1.fig
+  ylab("Sentence rating") 
+ # scale_fill_grey() + 
+ #scale_colour_grey()+
+#  ggtitle("Experiment 1: Syntax Rating") # -> E1.fig
 
-ggsave("figs/amlap_expt-syntax-rating-prereg-bars.pdf", width = 5, height = 3.5)
+ggsave("figs/expt-syntax-rating-prereg-bars-revised.pdf", width = 5, height = 3.5)
 ```
 
 

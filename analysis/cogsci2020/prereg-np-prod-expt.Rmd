@@ -10,8 +10,8 @@ library(lmerTest)
 
 ``` {r data, warnings = FALSE}
 # read the data
-d_prod <- rbind( read_csv('./data/results_28_prereg-NP-prod-subj.csv') ,
-                 read_csv('./data/results_29_prereg-NP-prod-pred.csv')%>%
+d_prod <- rbind( read_csv('./../../data/cogsci2020/results_28_prereg-NP-prod-subj.csv'),
+                 read_csv('./../../data/cogsci2020/results_29_prereg-NP-prod-pred.csv')%>%
                    select(-`X40`))
 
 
@@ -115,21 +115,21 @@ d_prod_main_responseCat %>%
 ungroup() %>%
   mutate(syntax = factor(syntax,
                          levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
-                         labels= c( "Subject NP\n(That __ is big.)", "Predicate NP\n(That's a big __.)"))
+                         labels= c( "Subject N\n(That __ is big.)", "Predicate N\n(That's a big __.)"))
   ) -> d_prod_main_responseCat.bs
 
 ggplot(d_prod_main_responseCat.bs, aes(x = syntax,
              y = mean, ymin = ci_lower, ymax = ci_upper)) +
   geom_col(position = position_dodge(0.8),  color = 'black', size = 1,
-           fill= 'white') +
+           fill= 'gray') +
   geom_linerange(position = position_dodge(0.8), size=1.2) +
   labs( y = "Proportion of basic-level responses", x = "") +
   ggthemes::theme_few()+
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) 
  # ggsave("figs/expt2-np-production.pdf", width = 5.5, height = 3.5)
-  ggtitle("Experiment 2: NP Production") -> E2.fig
+  #ggtitle("Experiment 2: NP Production") #-> E2.fig
 
-ggsave("figs/amlap_expt-np-prod-prereg-bars.pdf", width = 3.5, height = 3.5)
+ggsave("figs/expt-np-prod-prereg-bars-revised.pdf", width = 3.5, height = 3.5)
 ```
 
 ## Post-cogsci analyses 
