@@ -65,6 +65,7 @@
 \definecolor{Green}{RGB}{10,200,100}
 \definecolor{Blue}{RGB}{10,100,200}
 \definecolor{Orange}{RGB}{255,153,0}
+\definecolor{Purple}{RGB}{139,0,139}
 
 \newcommand{\denote}[1]{\mbox{ $[\![ #1 ]\!]$}}
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
@@ -72,7 +73,7 @@
 \newcommand{\mht}[1]{\textcolor{Blue}{[mht: #1]}}  
 \newcommand{\rl}[1]{\textcolor{Orange}{[rl: #1]}}  
 \newcommand{\js}[1]{\textcolor{Green}{[js: #1]}} 
-
+\newcommand{\pt}[1]{\textcolor{Purple}{[pt: #1]}} 
 
 % define functions for reading results from csv
 \newcommand{\datafoldername}{R_results_TeX}
@@ -130,9 +131,9 @@
 
  \author{Michael Henry Tessler  \\  Brain and Cognitive Sciences \\   MIT  \\  \texttt{tessler@mit.edu}
          \And  
-         Polina Tsvilodub  \\ Department of ... \\   Osnabrück University  \\  email
+         Polina Tsvilodub  \\ Institute of Cognitive Science \\   Osnabrück University  \\  ptsvilodub@uos.de
           \And
-         Jesse Snedecker  \\ Department of Psychology \\   Harvard University  \\  email
+         Jesse Snedeker  \\ Department of Psychology \\   Harvard University  \\  snedeker@wjh.harvard.edu
                    \And
          Roger Levy \\ Brain and Cognitive Sciences \\   MIT  \\  rplevy@mit.edu}
 
@@ -143,7 +144,7 @@
 \begin{abstract}
 %   Most Great Danes are big dogs, but some are also big Great Danes. Understanding a gradable adjective (e.g., \emph{big}) requires making reference to a \textit{comparison class}, a set of objects or entities against which the referent is implicitly compared (e.g., big for a Great Dane), but how do listeners decide upon a comparison class? Simple models of semantic composition stipulate that the adjective combines with a noun, which necessarily becomes the comparison class (e.g., ``That Great Dane is big'' means big for a Great Dane). We investigate an alternative hypothesis: the noun in a sentence is a cue to the comparison class, which must be integrated with other cues, like syntax, for a listener to infer the intended comparison class. We theorize that the utility of a noun in an adjectival utterance can be either for \textit{reference} (getting the listener to attend to the right object) or \textit{predication} (describing a property of the referent). Therefore, we hypothesize that when the presence of a noun can be explained by its utility in reference (e.g., being in the subject position: ``That NP is big''), it is less likely to set the comparison class; in contrast, nouns whose presence is more weakly explained by their utility in reference (e.g., predicate-NPs: ``That’s a big NP'') are more likely to set the comparison class. Across three pre-registered experiments, we find evidence that listeners integrate the noun of a sentence with syntactic information and world knowledge to infer comparison classes, consistent with a trade-off between reference and predication.
    
-Understanding a gradable adjective (e.g., \emph{big}) requires making reference to a comparison class, a set of objects or entities against which the referent is implicitly compared (e.g., big for a Great Dane), but how do listeners decide upon a comparison class? Simple models of semantic composition stipulate that the adjective combines with a noun, which necessarily becomes the comparison class (e.g., ``That Great Dane is big'' means big for a Great Dane). We investigate an alternative hypothesis built on the idea that the utility of a noun in an adjectival utterance can be either for reference (getting the listener to attend to the right object) or predication (describing a property of the referent). Therefore, we hypothesize that when the presence of a noun N can be explained away by its utility in reference (e.g., being in the subject position: ``That N is big''), it is less likely to set the comparison class. Across three pre-registered experiments, we find evidence that listeners integrate the noun of a sentence with syntactic information and world knowledge to infer comparison classes, consistent with a trade-off between reference and predication. 
+Understanding a gradable adjective (e.g., \emph{big}) requires making reference to a comparison class, a set of objects or entities against which the referent is implicitly compared (e.g., big for a Great Dane), but how do listeners decide upon a comparison class? Simple models of semantic composition stipulate that the adjective combines with a noun, which necessarily becomes the comparison class (e.g., ``That Great Dane is big'' means big for a Great Dane). We investigate an alternative hypothesis built on the idea that the utility of a noun in an adjectival utterance can be either for reference (getting the listener to attend to the right object) or predication (describing a property of the referent). Therefore, we hypothesize that when the presence of a noun (N) can be explained away by its utility in reference (e.g., being in the subject position: ``That N is big''), it is less likely to set the comparison class. Across three pre-registered experiments, we find evidence that listeners integrate the noun of a sentence with syntactic information and world knowledge to infer comparison classes, consistent with a trade-off between reference and predication. 
  
    
    
@@ -158,10 +159,10 @@ comparison class; adjectives; information structure; reference; predication
 The meanings of linguistic expressions can change dramatically depending on the context. 
 But determining which aspects of context are relevant for understanding a speaker's message is far from understood.
 This issue is brought into focus when trying to understand gradable adjectives like \emph{big}, \emph{tall}, or \emph{beautiful}.
-The utterance ``That Great Dane is big'' informs the listener than the referent (a Great Dane) has a relatively large size, but relative to what the speaker thinks the Great Dane is big goes unsaid: The Great Dane could be \textit{big for a Great Dane},  \textit{big for a dog}, \textit{big for a four-legged creature}, as well as an infinity of other possibilities. 
+The utterance ``That Great Dane is big'' informs the listener that the referent (a Great Dane) has a relatively large size, but relative to what the speaker thinks the Great Dane is big goes unsaid: The Great Dane could be \textit{big for a Great Dane},  \textit{big for a dog}, \textit{big for a four-legged creature}, as well as an infinity of other possibilities. 
 How do human listeners determine the comparison class when faced with multiple \textit{a priori} reasonable options? 
 
-Simple models of semantic composition posit that when an adjective combines syntactically with a noun, an interpretable adjectival phrase is produced by the noun providing the comparison class \cite<e.g., big(car) $\rightarrow$ \textit{big for a car},  small(watch) $\rightarrow$ \textit{small for a watch};>{Kamp1975, Cresswell1976}. 
+Simple models of semantic composition posit that when an adjective combines syntactically with a noun (N), an interpretable adjectival phrase is produced by the noun providing the comparison class \cite<e.g., big(car) $\rightarrow$ \textit{big for a car},  small(watch) $\rightarrow$ \textit{small for a watch};>{Kamp1975, Cresswell1976}. 
 Many arguments have been laid against such a simple mapping between the noun in the sentence and the comparison class \cite<e.g.,>{Bierwisch1989, Kennedy2007}: A \emph{big snowman} said of a snowman that a 4-year-old built probably means something like \textit{big relative to snowmen that 4-year-olds can build}; a \emph{rich Fortune-500 CEO} might not be \textit{rich relative to other Fortune-500 CEOs}. 
 Theoretical work on comparison classes has focused on how comparison classes are integrated into a compositional semantics and what representations might be preferred \cite{Kennedy2007, Solt2009, Bale2011}.
 Yet, little is known about how human listeners decide upon a comparison class in context. 
@@ -169,14 +170,16 @@ Yet, little is known about how human listeners decide upon a comparison class in
 \begin{center}
 \includegraphics[width=0.9\linewidth]{ref-pred-cartoon-w-subscripts2.pdf}
 \end{center}
-\caption{Cartoon of inferential account for comparison class determination. The noun (Great Dane) in a sentence can be employed either for the goal of reference (green) or predication (purple), shown in the case when this distinction is made via the syntactic position of the N (subject (S)~vs.~predicate (P)). When the noun is used for reference (top), a listener is left with uncertainty about what to use as the comparison class (dogs or Great Danes) and integrates their world knowledge and the physical context to make this inference.  When the noun is used for predication, the listener should have less uncertainty about the comparison class: The comparison class is stipulated by the noun.}
+\caption{Cartoon of inferential account for comparison class determination. The noun (Great Dane) in a sentence can be employed either for the goal of reference (green) or predication (purple), shown in the case when this distinction is made via the syntactic position of the N (subject (S)~vs.~predicate (P)). When the noun is used for reference (top), a listener is left with uncertainty about what to use as the comparison class (dogs or Great Danes) and integrates their world knowledge and the physical context to make this inference.  When the noun is used for predication (bottom), the listener should have less uncertainty about the comparison class: The comparison class is stipulated by the noun.}
 \label{model-cartoon}
 \end{figure*}
 
-We examine the problem from a functional perspective: what goals are speakers trying to achieve when crafting their utterance, and how might these goals influence listeners’ interpretations?  
-In order to communicate a property of a referent, a speaker must achieve two goals: the goal of \emph{reference} and the goal of \emph{predication} \cite{Reboul2001}. 
-In simple, subject-predicate sentence of the form ``$S$ $P$'', where $S$ is a referential subject noun phrase and $P$ is a predicate that is asserted to hold of the subject, we posit that listeners expect that the referent will be made clear by the subject N -- independent of the predicate -- and that speakers aim to satisfy this expectation.\footnote{Of course, it is not universally true that the referent is established by the subject NP (e.g., insofar as one can infer who \emph{he} is in the sentence ``He's making those outrageous tweets again.'', it is because the predicate provides a cue to the referent). We posit this relation between subject NP and reference as an expectation that listeners may hold, perhaps due to information structural reasons.
+We examine the problem from a functional perspective: what goals are speakers trying to achieve when crafting their utterance, and how might these goals influence listeners’ interpretations?  % should we include these definitions here?? (they occur in the abstract before)
+In order to communicate a property of a referent, a speaker must achieve two informational goals: the goal of \emph{reference} (helping the listener identify the right target) and the goal of \emph{predication} (communicating a property of the referent) \cite{Reboul2001}. 
+In simple, subject-predicate sentences of the form ``$S$ $P$'', where $S$ is a referential subject noun phrase and $P$ is a predicate that is asserted to hold of the subject, we posit that listeners expect that the referent will be made clear by the subject N -- independent of the predicate -- and that speakers aim to satisfy this expectation.
+\footnote{Of course, it is not universally true that the referent is established by the subject NP (e.g., insofar as one can infer who \emph{he} is in the sentence ``He's making those outrageous tweets again.'', it is because the predicate provides a cue to the referent). We posit this relation between subject NP and reference as an expectation that listeners may hold, perhaps due to information structural reasons.
 }
+\pt{subject NOUN PHRASE might be unclear, since we also look at sentences where the subject has no N and posit the same; we might want to add a sentence about general expectations of reference-in-subject. maybe sth like this? For simple sentences of the form "Subject Predicate", we posit that listeners expect that the referent will be made clear by the Subject - independently of the predicate, which is asserted to hold of the subject, and that speakers... }  
 %We explore the implications of such a theory of 
 %In this paper, we
 %
@@ -219,13 +222,13 @@ We examine human judgments using three distinct dependent measures in pre-regist
 % that two fundamental, informational goals of communication can serve as a basis for inferring a speaker's intended comparison class. 
 
 \section{Experiments}
-Our guiding hypothesis is that when speakers compose their utterance, the utility of a N in reference trades off with the utility of it conveying a feature value for the referent (predication); utility in reference can then ``explain away'' the utility of using a noun to set the comparison class. 
+Our guiding hypothesis is that when speakers compose their utterance, the utility of a N in reference trades off with the utility of it conveying a feature value of the referent (predication) \footnote{For scalar degrees, this amounts to communicating the intended comparison class of the respective gradable adjective}; utility in reference can then ``explain away'' the utility of using a noun to set the comparison class. 
 We operationalize utility in reference via the syntactic frame in which the noun phrase appears: if the noun appears in the subject of the sentence (That N is ADJ), it is likely to be used for reference and less likely to set the comparison class. If the noun appears in the predicate of the sentence (That's an ADJ N), it is unlikely to be used for reference and more likely to set the comparison class. 
 
-In all of our experiments, we use the ADJs \emph{big} and \emph{small} because of the simplicity with which the feature value (i.e., size) can be conveyed through visual presentation and for which many people have strong expectations about the feature value for members of category degrees (e.g., Great Danes are generally big dogs; goldfish are generally small fish; etc.). 
-Also, referents are described using the size adjective consistent with these general expectations (e.g., \emph{Great Dane -- big}, \emph{goldfish -- small}), to allow for the possibility of either subordinate (Great Dane) or basic-level (dog) comparison classes.
+In all of our experiments, we use the ADJs \emph{big} and \emph{small} because of the simplicity with which the feature value (i.e., size) can be conveyed through visual presentation and for which people have strong expectations about the feature value for members of different categories (e.g., Great Danes are generally big dogs; goldfish are generally small fish; etc.). 
+Referents were always described using the size adjective consistent with these general expectations (e.g., \emph{Great Dane -- big}, \emph{goldfish -- small}), to allow for the possibility of either subordinate (Great Dane) or basic-level (dog) comparison classes.
 %Thus, given world knowledge, both the subordinate-level or basic-level comparison class could be felicitous.%, though the basic-level is more likely \textit{a priori} (i.e., the Great Dane is likely to be \textit{big for a dog}, but could also be \textit{big for a Great Dane}).
-The preregistrations and full experimental procedures can be viewed at \url{tinyurl.com/rcsyz9f}.
+The preregistrations and full experimental procedures can be viewed at \url{tinyurl.com/rcsyz9f}\footnote{All data and code can be found under \url{https://github.com/polina-tsvilodub/refpred}}.
 
 %; thus, referential utility can serve as a cue to the comparison class for listeners and a guide for speaker preferences about  . %
 %  which we examine using the subject vs. predicate contrast in where the NP appears. 
@@ -269,7 +272,7 @@ Flowers* & Daisy* & Peony* \\
 }
 \end{table}
 
-\subsection{Experiment 1: Syntax Rating} In this experiment participants rated how well each of two sentences differing in the position of the noun (N) described the target in context. The noun was either the basic-level (e.g., dog) or the subordinate target label (e.g., Great Dane; within-subjects).
+\subsection{Experiment 1: Syntax Rating} In this experiment participants rated how well each of two sentences differing in the position of the noun described the target in context. The noun was either the basic-level (e.g., dog) or the subordinate target label (e.g., Great Dane; within-subjects).
 
 
 
@@ -282,21 +285,21 @@ All experiments used the same materials.
 Nouns and referent pictures were chosen from five \emph{basic-level categories} in the animal and plant domains: dogs, birds, fish, flowers, trees.
 Within each basic-level category, we chose target objects from \emph{subordinate level categories} about which people have prior expectations concerning the size of members of those categories (Table \ref{tab:stimuli}).
 %For example, Great Danes are generally big relative to other dogs; goldfish are generally small relative to other fish. 
-Targets are described using the size adjectives consistent with these general expectations (e.g., \emph{Great Dane -- big}, \emph{goldfish -- small}).
+%Targets are described using the size adjectives consistent with these general expectations (e.g., \emph{Great Dane -- big}, \emph{goldfish -- small}).
 %Thus, given world knowledge, both the subordinate-level or basic-level comparison class could be felicitous.%, though the basic-level is more likely \textit{a priori} (i.e., the Great Dane is likely to be \textit{big for a dog}, but could also be \textit{big for a Great Dane}).
 
 \subsubsection{Procedure}
 Participants completed two comprehension check trials and six main trials. In the comprehension check trials, participants see a picture (e.g., a purple chair), read pairs of sentences describing it (e.g., ``The chair is blue'' and ``The chair is yellow''), and are asked to rate on slider how well each of the sentences describes the referent.
 
 In the main trials, participants read: ``You and your friend see the following:'' above a context picture with other members of the same basic-level category (e.g., a group of dogs; Figure~\ref{screenshots}A). 
-Six different basic-level contexts were created from categories depicting groups of several members belonging to different subordinate categories (e.g., dogs of different breeds, including the target and filler subordinate categories, such as Great Danes, pugs and poodles; Table~\ref{tab:stimuli}).
-Below the context read ``You also see this \emph{subordinate label}'' and saw the referent pictured.
+Six different basic-level contexts were created from the five categories depicting groups of several members belonging to different subordinate categories (e.g., dogs of different breeds, including the target and filler subordinate categories, such as Great Danes, pugs and poodles; Table~\ref{tab:stimuli}).
+Below the context they read ``You also see this \emph{subordinate label}'' and saw the referent pictured.
 % possibly cut the following paragraph?
 %The visual size of the picture of the referent is manipulated such that it appears incongruent with the general expectations of that subordinate category (i.e., a Great Dane, which we would expect to be large, is actually small relative to other Great Danes in the context; Fig~\ref{screenshots}C compared to context in Fig.~\ref{screenshots}A). 
 %This subtle visual disparity was imposed in order to enhance the difference in felicity between the adjective used with a basic-level~vs.~subordinate level comparison class (e.g., the Great Dane is \emph{big for a dog} but probably not \emph{big for a Great Dane}).
 
 Participants rated how well two sentences described the target, using sliders ranging from \textit{very bad} to \textit{very well}. The sentences differed in whether the N appeared in the subject or predicate of the sentence (e.g., Predicate NP: ``That's a big Great Dane''; Subject NP: ``That Great Dane is big''; Fig.~\ref{screenshots}C), and the order in which the sentences and corresponding sliders appeared on the page was randomized between-subjects. 
-Trials differed in whether the noun was the subordinate referent label (e.g., \emph{Great Dane}) or the basic-level label (e.g., \emph{Dog}), in randomized order. 
+Trials differed in whether the noun was the subordinate referent label (e.g., \emph{Great Dane}) or the basic-level label (e.g., \emph{dog}), in randomized order. 
 Each participant saw only one of the two possible targets for each context (e.g., either the Great Dane or the pug for the dog basic-level context).
 
 \begin{figure}[t]
