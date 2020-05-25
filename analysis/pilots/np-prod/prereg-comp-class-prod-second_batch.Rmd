@@ -1,0 +1,238 @@
+---
+title: "Adjective Comparison Class Free Production Experiment"
+author: "Polina Tsvilodub"
+date: "8/12/2019"
+output: github_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+
+```
+# Introduction
+This free production experiment is part of the adjective comparison class studies, following up on promising pilot experiment results gained in the same experimental setup.   
+We investigate the hypothesis that NPs in a sentence can be employed either referentially or predicatively and that different syntactic frames suggest different functions for the NPs (reference vs. predication). In particular, we hypothesize that __the NP of a simple, copular sentence explicitly provides the comparison class of the adjective when the NP is used predicatively__ (and hence, the adjective appears prenominally: “That’s a big NP”). __When the NP is used referentially (and hence, the adjective appears in a predicative position: “That NP is big”), the NP does not fix the comparison class__, which allows other contextual circumstances to guide the inference about the comparison class. 
+This script analyses the data collected in two batches of the adjective comparison class free production experiment. The experiment and the analysis were preregistered prior to the first recruitment of 60 participants on MTurk. Since the experiment has four conditions, the data of 60 participants was not sufficient, so another 60 participants were recruited without another preregistration. The data from 120 participants is analysed here. They were compensated $1.00 / participant.
+
+## Experiment design 
+Before the main trails, participants complete warm-up trials to get faimiliar with subordinate-level labels of the main trial stimuli. They label two instances of a basic level category (e. g. dogs) from different subordinate level categories, e. g. a great dane and a pug (both the great dane and the pug are also target referents in subsequent main trials.) In the warm-up trial, participants provide the subordinate level labels as well as a common, basic-level label (i.e. dogs) for the instances shown. Participants are provided feedback. If participants supply an incorrect label, they are required to correct the label before proceeding. 
+The experimental task is to describe an object. Participants are presented a context picture of several members of a common basic-level category, e. g. a parade of dogs. The parade includes three different subordinate categories of the basic-level category (like dog), e. g. a big, a middle-sized and a small dog breed like great danes, poodles and chihuahuas. A representative of either the big or the small breed is a target presented in another picture below the context picture which the participant has to describe. We use both adjectives 'big' and 'small' (within-subject), consistent with the intuitive size of the target. The targets are chosen such that they are obviously big (or small) members of their basic-level category, but normal-sized for their subordinate category. 
+The participants are supposed to describe the target referent (e. g. a great dane) by completing a sentence. The syntax of the sentence is the main condition manipulated between subjects. It has either the prenominal syntax "That's a big _ " or the predicative syntax "That _ is big", the blank to be filled in with a noun phrase. 
+In the prenominal condition, the NP is hypothesized to set the adjective comparison class, i. e. inserting the basic-level label of the referent means that the referent (e. g. a great dane) is "big in comparison to other dogs".  
+Hence, we expect _more basic-level labels ('dog') to occur in the prenominal condition_, since the NP restricts the comparison class more strongly to the category used in the NP. In contrast, we expect _a similar proportion of basic-level ('dog') and subordinate ('great dane') labels in the predicative condition_, since the comparison class is less restricted. Inserting both the basic-level and the subordinate label of the target (e. g. great dane) could mean "big in comparison to other dogs".
+
+
+# Data analysis
+```{r}
+library(tidyverse)
+library(tidyboot)
+
+# read in data
+d1 <- read_csv('./../data/results_8_exp1-post-prereg-pred.csv')
+d2 <- read_csv('./../data/results_10_exp1-post-prereg-prenom.csv')
+d3 <- read_csv('./../data/results_8_exp1-post-prereg-pred_batch2.csv')
+d4 <- read_csv('./../data/results_10_exp1-post-prereg-prenom_batch2.csv')
+x <- rbind(d1, d3)
+y <- rbind(d2, d4)
+d <- rbind(x, y)
+
+#first look at the data
+#glimpse(d)
+
+# comments
+d_comments <- d %>%
+  distinct(submission_id, problems, comments, fairprice)
+
+# number of big / small targets per condition
+d %>% group_by(condition, size) %>% count()
+
+```
+
+##Spliting and filtering data
+Paticipants whose native language is not English or the information is missing are excluded from the analysis. Two participants were excluded. 
+```{r}
+# make sure how participants indicate their native language 
+# sometimes participants use only "en" or "eng" for english
+# excluded non-native speakers 
+d %>% distinct(d$languages) # %>% View()
+
+
+d_filt <- d %>% 
+  filter(grepl("eng", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, size, item, botresponse, response, condition,  picture) %>% mutate(size=factor(size), syntax = factor(condition))
+
+# glimpse(d_filt)
+
+# exclude participants if necessary based on botcaptcha 
+# d_filt %>% distinct(d_filt$botresponse) %>% View()
+
+# extract main trials 
+
+d_main <- d_filt %>% filter((trial_name =="main1") | (trial_name== "main2")  ) %>% 
+  select(submission_id, trial_number, response,  size, item, syntax, condition, picture)
+
+```
+
+## Categorizing the data 
+The responses produced by the participants are catgorized into subordinate and basic-level labels of the target picture. The following lemmas were categorized as basic-level responses: bird, dog, fish, plant, flower, tree, animal. All other valid responses were categrpized as subordinate labels. Six invalid data points like obviously wrong labels or ungrammatical sentences are excluded.
+```{r}
+# question1 and question2 are the sentence parts coded in the experiment 
+# look at the different responses provided and categorize them 
+# d_main %>% distinct(d_main$response) %>% View()
+
+# exclude if responses are not referring to the target 
+d_main_valid <- subset(d_main, !(response %in% c("rose", "duck", "weed", "pigeon", "stingfish", "rat"))) 
+
+d_main_responseCat <- d_main_valid %>%
+  rowwise() %>%
+  mutate( # categorize responses 
+    response_cat =
+      ifelse(
+      tolower(response) %in% c("bird", "birds", "dog", "dogs", "fish","one plant", "flower", "flowers", "tree", "trees", "animal", "plant"), "super", "sub"),
+    
+    resp_cat = ifelse(response_cat == "sub", 1, 0),
+    response_label = "sub"
+  )
+
+```
+
+## Proportion of subordinate responses by syntactic condition  
+
+The proportion of subordinate responses is the dependent variable we test by manipulating the syntactic condition: "That's a big __ " (prenominal) versus "That __ is big" (predicative). 
+The proportion of subordinate responses is higher in he predictaive than in the prenominal condition, supporting the hypothesis that in the prenominal condition rather basic-level labels are used in order to communicate the comparison class. 
+The overall proportion of subordinate responses is above 50 % in both syntactic conditions, revealing participants' preference for subordinate labels. The reason might be a general preference for more specific comparison classes over more general ones.  
+```{r}
+d_main_summary <- d_main_responseCat %>%
+  group_by(syntax, response_label) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of subordinate labels in the different conditions 
+  ungroup() %>%
+  mutate(condition = factor(syntax, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))
+        )
+
+ggplot(d_main_summary, aes(x = syntax, fill = syntax,
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8))+
+  geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))+
+  ggtitle("The proportion of subordinate responses by syntactic condition")
+
+
+```
+## Bayesian model
+The logistic Bayesian regression model was preregistered. Effect coding is used for the syntax, prenominal condition being the reference level. The categorized response (basic vs subordinate) is regressed against the syntactic category (prenominal vs. predicative) with random intercept by-participant effects and random intercept and syntax-effects by-item.
+Given the Bayesian model, the effect of the syntax on the response category is not statistically significant. There is big by-participant variation and some by-item variation. 
+```{r}
+library(brms)
+
+# effect coding
+#contrasts(d_main_responseCat$syntax)=contr.sum(2)
+contrasts(d_main_responseCat$syntax)=matrix(c(-1, 1))
+# fit regression model
+lm.bayes <- brm(resp_cat ~ syntax + (1| submission_id) + (1 + syntax|picture), data = d_main_responseCat, family = "bernoulli")
+summary(lm.bayes)
+
+
+#extract posterior samples
+pos_samples <- posterior_samples(lm.bayes)
+#head(pos_samples)
+
+# test hypothesis: is the sub response proportion credibly greater in the predicative condition?
+mean(pos_samples$b_Intercept - pos_samples$b_syntax1 > pos_samples$b_Intercept+pos_samples$b_syntax1)
+
+```
+ 
+
+## Bayesian model with target size effects
+This Bayesian model includes an exploration of the effect of the size condition (the target being big or small) on the response category. The same variable coding scheme is used as in the model above. This model was not preregistered.
+Given the CI, there seems to be no evidence for a size effect on the response category.
+``` {r}
+# 
+contrasts(d_main_responseCat$syntax)=matrix(c(-1, 1))
+# fit regression model
+lm.bayes.size <- brm(resp_cat ~ syntax + size + (1| submission_id) + (1 + syntax|picture) + (1|size), data = d_main_responseCat, family = "bernoulli")
+summary(lm.bayes.size)
+
+```
+
+## General Stats
+A generalized linear regression model is fitted additionally to the Bayesian regression model. This model was not preregistered. 
+The response category is regressed against the syntactic category and random intercept by-participant effects with random intercept and syntax-effects by-item. 
+Effect coding scheme is used for the syntactic category, prenominal syntax being the reference level.
+
+There is a big by-participant variation (SD = 3.8). There is also by-item (by target picture) variation. 
+
+Given this model, the syntactic categoty has a statistically significant effect on the response category (p-value < 0.05): there are more subordinate responses in the predicative than in the prenominal condition. 
+
+``` {r}
+library(lme4)
+contrasts(d_main_responseCat$syntax)=matrix(c(-1, 1))
+lm.fit <- glmer(resp_cat ~ syntax + (1| submission_id) + (1 + syntax|picture), data = d_main_responseCat, family="binomial")
+summary(lm.fit)
+```
+
+## Proportion of subordinate responses in the first trial
+To exclude possible within-participant variations due to seeing many different conetxt pictures ofdifferent animals, only the first trial is analysed. 
+The proportion of subordinate responses is about chance level in the prenominal condition (0.5), the proportion in the predicative condition is higher (0.65). The effect of syntactic condition on the response category has statistical significance of p < 0.1. 
+``` {r}
+# analysing first trial response propotions
+first_trials <- d_main_responseCat %>% filter(trial_number == 1)
+first_trials %>% group_by(response_label, condition) %>% tidyboot_mean(column = resp_cat) %>% ungroup() %>% ggplot(., aes(x = condition, y = mean, fill = condition, ymin = ci_lower, ymax = ci_upper)) + geom_col(position = position_dodge()) + geom_linerange(position = position_dodge())
+
+contrasts(first_trials$syntax) = matrix(c(-1, 1))
+lm.first_trials <- glmer(resp_cat ~ syntax + (1| submission_id) + (1 + syntax|picture), data = first_trials, family="binomial")
+summary(lm.first_trials)
+```
+
+
+## Proportion of subordinate reponses by contextual domain
+There are 5 contextual domains employed in the experiment: dogs, birds, trees, flowers and fish. 
+As expected, there is no substantial difference in the proportions of subordinate responses between the domains. In the bird domain, subordinate labels seem to be more salient in the prenominal condition than subordinate labels in other domains. Given prior experimetns, it might be due to the swan being a very salient target of the bird domain.
+``` {r}
+# porportions of sub reponses instead of counts
+d_main_responseCat %>% group_by(item, syntax, response_label) %>% tidyboot_mean(column = resp_cat) %>% ungroup() %>% ggplot(., aes(x = item, y = mean, fill=syntax, ymin = ci_lower, ymax = ci_upper)) + geom_col(position = position_dodge(0.8)) + geom_linerange(position = position_dodge(0.8)) 
+
+```
+
+## Proportion of subordinate reponses by single item (target picture)
+In the 5 different domains, there are 10 different contexts: 2 dog parades, 2 fish parades, 2 flower collections, 3 bird parades and a tree collection. For each context, there is a big and a small representative of the basic level category, resulting in 20 different targets. Each participant sees 3 big and 3 small targets, randomly sampled from the 10 different conditions.
+
+Analysing the subordinate labels of the single targets in the different syntactic conditions reveals some variation we ascribe to the different saliency / availability of the corresponding subordinate labels. 
+Specifically, the swan and the eagle seem to elicit a proportion of 0.75 or more subordinate labels in both syntactic conditions, whereas the doberman label proportion was below 0.5 in both conditions. 
+We expect the proportion of subordinate responses to be higher in the predicative condition for all the items. However, it is not the case for the goose and the daisy items.
+Furthermore, the swan, the sunflower and the doberman items seem to be insensitive to the syntactic manipulation, eliciting roughly equal subordinate label proportions. 
+
+In the prenominal condition, big targets tend to elicit more subordinate labels than small targets. It remains to be investigated if it is a result of the item design.
+``` {r}
+#d_main_responseCat %>% group_by(item, syntax, response_label, size) %>% summarise(nr_sub_resp = sum(resp_cat)) %>% ungroup() %>% ggplot(., aes(x = nr_sub_resp)) + geom_bar() + facet_grid(syntax + size ~item)
+
+# proportion of sub reponses by picture
+d_main_responseCat %>% group_by(picture, syntax, response_label) %>% tidyboot_mean(column = resp_cat) %>% ungroup() %>% ggplot(., aes(x = reorder(picture, mean), y = mean, fill=syntax, ymin = ci_lower, ymax = ci_upper)) + geom_col(position = position_dodge(0.8)) + geom_linerange(position = position_dodge(0.8)) + coord_flip() 
+# + facet_wrap(~syntax)
+```
+``` {r}
+## Analysis by target size
+
+d_main_responseCat %>% group_by(size, response_label, syntax) %>% tidyboot_mean(column=resp_cat) %>% ungroup() %>% ggplot(., aes(x=size, fill=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) + geom_col(position = position_dodge(0.8)) + geom_linerange(position = position_dodge(0.8))
+```
+
+
+## Response consistency within participants
+Do participants keep the same lanbeling strategy through the 6 trials they complete? Specifically, how many participants give subordinate labels in all the trials in both syntactic conditions?
+Almost half of the participants assigned to the predicative condition use only subordinate labels throughout the experiment. Roughly 15% of participants did not use subordinate labels at all.The others switched their strategy with a tendency towards more subordinate labels. 
+In the prenominal condition, more than 25% of participants still use only subordinate labels, and only about 20% use no subordinate labels. Other participants mixed their labels. 
+Generally more than 50% of participants stick to uniform labelling behavior throughout the experiment.
+
+``` {r}
+d_main_responseCat %>%
+  group_by(submission_id, syntax, response_label) %>%
+  summarize(n_sub_responses = sum(resp_cat)) %>%
+  ungroup() %>%
+  ggplot(., aes( x = n_sub_responses))+
+  geom_bar(position=position_dodge())+
+  facet_wrap(~syntax) + ggtitle("Number of subordinate responses uttered per participant in the 6 trials")
+```
+

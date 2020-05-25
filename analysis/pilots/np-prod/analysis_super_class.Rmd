@@ -1,0 +1,315 @@
+---
+title: "Comparison Class Elicitation With Superordinate Context Items"
+author: "Polina Tsvilodub"
+date: "7/29/2019"
+output: github_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+# Experiment outline 
+This script analyses the data from a comparison class elicitation pilot experiment with different adjective and target pais (n=80). 
+
+We expect _more subordinate labels to occur in the incongruent condition_. In contrast, we expect _a similar proportion of superordinate and subordinate labels as in the previous experiment in the congruent condition_. Overall proportion of _subordinate labels should be higher in the predicative condition_. 
+The proportion of superordinate labels is expected to be higher due to superordinate contextual competitors.
+
+### Procedure
+The pairings of the target and the adjective are altered in this experiment: i. e. in the congruent condition, if target is a chihuahua, the sentence includes the adjective "small", if it is a great dane, it includes "big". In the incongruent (critical) condition, if the target is a chihuahua, the sentence includes the adjective "big", if the target is a great dane, it includes "small" (between-subject).
+
+
+## Data analysis
+```{r}
+library(tidyverse)
+library(tidyboot)
+
+# read in data
+d <- read_csv('./../data/results_6_super-comp-class-exp_80.csv')
+
+#first look at the data
+glimpse(d)
+
+# comments
+d_comments <- d %>%
+  distinct(submission_id, problems, comments, fairprice)
+
+```
+
+The participants recruited via MTurk were paid $0.50. 
+
+
+##Spliting data into main and warm-up, excluding participants
+
+6 participants are excluded because of their native language. 
+There are participants using upper case in the bot captcha, but they are not excluded in this analysis. 
+```{r}
+# make sure how participants indicate their native language 
+# sometimes participants use only "en" or "eng" for english
+# excluded non-native speakers 
+d %>% distinct(d$languages) %>% View()
+d_langs <- d %>% mutate(
+  languages = ifelse(languages == "yes", "English", languages)
+) %>% mutate(
+  languages = ifelse(is.na(languages), "X", languages)
+) 
+
+d_filt <- d %>% 
+  filter(grepl("English", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, size_adj, item, botresponse, response, condition, size_target, adj_cond, picture)
+
+glimpse(d_filt)
+
+d_filt %>% distinct(d_filt$botresponse) %>% View()
+# extract main trials 
+d_main <- d_filt %>% 
+  select(submission_id, trial_number, response, size_adj, item, condition, size_target, adj_cond, picture)
+
+```
+
+## Categorizing the data 
+About 30 responses excluded due to task misundersatnding.
+```{r}
+# question1 and question2 are the sentence parts coded in the experiment 
+# look at the different responses provided and categorize them 
+d_main %>% distinct(d_main$response) %>% View()
+
+d_main_valid <- subset(d_main, !(response %in% c("horse", "house", "koala", "butterfly", "squirrel", "shark", "whale", "flamingo", "snake", "rose", "crab", "pug", "tiger", "tail", "parade", "fox", "deer", "item"))) 
+d_main_valid$response[d_main_valid$response == "gold fish"] <- "goldfish"
+d_main_valid$response[d_main_valid$response == "straight tail monkey"] <- "monkey"
+d_main_valid$response[d_main_valid$response == "scaly fish"] <- "fish"
+d_main_valid$response[d_main_valid$response == "blue and white fish"] <- "fish"
+d_main_valid$response[d_main_valid$response == "grey dog"] <- "dog"
+
+  
+d_main_responseCat <- d_main_valid %>%
+  rowwise() %>%
+  mutate( # categorize responses 
+    response_cat =
+      ifelse(
+      tolower(response) %in% c("ape", "primate", "bird", "dog", "fish", "flower", "monkey", "tree", "leaf", "twig", "branch", "bush"), "basic", "sub"),
+    
+    response_num = ifelse(response_cat == "sub", 1, 0),
+    response_label = "sub"
+  )
+d_main_responseCat$response_cat[d_main_responseCat$response == "plant"] <- "super"
+d_main_responseCat$response_cat[d_main_responseCat$response == "animal"] <- "super"
+```
+## Response category distribution
+```{r}
+d_main_responseCat %>% mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))) %>% ggplot(aes(x=response_cat, fill=adj_cond)) +geom_bar(position=position_dodge()) + facet_wrap(~condition)
+```
+
+## Proportion of subordinate responses by condition, separated by congruency  
+
+The proportion of subordinate responses is the dependent variable we test by manipulating the syntactic condition: "That's a big X" (prenominal) versus "That X is big" (predicative). 
+
+Count of different conditions: about 160 incongruent observations, about 240 congruent observations. Given the task description, the confusion among participants seems to happens especially in incongruent trials.
+
+```{r}
+d_main_summary <- d_main_responseCat %>%
+  group_by(condition, response_label, adj_cond) %>%
+  tidyboot_mean(column = response_num) %>% # calculate proportion of subordinate labels in the different conditions 
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big")),
+         adj_cond = factor(adj_cond, 
+                            levels=c("congruent", "incongruent"), 
+                           labels = c("great dane : big", "great dane : small")))
+
+ggplot(d_main_summary, aes(x = adj_cond, fill = adj_cond,
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8))+
+  geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))+
+  ggtitle("The proportion of subordinate responses by syntactic condition")+
+  facet_wrap(~condition)
+
+```
+## Stats
+```{r}
+d_main_congruent <- d_main_responseCat %>% filter(adj_cond == "congruent")
+
+library(lme4)
+lm.rs <- glmer(response_num ~ condition + (1 | submission_id) + 
+        (1 + condition | item), data = d_main_congruent, family = 'binomial')
+summary(lm.rs)
+```
+
+```{r}
+cond_numeric <- ifelse(d_main_congruent$condition=="prenominal", 1, -1)
+lm.rsnum <- glmer(response_num ~ cond_numeric + (1 | submission_id) + 
+        (1 + cond_numeric | item), data = d_main_congruent, family = 'binomial')
+summary(lm.rsnum)
+
+```
+
+## Proportion of subordinate responses by congruence 
+```{r}
+d_main_congr <- d_main_responseCat %>%
+  group_by(adj_cond, condition, response_label) %>%
+  tidyboot_mean(column = response_num) %>% # calculate proportion of subordinate labels in the different conditions 
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big")),
+         adj_cond = factor(adj_cond, 
+                            levels=c("congruent", "incongruent"), 
+                           labels = c("great dane : big", "great dane : small")))
+
+ggplot(d_main_congr, aes(x = condition, fill = condition,
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8))+
+  geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))+
+  ggtitle("Proportion of subordinate responses by congruence")+
+  facet_wrap(~adj_cond)
+```
+
+## Proportion of subordinate labels in big vs. small trials 
+
+We check if there is any proportional difference between the trials with different target size. The size does not seem to have a significant effect.  
+
+```{r}
+d_main_responseCat %>% group_by(size_target, adj_cond) %>% count()
+
+d_main_summary_bySize <- d_main_responseCat %>%
+  group_by(condition, size_target, adj_cond, size_adj, response_label) %>%
+  tidyboot_mean(column = response_num) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big")),
+         adjective = factor(size_adj, 
+                            levels=c("big", "small"), 
+                           labels = c("big", "small")))
+
+# big and small indicate the size of the target here 
+ggplot(d_main_summary_bySize, aes(x = size_target, fill = adjective, 
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8), width = 0.8)+
+  geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  facet_wrap(~condition)+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))+ ggtitle("Proportions in trials grouped by target size")
+```
+
+## Consistency of choosing a response category by subject
+
+Do participants switch between superordinate and subordinate labels within the experiment?  
+
+
+```{r}
+d_main_responseCat %>%
+  group_by(submission_id, adj_cond, condition, response_label) %>%
+  summarize(n_sub_responses = sum(response_num)) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X (prenominal)", "That X is big (predicative)")),
+         adj_cond = factor(adj_cond, 
+                            levels=c("congruent", "incongruent"), 
+                           labels = c("great dane : big", "great dane : small"))) %>%
+  ggplot(., aes( x = n_sub_responses, fill = adj_cond))+
+  geom_bar(position=position_dodge())+
+  facet_grid(adj_cond~condition) + ggtitle("Number of subordinate responses uttered per participant in the 3 trials")
+```
+
+
+## Proportion of subordinate responses by item (context)
+For each context, there is a pair of targets (a big and a small one). The targets seem to elicit different proportions of subordinate labels. 
+```{r}
+d_main_responseCat %>% count(item, condition) %>% View()
+
+
+
+d_main_responseCat %>%
+  group_by(condition, item, size_adj, size_target, response_label) %>%
+  tidyboot_mean(column = response_num) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))
+         ) %>%
+
+# big and small indicate the adjective actually used 
+ggplot(., aes(x = size_target, fill = size_adj, 
+                           y = mean, ymin = ci_lower, ymax = ci_upper))+
+  geom_col(position = position_dodge(0.8), width = 0.8)+
+  geom_linerange(position = position_dodge(0.8))+
+  labs( y = "Proportion subordinate responses")+
+  facet_grid(condition~item)+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+# leave this grouping or interchange adj_cond and condition?
+
+```
+``` {r}
+d_main_responseCat %>%
+  group_by(condition, item,  response_label) %>%
+  summarize(n_sub_responses = sum(response_num)) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))
+         ) %>%
+
+# big and small indicate the adjective actually used 
+ggplot(., aes(x = n_sub_responses
+                        ))+
+  geom_bar(position = position_dodge(0.8), width = 0.8)+
+ 
+  labs( y = "Proportion subordinate responses")+
+  facet_grid(condition~item)
+# leave this grouping or interchange adj_cond and condition?
+
+```
+
+``` {r}
+d_main_responseCat %>%
+  group_by(condition, item, size_target, response_label) %>%
+  summarize(n_sub_responses = sum(response_num)) %>%
+  ungroup() %>%
+  mutate(condition = factor(condition, 
+                            levels = c("prenominal", "predicative"),
+                            labels= c("That's a big X", "That X is big"))
+         ) %>%
+
+# big and small indicate the adjective actually used 
+ggplot(., aes(x = n_sub_responses, fill = size_target
+                        ))+
+  geom_bar(position = position_dodge(0.8), width = 0.8)+
+ 
+  labs( y = "Proportion subordinate responses")+
+  facet_grid(condition~item)
+
+
+```
+
+``` {r}
+d_main_responseCat.itemCon <- d_main_responseCat %>%
+  group_by(picture, response_label) %>%
+  summarize(n_sub_responses = sum(response_num),
+            n = n(),
+            prop = n_sub_responses / n) %>%
+  ungroup() 
+
+
+d_main_responseCat.itemCon %>%
+  ggplot(., aes( x = prop ))+
+  geom_histogram()+
+  xlab("proportion subordinate responses")+
+  ylab('number of items')
+```
+
+```{r}
+d_main_responseCat.itemCon[with(d_main_responseCat.itemCon, order(prop)),] %>%
+  select(picture, prop, n_sub_responses, n) %>%
+  kable()
+
+```

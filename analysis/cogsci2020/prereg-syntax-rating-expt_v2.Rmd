@@ -1,0 +1,350 @@
+# Syntax Rating Experiment Analysis
+
+``` {r libraries}
+# libraries
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+library(readr)
+```
+
+``` {r}
+# read the data
+d_rate <- read_csv('./data/results_27_syntax-rating-prereg-80_cleaned.csv')
+d_rate_second <- read_csv('./data/results_27_syntax-rating-prereg-29_cleaned.csv')
+
+d_rate_second <- d_rate_second[!(names(d_rate_second) %in% c("worker_id", "hit_id", "assignment_id"))]
+#write_csv(d_rate_second, '../data/results_27_syntax-rating-prereg-29_cleaned.csv')
+d_rate <- rbind(d_rate, d_rate_second)
+```
+
+``` {r filters}
+# exclude participants who report difficulties 
+d_rate %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+# d_rate <- subset(d_rate, !(submission_id %in% c(....)))
+
+# exclude data from non-native English speakers and those where the language information is missing
+d_rate %>% distinct(languages) %>% View()
+
+d_rate_filt <- d_rate %>% filter(grepl("en", languages, ignore.case = T))
+``` 
+
+``` {r warmup analysis}
+# warmup trials 
+d_rate_warmup <- d_rate_filt %>% filter(trial_name == "custom_warmup")
+
+# exclude participants who gave nonsense ratings on warmup trials 
+# for chair trial: sentence1 > sentence 2
+# for basketball trial: sentence 2 > sentence 1 or sentence 1 < 50
+d_warmUp_catch_trials <- d_rate_warmup %>% group_by(submission_id) %>%
+  filter( ( ( (target == "warmup/basketball.png") & 
+                                               (response2 >= response1)  ) | 
+              ( (target == "warmup/basketball.png") &  (response1 <= 50) )  ) |
+            ( (target == "warmup/purple-chair.png") & 
+                                                  (response1 > response2 ) )
+            ) 
+            
+# exclude these participants
+d_rate_passedWarmup <- anti_join(d_rate_filt, d_warmUp_catch_trials, by = c("submission_id"))
+
+# exclude participants who give ratings within 5 points for one condition on every trial
+d_catch_main <- d_rate_passedWarmup %>% filter((trial_name == "custom_slider1") |
+                                      (trial_name == "custom_slider2")) %>%
+  group_by(submission_id) %>% 
+  mutate(check_resp1 = ifelse(max(response1)-min(response1) <= 5, 1, 0),
+         check_resp2 = ifelse(max(response2)-min(response2) <= 5, 1, 0)) 
+# exclude participants whose ratings are within 5 for the two sentences on every trial
+d_catch_main_counts <- d_catch_main %>% 
+  rowwise() %>% 
+  mutate(check_ratings = ifelse( abs(response1 - response2) <= 5 , 1, 0 )) %>%
+  group_by(submission_id) %>% 
+  mutate(sum_check = sum(check_ratings)) %>% ungroup() %>%
+  # participants not passing exclusion criteria
+  filter((sum_check == 6) | (check_resp1 == 1) | (check_resp2 == 1))
+
+# exclude failing participants 
+d_rate_cleanedData <- anti_join(d_rate_passedWarmup, d_catch_main_counts, by = c("submission_id"))
+```
+
+``` {r csv vars}
+# write a csv with subject exclusion stats for TeX
+myvars = list()
+
+myvars["nSubj"] = (d_rate %>% distinct(submission_id) %>% count() %>% .$n) - 1 # one extra participant was collected, excluded below
+myvars["nExcludedTotal"] = (d_rate %>% distinct(submission_id) %>% count() %>% .$n) - 
+  (d_rate_cleanedData %>% distinct(submission_id) %>% count() %>% .$n)
+myvars["nBugs"] = 0 # no subjects excluded due to glitches
+myvars["nNonEN"] = (d_rate %>% distinct(submission_id) %>% count() %>% .$n) - 
+  (d_rate_filt %>% distinct(submission_id) %>% count() %>% .$n)
+myvars["nFailedWarmUp"] = d_warmUp_catch_trials %>% distinct(submission_id) %>% count() %>% .$n %>% sum()
+myvars["nFailedMains"] = d_catch_main_counts %>% distinct(submission_id) %>% count() %>% .$n
+
+myvars = as_tibble(myvars)
+#write_csv(myvars, path = "R_results_TeX/myvars.csv", col_names = T)
+```
+
+
+``` {r categorization}
+# get main trials
+d_rate_main <- d_rate_cleanedData %>% filter((trial_name == "custom_slider1") |
+                                      (trial_name == "custom_slider2")) %>%
+  select(submission_id, trial_number, trial_name, np, sentence_order, domain, item, target_size, sentence1, sentence2, response1, response2)
+
+# turn NP, syntax, sentence order to factors 
+d_rate_main <- d_rate_main %>% mutate(NP = factor(np, levels = c(0, 1),
+                                                  labels = c("sub", "basic")),
+                                      target_size = factor(target_size, levels = c(0, 1),
+                                                           labels = c("big", "small")),
+                                      sentence1 = ifelse(sentence1 == 0, "predicate", "subject"),
+                                      sentence2 = ifelse(sentence2 == 0, "predicate", "subject")
+                                      )
+
+
+d_rate_main_full <- d_rate_main %>%
+  mutate(predicate = ifelse(sentence1 == "predicate", response1, response2),
+         subject = ifelse(sentence1 == "subject", response1, response2)) %>% 
+  select(-sentence1, -sentence2, -response1, -response2) %>% 
+  gather(syntax, response, predicate, subject) %>%
+  filter(submission_id != 1053)  %>% # exclude the last participant (81)
+  mutate(NP = ifelse(NP == "sub", "subordinate", "basic")) 
+
+#  mutate(order = ifelse(order == "sub_pred", "Subject-Predicate", "Predicate-Subject")) %>%
+
+
+```
+
+``` {r plot}
+# plot
+bar.width = 0.8
+d_rate_main_full %>%
+  group_by(NP, syntax) %>% 
+  tidyboot_mean(column = response) -> d_rate_main_full.bs
+
+d_rate_main_full.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subject", "predicate"),
+                         labels = c("Subject NP\n(That NP is big.)", "Predicate NP\n(That's a big NP.)"))) %>%
+  ggplot(., aes(x = syntax, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), 
+           width = bar.width, alpha = 0.3, color = 'black', size = 1) +
+  geom_point(data = d_rate_main_full %>% 
+               group_by(submission_id, syntax, NP) %>%
+               summarize(subj_mean = mean(response)) %>%
+               ungroup() %>%
+               mutate(syntax = factor(syntax, levels = c("subject", "predicate"),
+                         labels = c("Subject NP\n(That NP is big.)", "Predicate NP\n(That's a big NP.)"))), 
+             position = position_jitterdodge(dodge.width = bar.width, jitter.width = 0.1),
+             inherit.aes = F, aes(x = syntax, y = subj_mean, color = NP, fill = NP),
+             #shape = 21,
+             alpha = 0.5)+
+  geom_linerange(position = position_dodge(bar.width), size = 1.2) +
+  ggthemes::theme_few()+
+  theme(legend.position = c(0.5, 0.12),legend.text = element_text(size = 7),
+        legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line")) +
+  #facet_wrap(~order) +
+  xlab("") + 
+  ylab("Sentence rating") +
+  scale_fill_grey() + 
+  scale_colour_grey()+
+  ggtitle("Experiment 1: Syntax Rating") -> E1.fig
+
+ggsave("figs/amlap_expt-syntax-rating-prereg-bars.pdf", width = 5, height = 3.5)
+```
+
+
+
+##### AMLaP2020 plot
+```{r}
+# to be used with the NP produciton data 
+library(gridExtra)
+grid.arrange(E1.fig, E2.fig, ncol=2)
+
+```
+
+
+
+``` {r contrasts}
+# contrast coding: explicitly numeric, to avoid strange behavior of random effects estimation
+# subject NP -1, predicate NP 1
+# basic-level NP -1, subordinate NP 1
+d_rate_main_full <- d_rate_main_full %>% mutate(syntax = ifelse(syntax =="subject", -1, 1 ),
+                                                NP = ifelse( NP == "basic", -1, 1   ),
+                                                # predicate | subject is -1 , subject|predictae is 1
+                                                order = ifelse(sentence_order == "0|1", -1 , 1),
+                                                target_size_contr = ifelse(target_size == "big", 1, -1)
+                                                  ) 
+```
+
+``` {r exploratory lm}
+# exploratory analysis with presentation order main effect
+lm.fit.w.order <- lmer(response ~ syntax*NP + order + 
+                         (1 + syntax*NP | submission_id) + 
+                         (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                REML = F)
+summary(lm.fit.w.order)
+```
+
+``` {r plot full}
+bar.width = 0.8
+d_rate_main_full %>%
+  mutate(order = ifelse(order == "sub_pred", "Subject-Predicate", "Predicate-Subject")) %>%
+  group_by(NP, syntax, order) %>% 
+  tidyboot_mean(column = response1) %>% 
+  ggplot(aes(x = NP, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), 
+           width = bar.width, alpha = 0.3, color = 'black') +
+  geom_point(data = d_rate_main_full, 
+             position = position_jitterdodge(),
+             inherit.aes = F, aes(x = NP, y = response1, color = syntax),
+             alpha = 0.25)+
+  geom_linerange(position = position_dodge(bar.width)) +
+  #facet_wrap(~order) +
+  xlab("NP condition") + 
+  ylab(" sentence rating") +
+  ggtitle("Mean ratings by syntactic and NP condition in full data set")
+```
+
+``` {r lmer full}
+# model on the full data set
+lm.fit.full <- lmer(response ~ syntax*NP + 
+                         (1 + syntax*NP | submission_id) + 
+                         (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                REML = F
+                )
+summary(lm.fit.full)
+```
+
+
+``` {r bootstrap}
+#random-effects parameter estimates: these are parameterized as the relative Cholesky factors of each random effect term
+myFun <- function(.) {c(beta =getME(., "theta"))}
+myFun_fixed <- function(.) {c(beta = getME(., "beta"))} 
+# bootstrap 
+boo1 <- bootMer(lm.fit.full, myFun, nsim = 10)
+head(as.data.frame(boo1))
+boo2 <- bootMer(lm.fit.full, myFun_fixed, 10)
+head(as.data.frame(boo2))
+# index is the position of the effect of interest in boo1$t0
+bCI.subj.Intercept <- boot::boot.ci(boo1, index=1,  type="norm")
+bCI.subj.Intercept
+bCI.item.Intercept <- boot::boot.ci(boo1, index=11,  type="norm")
+bCI.item.Intercept
+
+#lm.rating.boot <- modelr::bootstrap(lm.fit.full, 10)
+```
+
+``` {r brm}
+# Bayesian model 
+b.lm.fit <- brm(response ~ syntax*NP + 
+                  (1 + syntax*NP | submission_id) + 
+                  (1 + syntax*NP  | item),
+                data = d_rate_main_full,
+                family = "gaussian")
+summary(b.lm.fit)
+```
+
+``` {r brm csv}
+b.lm.fit.summary <- summary(b.lm.fit)
+write_csv(data.frame(b.lm.fit.summary[["fixed"]]) %>% 
+            mutate(Rowname = row.names(.)), 
+          path = "R_results_TeX/expt1_brm.csv")
+write_csv(data.frame(b.lm.fit.summary[["random"]]) %>% 
+            mutate(Rowname = row.names(.)), 
+          path = "R_results_TeX/expt1_random_brm.csv")
+
+myTable = cbind(tibble(Rowname = row.names(summary(b.lm.fit)[["fixed"]])), 
+                summary(b.lm.fit)[["fixed"]] %>% as_tibble())
+write_csv(myTable, path = "R_results_TeX/syntax-rating-brm.csv", col_names = T)
+```
+
+``` {r}
+# with size effect
+lm.fit.w.size <- lmer(response ~ syntax*NP*target_size_contr + 
+                         (1 + syntax*NP*target_size_contr || submission_id) + 
+                         (1 + syntax*NP  || item),
+                data = d_rate_main_full,
+                REML = F)
+summary(lm.fit.w.size)
+# pairwise contrasts
+d_rate_basic <- d_rate_main_full %>% filter(NP == -1)
+d_rate_sub <- d_rate_main_full %>% filter(NP == 1)
+
+lm.fit.basic <- lmer(response ~ syntax + 
+                         (1 + syntax || submission_id) + 
+                         (1 + syntax  || item),
+                data = d_rate_basic,
+                REML = F
+                )
+lm.fit.basic <- summary(lm.fit.basic)
+write_csv(data.frame(lm.fit.basic[["coefficients"]]) %>% 
+            mutate(Rowname = row.names(.)), 
+          path = "R_results_TeX/expt2_basicNP_lmer.csv")
+lm.fit.sub <- lmer(response ~ syntax + 
+                         (1 + syntax || submission_id) + 
+                         (1 + syntax  || item),
+                data = d_rate_sub,
+                REML = F
+                )
+summary(lm.fit.sub)
+```
+
+``` {r}
+# by - item
+d_rate_big <- d_rate_main_full %>% filter(target_size == "big")
+d_rate_small <- d_rate_main_full %>% filter(target_size == "small")
+lm.fit.big <- lmer(response ~ syntax*NP + item + 
+                         (1 + syntax*NP  || submission_id),  
+                        # (1 + syntax*NP || item),
+                data = d_rate_big,
+                REML = F
+                )
+summary(lm.fit.big)
+
+
+```
+
+``` {r plot by-item}
+bar.width = 0.8
+d_rate_main_full %>%
+  group_by(NP, syntax, item) %>% 
+  tidyboot_mean(column = response) -> d_rate_main_full.by.item
+
+d_rate_main_full.by.item %>%
+  ungroup() %>%
+  mutate(syntax = factor(ifelse(syntax == -1, "Subject", "Predicate")),
+         NP = factor(ifelse(NP == -1 , "basic", "subordinate"))) %>%
+  ggplot(., aes(x = syntax, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), 
+           width = bar.width, alpha = 0.3, color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(bar.width), size = 1.2) +
+  ggthemes::theme_few()+
+  facet_wrap(~item) +
+  xlab("") + 
+  ylab("Sentence rating") +
+  #ggtitle("Experiment 1: Syntax Rating")
+ ggsave("figs/expt-syntax-rating-by-item.pdf", width = 6, height = 3.5)
+#
+```
+``` {r}
+# by-size plot 
+d_rate_main_full %>%
+  group_by(syntax, NP, target_size) %>%
+  tidyboot_mean(column = response) %>%
+  ungroup() %>%
+  mutate(syntax = factor(ifelse(syntax == -1, "Subject", "Predicate")),
+         NP = factor(ifelse(NP == -1 , "basic", "subordinate"))) %>%
+  ggplot(., aes(x = syntax, y = mean, fill = NP, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), 
+           width = bar.width, alpha = 0.3, color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(bar.width), size = 1.2) +
+  ggthemes::theme_few()+
+  facet_wrap(~target_size) +
+  xlab("") + 
+  ylab("Sentence rating") +
+  #ggtitle("Experiment 1: Syntax Rating")
+ ggsave("figs/expt-syntax-rating-by-size.pdf", width = 6, height = 3.5)
+```

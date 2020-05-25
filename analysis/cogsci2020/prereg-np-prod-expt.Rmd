@@ -1,0 +1,326 @@
+# NP production experiment analysis
+
+``` {r libs}
+# libraries
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+```
+
+``` {r data, warnings = FALSE}
+# read the data
+d_prod <- rbind( read_csv('./data/results_28_prereg-NP-prod-subj.csv') ,
+                 read_csv('./data/results_29_prereg-NP-prod-pred.csv')%>%
+                   select(-`X40`))
+
+
+```
+
+``` {r warmups}
+# exclude participants who report difficulties
+d_prod %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+d_prod_woGlitch <- subset(d_prod, !(submission_id %in% c(1214)))
+
+# exclude data from non-native English speakers and those where the language information is missing
+
+d_prod_woGlitch %>% distinct(languages)
+d_prod_Native <- d_prod_woGlitch #%>%
+
+#d_prod %>% distinct(languages)
+d_prod_filt <- d_prod_Native %>%
+  filter(grepl("eng", languages, ignore.case = T)) %>% # excluded 14 participants
+  select(submission_id, trial_name, trial_number, attempts, size, item, botresponse, response,
+         condition,  picture, target) %>%
+  mutate(size = factor(size), syntax = factor(condition))
+
+# get participants who need more than 4 attempts per warmup
+
+d_prod_warmup <- d_prod_filt %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2"))
+d_prod_warmup1 <- d_prod_warmup %>% group_by(submission_id) %>%
+  filter( attempts > 4)
+# exclude those participants
+
+
+### NOT SURE WHICH TO KEEP DURING MERGE!!
+
+#d_prod_filt <- anti_join(d_prod_Native, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
+d_prod_filt <- anti_join(d_prod_filt, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
+# d_prod_filt <- anti_join(d_prod_Native, d_prod_warmup1, by = c("submission_id")) # excluded 35 participants
+```
+
+
+``` {r}
+# 1 participants too many in prenominal condition, excluding last  :  1300
+d_prod_cleanData <- d_prod_filt %>% filter(!(submission_id %in% c(1300)))
+```
+
+``` {r csv vars}
+# write a csv with subject exclusion stats for TeX
+myvars = list()
+
+myvars["nSubj"] = (d_prod %>% distinct(submission_id) %>% count() %>% .$n) - 1  # one extra participant was collected, excluded below
+myvars["nExcludedTotal"] = ((d_prod %>% distinct(submission_id) %>% count() %>% .$n) - 1) -
+  (d_prod_cleanData %>% distinct(submission_id) %>% count() %>% .$n)
+myvars["nBugs"] = 1 # 1subject excluded due to glitches
+myvars["nNonEN"] = (d_prod_woGlitch %>% distinct(submission_id) %>% count() %>% .$n) -
+  (d_prod_Native %>% distinct(submission_id) %>% count() %>% .$n)
+myvars["nFailedWarmUp"] = d_prod_warmup1 %>% distinct(submission_id) %>% count() %>% .$n %>% sum()
+#myvars["nFailedMains"] = d_catch_main_counts %>% distinct(submission_id) %>% count() %>% .$n
+
+myvars = as_tibble(myvars)
+write_csv(myvars, path = "R_results_TeX/myvars-np.csv", col_names = T)
+```
+
+
+```{r filtering}
+
+# main trials
+# main trials
+d_prod_main <- d_prod_filt %>% filter((trial_name == "main1") | (trial_name == "main2")) %>%
+  select(submission_id, trial_number, trial_name, response, size, item, syntax, picture, target)
+
+# look at the responses
+d_prod_main %>% distinct(response) %>% View()
+# exlclude invalid responses
+d_prod_main_valid <- subset(d_prod_main, !(tolower(response) %in% c("last", "oak", "finch", "duck", "lavender", "salmon", "goldfinch", "dahlia", "poetry", "one", "lablador", "geony" )))
+
+# categprize responses
+d_prod_main_responseCat <- d_prod_main_valid %>%
+  rowwise() %>%
+  mutate(
+    response_cat =
+      ifelse(
+        # to be extended depending on participants' responses
+        tolower(response) %in% c("bird", "birds", "dog", "dogs", "dig", "dogt", "great dog", "fish","fishes",
+                                 "flower", "flowers", "tree", "trees", "animal", "plant", "plants", "weed", "weeds"),
+        "basic", "sub"),
+    resp_cat = ifelse(response_cat == "basic", 1, 0),
+    response_label = "basic"
+  )
+```
+
+```{r}
+# predicative : 95
+# prenominal 94
+```
+
+```{r plot}
+# plot
+d_prod_main_responseCat %>%
+  group_by(syntax, response_label) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
+
+ungroup() %>%
+  mutate(syntax = factor(syntax,
+                         levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
+                         labels= c( "Subject NP\n(That __ is big.)", "Predicate NP\n(That's a big __.)"))
+  ) -> d_prod_main_responseCat.bs
+
+ggplot(d_prod_main_responseCat.bs, aes(x = syntax,
+             y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8),  color = 'black', size = 1,
+           fill= 'white') +
+  geom_linerange(position = position_dodge(0.8), size=1.2) +
+  labs( y = "Proportion of basic-level responses", x = "") +
+  ggthemes::theme_few()+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+ # ggsave("figs/expt2-np-production.pdf", width = 5.5, height = 3.5)
+  ggtitle("Experiment 2: NP Production") -> E2.fig
+
+ggsave("figs/amlap_expt-np-prod-prereg-bars.pdf", width = 3.5, height = 3.5)
+```
+
+## Post-cogsci analyses 
+``` {r}
+d_prod_main_responseCat %>%
+  group_by(submission_id) %>%
+  summarize(prop_basic = mean(resp_cat)) %>%
+  ungroup() %>%
+  group_by(prop_basic) %>%
+  count()
+```
+``` {r}
+d_prod_main_responseCat %>%
+  group_by(syntax, target) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
+  ungroup() %>%
+  mutate(syntax = factor(syntax,
+                         levels = c("predicative", "prenominal"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
+                         labels= c( "Subject NP\n(That __ is big.)", "Predicate NP\n(That's a big __.)"))
+  ) -> d_prod_main_responseCat.item
+
+ggplot(d_prod_main_responseCat.item, aes(x = syntax,
+             y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8),  color = 'black', size = 1,
+           fill= 'grey89') +
+  geom_linerange(position = position_dodge(0.8), size=1.2) +
+  labs( y = "Proportion of basic-level responses", x = "") +
+  ggthemes::theme_few()+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  facet_wrap(~target)
+             
+ggsave("./data/expt2_byItem.pdf", height = 6, width = 6)
+
+```
+
+``` {r contrasts}
+# contrast coding of syntax
+# subject NP -0.5. predicate NP 0.5, explicit numeric coding to avoid unpredicted bahaviour due to factors
+d_prod_main_responseCat <- d_prod_main_responseCat %>%
+  mutate(syntax_contr = ifelse( syntax == "prenominal", 0.5, -0.5),
+         size_contr = ifelse(size == "big", -0.5, 0.5)) # target size contrast coding
+
+```
+
+``` {r lmer}
+# frequentist analysis
+lm.prod.fit <- glmer(resp_cat ~  syntax_contr + (1 | submission_id) +
+                      (1  + syntax_contr | target),
+                    data = d_prod_main_responseCat,
+                    family = "binomial",
+                    REML = F,
+                    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                    )
+summary(lm.prod.fit)
+```
+
+``` {r lmer w size}
+# exploratory analysis with the main effect of target size
+lm.prod.w.size <- glmer(resp_cat ~ syntax_contr*size + (1 + size | submission_id) +
+                      (1 + syntax_contr*size | target),
+                    data = d_prod_main_responseCat,
+                    family = "binomial",
+                    REML = F,
+                    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                    )
+summary(lm.prod.w.size)
+lm.prod.b.w.size <- brm(resp_cat ~ syntax_contr*size_contr + (1 + size_contr | submission_id) +
+                      (1 + syntax_contr*size_contr | target),
+                    data = d_prod_main_responseCat,
+                    family = "binomial",
+                    control=list(adapt_delta=0.95)
+                    )
+summary(lm.prod.b.w.size)
+```
+
+
+``` {r brm}
+# Bayesian model
+
+# full model
+b.prod.lm <- brm( resp_cat ~  syntax_contr + (1 | submission_id) +
+                      (1 + syntax_contr | target),
+                    data = d_prod_main_responseCat,
+                    family = "bernoulli",
+                    control=list(adapt_delta=0.95))
+summary(b.prod.lm)
+```
+
+``` {r brm csv}
+b.prod.lm.summary <- summary(b.prod.lm)
+write_csv(data.frame(b.prod.lm.summary[["fixed"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt2_brm.csv")
+write_csv(data.frame(b.prod.lm.summary[["random"]]["target"]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "R_results_TeX/expt2_random_brm2.csv")
+```
+
+``` {r}
+# by-item analysis
+# by-size plot
+d_prod_main_responseCat %>%
+  group_by(syntax, response_label, size) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
+  ungroup() %>%
+  mutate(syntax = factor(syntax,
+                         levels = c("prenominal", "predicative"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
+                         labels= c("Predicate NP\n(That's a big NP.)", "Subject NP\n(That NP is big.)"))
+  ) %>%
+  ggplot(aes(x = syntax, fill = syntax,
+             y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8), color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(0.8), size=1.2) +
+  facet_wrap(~size) +
+  labs( y = "Proportion of basic-level responses") +
+  ggthemes::theme_few()+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  ggsave("figs/expt-np-production-by-size.pdf", width = 6, height = 3.5)
+
+# by-item plot
+d_prod_main_responseCat %>%
+  group_by(syntax, response_label, target) %>%
+  tidyboot_mean(column = resp_cat) %>% # calculate proportion of basic-level labels in the different conditions
+  ungroup() %>%
+  mutate(syntax = factor(syntax,
+                         levels = c("prenominal", "predicative"), # prenominal adjective = Predi cate NP; predicative adjective = Subject NP
+                         labels= c("Predicate", "Subject"))
+  ) %>%
+  ggplot(aes(x = syntax, fill = syntax,
+             y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(0.8), color = 'black', size = 1) +
+  geom_linerange(position = position_dodge(0.8), size=1.2) +
+  facet_wrap(~target) +
+  labs( y = "Proportion of basic-level responses") +
+  ggthemes::theme_few()+
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  ggsave("figs/expt-np-production-by-item.pdf", width = 6, height = 3.5)
+
+```
+
+``` {r}
+# separate by size
+d_prod_big <- d_prod_main_responseCat %>% filter(size == "big")
+d_prod_small <- d_prod_main_responseCat %>% filter(size == "small")
+lm.prod.big <- glmer(resp_cat ~  syntax_contr + (1 | submission_id) +
+                      (1  + syntax_contr | target),
+                    data = d_prod_big,
+                    family = "binomial",
+                    REML = F,
+                    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                    )
+summary(lm.prod.big)
+lm.prod.small <- glmer(resp_cat ~  syntax_contr + (1 | submission_id) +
+                      (1  + syntax_contr | target),
+                    data = d_prod_small,
+                    family = "binomial",
+                    REML = F,
+                    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                    )
+summary(lm.prod.small)
+d_prod_subject <- d_prod_main_responseCat %>% filter(syntax == "predicative")
+d_prod_pred <- d_prod_main_responseCat %>% filter(syntax == "prenominal")
+lm.prod.subj <- glmer(resp_cat ~  size_contr + (1 + size_contr | submission_id) +
+                      (1  + size_contr | target),
+                    data = d_prod_subject,
+                    family = "binomial",
+                    REML = F,
+                    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                    )
+lm.prod.pred <- glmer(resp_cat ~  size_contr + (1 + size_contr | submission_id) +
+                      (1  + size_contr | target),
+                    data = d_prod_pred,
+                    family = "binomial",
+                    REML = F,
+                    control=glmerControl(optimizer="bobyqa",
+                            optCtrl=list(maxfun=2e5))
+                    )
+lm.b.prod.pred <- brm(resp_cat ~  size_contr + (1 + size_contr | submission_id) +
+                      (1  + size_contr | target),
+                    data = d_prod_pred,
+                    family = "bernoulli",
+                    control=list(adapt_delta=0.95))
+summary(lm.prod.subj)
+lm.b.prod.pred.summary <- summary(lm.b.prod.pred)
+summary(lm.prod.pred)
+write_csv(data.frame(lm.b.prod.pred.summary[["fixed"]]) %>%
+             mutate(Rowname = row.names(.)),
+           path = "R_results_TeX/expt2_predicate_brm.csv")
+```

@@ -1,0 +1,135 @@
+submission_id,trial_number,target,item,response,syntax,adj,response_cat,response_num,response_label,pilot_nr,syntax_dev
+2062,1,sunflower,flowers,other flowers,predicate,big,basic,1,basic,1,-1
+2062,2,chihuahua,dogs1,other dogs,subject,small,basic,1,basic,1,1
+2062,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2062,1,hummingbird,birds,birds,subject,small,basic,1,basic,1,1
+2062,2,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2061,1,eagle,birds,eagle,predicate,big,subordinate,0,basic,1,-1
+2061,2,doberman,dogs1,dog,subject,big,basic,1,basic,1,1
+2059,1,eagle,birds,eagles,predicate,big,subordinate,0,basic,1,-1
+2059,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2059,3,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2059,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,-1
+2059,2,dandelion,flowers,dandelion,subject,small,subordinate,0,basic,1,1
+2058,1,redwood,trees,trees,subject,big,basic,1,basic,1,1
+2058,2,great dane,dogs2,dogs,subject,big,basic,1,basic,1,1
+2058,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2058,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,-1
+2058,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2057,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,1
+2057,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2057,3,sunflower,flowers,sunflowers,predicate,big,subordinate,0,basic,1,-1
+2057,1,redwood,trees,redwoods,predicate,big,subordinate,0,basic,1,-1
+2057,2,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2056,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2056,2,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2056,3,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2056,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,1
+2056,2,pug,dogs2,dogs,predicate,small,basic,1,basic,1,-1
+2055,1,great dane,dogs2,dogs,subject,big,basic,1,basic,1,1
+2055,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,-1
+2055,3,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2055,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2055,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,1
+2054,2,pug,dogs2,pug,subject,small,subordinate,0,basic,1,1
+2054,2,dandelion,flowers,plant,subject,small,basic,1,basic,1,1
+2053,1,doberman,dogs1,dogs,subject,big,basic,1,basic,1,1
+2053,2,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2053,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,-1
+2053,1,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2053,2,dandelion,flowers,flowers,subject,small,basic,1,basic,1,1
+2052,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2052,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,1,-1
+2052,3,great dane,dogs2,dogs,subject,big,basic,1,basic,1,1
+2052,1,eagle,birds,birds,predicate,big,basic,1,basic,1,-1
+2052,2,doberman,dogs1,dogs,subject,big,basic,1,basic,1,1
+2050,3,sunflower,flowers,sunflower,predicate,big,subordinate,0,basic,1,-1
+2050,1,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2050,2,chihuahua,dogs1,dog,subject,small,basic,1,basic,1,1
+2049,1,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2049,2,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,-1
+2049,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2049,1,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2049,2,dandelion,flowers,flowers,subject,small,basic,1,basic,1,1
+2046,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,-1
+2046,2,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2046,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2046,1,hummingbird,birds,birds,subject,small,basic,1,basic,1,1
+2046,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2045,1,eagle,birds,eagles,predicate,big,subordinate,0,basic,1,-1
+2045,2,doberman,dogs1,dogs,subject,big,basic,1,basic,1,1
+2045,3,bonsai,trees,trees,subject,small,basic,1,basic,1,1
+2045,1,dandelion,flowers,flowers,subject,small,basic,1,basic,1,1
+2045,2,pug,dogs2,dogs,predicate,small,basic,1,basic,1,-1
+2044,1,chihuahua,dogs1,DOG,predicate,small,basic,1,basic,1,-1
+2044,2,dandelion,flowers,FLOWER,subject,small,basic,1,basic,1,1
+2043,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,-1
+2043,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,-1
+2043,3,hummingbird,birds,birds,subject,small,basic,1,basic,1,1
+2043,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,-1
+2043,2,bonsai,trees,trees,subject,small,basic,1,basic,1,1
+2042,1,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2042,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,1
+2042,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,-1
+2042,1,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2042,2,dandelion,flowers,plants,subject,small,basic,1,basic,1,1
+2041,1,great dane,dogs2,dogs,subject,big,basic,1,basic,1,1
+2041,2,doberman,dogs1,animals,subject,big,basic,1,basic,1,1
+2041,3,bonsai,trees,trees,subject,small,basic,1,basic,1,1
+2041,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,1,-1
+2041,2,eagle,birds,birds,predicate,big,basic,1,basic,1,-1
+2040,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,-1
+2040,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2040,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2040,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2040,2,great dane,dogs2,dogs,subject,big,basic,1,basic,1,1
+2039,1,redwood,trees,trees,subject,big,basic,1,basic,1,1
+2039,2,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,-1
+2039,3,dandelion,flowers,flowers,subject,small,basic,1,basic,1,1
+2039,1,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2039,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2037,1,bonsai,trees,trees,subject,small,basic,1,basic,1,1
+2037,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2037,3,eagle,birds,eagles,predicate,big,subordinate,0,basic,1,-1
+2037,1,doberman,dogs1,dobermans,predicate,big,subordinate,0,basic,1,-1
+2037,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,-1
+2036,1,dandelion,flowers,flowers,subject,small,basic,1,basic,1,1
+2036,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2036,3,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,-1
+2036,1,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2036,2,great dane,dogs2,animals,subject,big,basic,1,basic,1,1
+2035,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2035,2,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2035,3,dandelion,flowers,flowers,subject,small,basic,1,basic,1,1
+2035,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,-1
+2035,2,pug,dogs2,dogs,predicate,small,basic,1,basic,1,-1
+2034,1,sunflower,flowers,flowers in the garden,subject,big,basic,1,basic,1,1
+2034,2,redwood,trees,all the other trees,predicate,big,basic,1,basic,1,-1
+2034,3,hummingbird,birds,the other birds in the animal shelter,subject,small,basic,1,basic,1,1
+2034,1,chihuahua,dogs1,all the other dogs at the dog park,predicate,small,basic,1,basic,1,-1
+2034,2,great dane,dogs2,dogs at the dog show,subject,big,basic,1,basic,1,1
+2033,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2033,2,great dane,dogs2,dogs,subject,big,basic,1,basic,1,1
+2033,3,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,1
+2033,1,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2033,2,eagle,birds,birds,predicate,big,basic,1,basic,1,-1
+2032,1,hummingbird,birds,hummingbirds,predicate,small,subordinate,0,basic,1,-1
+2032,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2032,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2032,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,-1
+2032,2,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2030,1,redwood,trees,trees,predicate,big,basic,1,basic,1,-1
+2030,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,-1
+2030,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,1
+2030,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,1
+2030,2,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2029,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,-1
+2029,2,sunflower,flowers,flowers,subject,big,basic,1,basic,1,1
+2029,3,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,-1
+2029,1,hummingbird,birds,birds,subject,small,basic,1,basic,1,1
+2029,2,bonsai,trees,trees,predicate,small,basic,1,basic,1,-1
+2028,1,eagle,birds,birds,subject,big,basic,1,basic,1,1
+2028,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,-1
+2028,3,bonsai,trees,trees,subject,small,basic,1,basic,1,1
+2028,1,pug,dogs2,dogs,predicate,small,basic,1,basic,1,-1
+2028,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,-1

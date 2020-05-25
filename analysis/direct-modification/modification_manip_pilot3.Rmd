@@ -1,0 +1,230 @@
+---
+title: "Modification Manipulation Pilot 3"
+author: "Polina Tsvilodub"
+date: "07 04 2020"
+output: github_document
+---
+We ran a third pilot (n=36) for the NP modification manipulation experiment. In order to make the subordinate comparison class even more salient than in the previous pilots, we create context pictures with three subordinate representatives of the same category as the referent. Due to this manipulation the referential utility of the subordinate NP decreases which we expect to lead to more subordinate comparison class inferences, driven by both the manipulated context and the NP. We still expect an effect of syntax - more subordinate comparison classes should be inferred from predicate than from subject NPs.
+The referent is perceptually slightly bigger (smaller) than the other subordinate members. One of the context-members is presented as the instance to be labeled in the labeling warm-up trials - hence we make sure that participants recognize them as members of the same subordinate category as the target. The target is always described with the subordinate label and hence its subordinate category is clear.  
+
+Participants inferred the comparison class (via free paraphrase) from the sentences 'That {big, small} NP is a prize-winner' or 'That prize-winner is a {small, big} NP' (within-subject). We created nouns like 'prize-winner' for five context items (trees, 2 x dogs, flowers, birds).
+
+``` {r libraries, echo=F, warnings=F}
+
+library(tidyverse)
+library(tidyboot)
+library(brms)
+library(lmerTest)
+```
+
+``` {r, warnings=F, echo=F}
+#d_infer <- read_csv('../data/results_32_modification-manipulation-pilot3.csv')
+#d_infer1 <- d_infer %>% subset( select = -c(worker_id, hit_id, assignment_id, startDate))
+#write_csv(d_infer1, '../data/results_32_modification_manipulation_pilot3.csv')
+
+d_infer1 <- read_csv('../data/results_32_modification_manipulation_pilot3.csv')
+```
+4 participants were excluded for failing the labeling warm-up task.
+
+``` {r filter}
+# exclude participants who report difficulties
+d_infer1 %>% select(submission_id, comments, problems) %>% distinct() %>% View()
+
+d_infer_woGlitches <- d_infer1 # %>% subset( !(submission_id %in% c()))
+
+# exclude data from non-native English speakers and those where the language information is missing
+d_infer_woGlitches %>% distinct(languages) %>% View()
+d_infer_Native <- d_infer_woGlitches %>%
+  filter(grepl("en", languages, ignore.case = T)) %>%
+  select(submission_id, trial_name, trial_number, adj, item, target, response, botresponse,
+         syntax, attempts, reference)
+
+# participants who do not get the comparison class warmup right
+d_infer_cc_warmup <- d_infer_Native %>% filter( trial_name == "comp_class_warmup") %>%
+  group_by(submission_id) %>% count() %>%
+  filter( n > 4 )
+
+# exclude participants who need more than 4 attempts per warmup
+d_infer_warmup <- d_infer_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(submission_id) %>%
+  filter(attempts > 4)
+
+# excluding 6 participants
+d_infer_filt1 <- anti_join(d_infer_Native, d_infer_warmup, by = c("submission_id"))
+d_infer_filt1 <- anti_join(d_infer_filt1, d_infer_cc_warmup, by = c("submission_id"))
+
+```
+
+Participants need more labeling warm-up trials for the tree and dog items (they correct their responses about 2 times), for both items it is mostly for the big targets. 
+``` {r}
+# labeling warm-up trial analysis
+
+d_infer1 %>%
+  filter((trial_name == "warmup1") | (trial_name == "warmup2")) -> d_infer_label_warmup
+         
+d_infer_label_warmup %>% group_by(submission_id, item, response1, response2) %>% count() %>%
+  gather(key="responseNr", value="response", response1, response2) -> warmup.resps.counts.long
+warmup.resps.counts.long %>% group_by(submission_id, item) %>% count(response) -> warmup.resps.counts.long.subs
+warmup.resps.counts.long.subs %>% group_by(submission_id, item) %>%  count(item) %>% mutate(nr_super = n) %>% select(-n) -> warmup.resps.counts.long.supers
+warmup.resps.counts.long.final <- warmup.resps.counts.long.subs %>%
+  left_join(., warmup.resps.counts.long.supers)
+
+warmup.resps.counts.long.final %>% group_by(item) %>% tidyboot_mean(column=nr_super) %>% select(-ci_lower, -ci_upper, - mean)
+```
+
+The numbers of size-syntax and item-syntax combinations are relatively balanced.
+``` {r}
+d_infer_filt1 %>% count(syntax, adj)
+```
+
+There are no invalid responses.
+Superordinate responses are collapsed with basic-level responses. 
+
+``` {r categorization}
+d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
+                                          (trial_name == "custom_main_text2")) %>%
+
+  mutate(syntax = factor(syntax)
+         ) %>%
+  select(submission_id, trial_number, target, item, response, syntax,
+        adj)
+
+# categorize responses
+d_infer_main %>% distinct(response) %>% View()
+# exclude invalid responses
+d_infer_valid <- d_infer_main #%>% subset(., !(tolower(response) %in% c( "gifts", "landmarks", "service animals"))) # 3 responses excluded
+d_infer_main_responseCat <- d_infer_valid %>%
+  rowwise() %>%
+  mutate(  
+    response_cat =
+      ifelse( # do be extended dependent on responses provided
+        tolower(response) %in% c("birds", "bird","dog", "dogs", "fish","flower", "flowers","trees", "tree", "animals", "plants" 
+                               ), "basic", "subordinate"),
+
+    response_num = ifelse(response_cat == "basic", 1, 0),
+    response_label = "basic",
+    pilot_nr = 3
+  )
+```
+
+``` {r}
+d_infer_main_responseCat %>% count( item, syntax)
+#d_infer_main_responseCat %>% count(item)
+```
+
+``` {r}
+d_infer_main_responseCat %>% count(item, adj, syntax)
+```
+
+
+## Subject vs. predicate NP position plot
+
+The proportion of inferred basic-level comparison classes is plotted by-syntax (subject vs. predicate) (n=32 participants). A very weak effect of syntax is visible.
+``` {r proportions plot}
+# plot
+bar.width = 0.8
+d_infer_main_responseCat %>%  
+  group_by(syntax) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs
+
+
+d_infer_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP is a prize-winner)", "Predicate NP\n(That prize-winner is a big NP)"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses")
+ 
+```
+
+## By-item plot
+
+We achieve more flexibility of the single items compared to the previous pilots. However, some items still elicit more subordinate comparison classes in the subject then in the predicate position.  
+``` {r}
+d_infer_main_responseCat %>%  
+  group_by(syntax, item, adj) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.item
+
+
+d_infer_main_responseCat.bs.item %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject NP\n(That big NP\n is a prize-winner)", 
+                                         "Predicate NP\n(That prize-winner\n is a big NP)")),
+         size = factor(adj, level = c("big", "small"), labels = c("big", "small"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-item inferred Comparison Classes")+
+  facet_grid(item~size)
+
+```
+
+## By-subject plot
+In this pilot more subjects provide subordinate responses compared to previous pilots. However, the effect of syntax is not very salient, and still many subjects stick to basic-level responses only. 
+``` {r}
+d_infer_main_responseCat %>%  
+  group_by(syntax, submission_id) %>%
+  tidyboot_mean(column = response_num) -> d_infer_main_responseCat.bs.subj
+
+
+d_infer_main_responseCat.bs.subj %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
+                            labels = c(  "Subject\n NP", 
+                                         "Predicate\n NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black',
+           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  ggthemes::theme_few()+
+  xlab("") +
+  theme(legend.position = c(0.88, 0.84),#legend.text = element_text(size = 7),
+        #legend.title = element_text(size = 7), 
+        legend.key.size = unit(0.5,"line"))+
+  scale_y_continuous(breaks = c(0, 0.5, 1))+
+  ylab("Proportion of basic-level responses") +
+  ggtitle("By-item inferred Comparison Classes")+
+  facet_wrap(~submission_id)
+
+```
+
+## Stats
+
+Bayesian stats with maximal random effects:  
+
+``` {r}
+# deviation coding syntax
+d_infer_main_responseCat <- d_infer_main_responseCat %>%
+  rowwise() %>%
+  mutate(syntax_dev = ifelse(syntax=="subject", 1, -1))
+#write_csv(d_infer_main_responseCat, '../data/results_32_modification_manipulation_pilot3_tidy.csv')
+
+d.infer.brm.dev <- brm(response_num ~ syntax_dev + (1 + syntax_dev | submission_id ) + (1 + syntax_dev | target ),
+                   data = d_infer_main_responseCat,
+                   family = "bernoulli",
+                   cores = 4,
+                   control = list(adapt_delta = 0.95))
+
+summary(d.infer.brm.dev)
+```
+
+
