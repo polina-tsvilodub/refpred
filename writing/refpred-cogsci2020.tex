@@ -25,7 +25,7 @@
 
 \usepackage{cogsci}
 
-%\cogscifinalcopy % Uncomment this line for the final submission 
+\cogscifinalcopy % Uncomment this line for the final submission 
 
 
 \usepackage{pslatex}
@@ -120,20 +120,32 @@
 %\title{Informational goals constrain how listeners infer comparison classes}
 \title{Informational goals, sentence structure, and comparison class inference}
 % slightly misleading since we don't mention IS anymore.
-\author{{\large \bf Michael Henry Tessler (tessler@mit.edu)} \\
-  Department of Brain and Cognitive Sciences,  \\
-  Cambridge, MA  USA
-  \AND {\large \bf Sharon J.~Derry (SDJ@Macc.Wisc.Edu)} \\
-  Department of Educational Psychology, 1025 W. Johnson Street \\
-  Madison, WI 53706 USA}
+%\author{{\large \bf Michael Henry Tessler (tessler@mit.edu)} \\
+%  Department of Brain and Cognitive Sciences,  \\
+%  Cambridge, MA  USA
+%  \AND {\large \bf Sharon J.~Derry (SDJ@Macc.Wisc.Edu)} \\
+%  Department of Educational Psychology, 1025 W. Johnson Street \\
+%  Madison, WI 53706 USA}
 
+ \author{Michael Henry Tessler  \\  Brain and Cognitive Sciences \\   MIT  \\  \texttt{tessler@mit.edu}
+         \And  
+         Polina Tsvilodub  \\ Department of ... \\   Osnabrück University  \\  email
+          \And
+         Jesse Snedecker  \\ Department of Psychology \\   Harvard University  \\  email
+                   \And
+         Roger Levy \\ Brain and Cognitive Sciences \\   MIT  \\  rplevy@mit.edu}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-   Most Great Danes are big dogs, but some are also big Great Danes. Understanding a gradable adjective (e.g., \emph{big}) requires making reference to a \textit{comparison class}, a set of objects or entities against which the referent is implicitly compared (e.g., big for a Great Dane), but how do listeners decide upon a comparison class? Simple models of semantic composition stipulate that the adjective combines with a noun, which necessarily becomes the comparison class (e.g., ``That Great Dane is big'' means big for a Great Dane). We investigate an alternative hypothesis: the noun in a sentence is a cue to the comparison class, which must be integrated with other cues, like syntax, for a listener to infer the intended comparison class. We theorize that the utility of a noun in an adjectival utterance can be either for \textit{reference} (getting the listener to attend to the right object) or \textit{predication} (describing a property of the referent). Therefore, we hypothesize that when the presence of a noun can be explained by its utility in reference (e.g., being in the subject position: ``That NP is big''), it is less likely to set the comparison class; in contrast, nouns whose presence is more weakly explained by their utility in reference (e.g., predicate-NPs: ``That’s a big NP'') are more likely to set the comparison class. Across three pre-registered experiments, we find evidence that listeners integrate the noun of a sentence with syntactic information and world knowledge to infer comparison classes, consistent with a trade-off between reference and predication.
+%   Most Great Danes are big dogs, but some are also big Great Danes. Understanding a gradable adjective (e.g., \emph{big}) requires making reference to a \textit{comparison class}, a set of objects or entities against which the referent is implicitly compared (e.g., big for a Great Dane), but how do listeners decide upon a comparison class? Simple models of semantic composition stipulate that the adjective combines with a noun, which necessarily becomes the comparison class (e.g., ``That Great Dane is big'' means big for a Great Dane). We investigate an alternative hypothesis: the noun in a sentence is a cue to the comparison class, which must be integrated with other cues, like syntax, for a listener to infer the intended comparison class. We theorize that the utility of a noun in an adjectival utterance can be either for \textit{reference} (getting the listener to attend to the right object) or \textit{predication} (describing a property of the referent). Therefore, we hypothesize that when the presence of a noun can be explained by its utility in reference (e.g., being in the subject position: ``That NP is big''), it is less likely to set the comparison class; in contrast, nouns whose presence is more weakly explained by their utility in reference (e.g., predicate-NPs: ``That’s a big NP'') are more likely to set the comparison class. Across three pre-registered experiments, we find evidence that listeners integrate the noun of a sentence with syntactic information and world knowledge to infer comparison classes, consistent with a trade-off between reference and predication.
+   
+Understanding a gradable adjective (e.g., \emph{big}) requires making reference to a comparison class, a set of objects or entities against which the referent is implicitly compared (e.g., big for a Great Dane), but how do listeners decide upon a comparison class? Simple models of semantic composition stipulate that the adjective combines with a noun, which necessarily becomes the comparison class (e.g., ``That Great Dane is big'' means big for a Great Dane). We investigate an alternative hypothesis built on the idea that the utility of a noun in an adjectival utterance can be either for reference (getting the listener to attend to the right object) or predication (describing a property of the referent). Therefore, we hypothesize that when the presence of a noun N can be explained away by its utility in reference (e.g., being in the subject position: ``That N is big''), it is less likely to set the comparison class. Across three pre-registered experiments, we find evidence that listeners integrate the noun of a sentence with syntactic information and world knowledge to infer comparison classes, consistent with a trade-off between reference and predication. 
+ 
+   
+   
 \end{abstract}
 
 \begin{quote}
@@ -141,18 +153,14 @@
 \textbf{Keywords:} 
 comparison class; adjectives; information structure; reference; predication
 \end{quote}
-
 %\section{Introduction}
-
-% MH: Maybe we start with the reference-predication trade-off and then move to comparison classes?
-
 The meanings of linguistic expressions can change dramatically depending on the context. 
-But determining what are the relevant aspects of context that a listener should use to understand a message is far from understood.
-Pointing and saying ``That Great Dane is big'' informs the listener than the referent (a Great Dane) has a relatively large size, but what the speaker is using as a basis of comparison---the \emph{comparison class}---goes unsaid: The Great Dane could be \textit{big for a Great Dane},  \textit{big for a dog}, \textit{big for a four-legged creature}, \textit{big for a furry animal}, as well as an infinity of other possibilities. 
-Comparison classes are employed for understanding relative adjectives \cite<e.g., \emph{big};>{Kennedy2007} and many other linguistic expressions that convey relative meanings, including vague quantifiers \cite<e.g., ``She ate \emph{a lot} of hot dogs'';>{scholler2017semantic} and generic language \cite<e.g., ``Dogs are friendly \emph{[relative to other animals]}'';>{tessler2019language}.
+But determining which aspects of context are relevant for understanding a speaker's message is far from understood.
+This issue is brought into focus when trying to understand gradable adjectives like \emph{big}, \emph{tall}, or \emph{beautiful}.
+The utterance ``That Great Dane is big'' informs the listener than the referent (a Great Dane) has a relatively large size, but relative to what the speaker thinks the Great Dane is big goes unsaid: The Great Dane could be \textit{big for a Great Dane},  \textit{big for a dog}, \textit{big for a four-legged creature}, as well as an infinity of other possibilities. 
 How do human listeners determine the comparison class when faced with multiple \textit{a priori} reasonable options? 
 
-Simple models of semantic composition posit that when an adjective combines syntactically with a noun, the noun necessarily stipulates the comparison class  to produce an interpretable adjectival phrase \cite<e.g., big(car) $\rightarrow$ \textit{big for a car},  small(watch) $\rightarrow$ \textit{small for a watch};>{Kamp1975, Cresswell1976}. 
+Simple models of semantic composition posit that when an adjective combines syntactically with a noun, an interpretable adjectival phrase is produced by the noun providing the comparison class \cite<e.g., big(car) $\rightarrow$ \textit{big for a car},  small(watch) $\rightarrow$ \textit{small for a watch};>{Kamp1975, Cresswell1976}. 
 Many arguments have been laid against such a simple mapping between the noun in the sentence and the comparison class \cite<e.g.,>{Bierwisch1989, Kennedy2007}: A \emph{big snowman} said of a snowman that a 4-year-old built probably means something like \textit{big relative to snowmen that 4-year-olds can build}; a \emph{rich Fortune-500 CEO} might not be \textit{rich relative to other Fortune-500 CEOs}. 
 Theoretical work on comparison classes has focused on how comparison classes are integrated into a compositional semantics and what representations might be preferred \cite{Kennedy2007, Solt2009, Bale2011}.
 Yet, little is known about how human listeners decide upon a comparison class in context. 
@@ -160,21 +168,27 @@ Yet, little is known about how human listeners decide upon a comparison class in
 \begin{center}
 \includegraphics[width=0.9\linewidth]{ref-pred-cartoon-w-subscripts2.pdf}
 \end{center}
-\caption{Cartoon of theoretical perspective. The noun (Great Dane) in a sentence can be employed either for the goal of reference (green) or predication (purple), shown in the case when this distinction is made via the syntactic position of the NP (subject (S)~vs.~predicate (P)). When the noun is used for reference (top), a listener is left with uncertainty about what to use as the comparison class (dogs or Great Danes) and integrates their world knowledge and the physical context to make this inference.  When the noun is used for predication, the listener should have less uncertainty about the comparison class: The comparison class is stipulated by the noun.}
+\caption{Cartoon of inferential account for comparison class determination. The noun (Great Dane) in a sentence can be employed either for the goal of reference (green) or predication (purple), shown in the case when this distinction is made via the syntactic position of the N (subject (S)~vs.~predicate (P)). When the noun is used for reference (top), a listener is left with uncertainty about what to use as the comparison class (dogs or Great Danes) and integrates their world knowledge and the physical context to make this inference.  When the noun is used for predication, the listener should have less uncertainty about the comparison class: The comparison class is stipulated by the noun.}
 \label{model-cartoon}
 \end{figure*}
 
-We examine the problem from a functional perspective: what goals are speakers trying to achieve when crafting their utterance, and how might these goals influence listeners’ interpretation?  
-We propose an inferential theory of comparison class determination: Speakers have basic informational goals that guide how they structure their utterance, and listeners infer the most likely comparison class in light of speaker goals.  
-In this paper, we explore the implications of such a theory for comparison classes of adjectives appearing in simple subject-predicate sentences of the form ``$S$ $P$'', where $S$ is a referential subject noun phrase and $P$ is a predicate that is asserted to hold of the subject \cite{Reboul2001}. 
-In order to successfully predicate something, one must establish reference.
-We posit that listeners expect that the referent will generally be clear in context from the subject NP -- independent of the predicate -- and that speakers aim to satisfy this expectation. \footnote{ Of course, it is not universally true that the referent is established by the subject NP (e.g., insofar as one can infer who \emph{he} is in the sentence ``He's making those outrageous tweets again.'', it is because the predicate provides a cue to the referent). We posit this relation between subject NP and reference as an expectation that listeners may hold, perhaps due to information structural reasons.
+We examine the problem from a functional perspective: what goals are speakers trying to achieve when crafting their utterance, and how might these goals influence listeners’ interpretations?  
+In order to communicate a property of a referent, a speaker must achieve two goals: the goal of \emph{reference} and the goal of \emph{predication} \cite{Reboul2001}. 
+In simple, subject-predicate sentence of the form ``$S$ $P$'', where $S$ is a referential subject noun phrase and $P$ is a predicate that is asserted to hold of the subject, we posit that listeners expect that the referent will be made clear by the subject N -- independent of the predicate -- and that speakers aim to satisfy this expectation.\footnote{Of course, it is not universally true that the referent is established by the subject NP (e.g., insofar as one can infer who \emph{he} is in the sentence ``He's making those outrageous tweets again.'', it is because the predicate provides a cue to the referent). We posit this relation between subject NP and reference as an expectation that listeners may hold, perhaps due to information structural reasons.
 }
+%We explore the implications of such a theory of 
+%In this paper, we
+%
+%
+% (e.g., the Great Dane over there by that park bench is big)
+%
+%We propose an inferential theory of comparison class determination: Speakers aim to achieve basic informational goals that guide how they structure their utterance, and listeners infer the most likely comparison class in light of a speaker's goals.  
+%In order to successfully predicate something, one must establish reference.
 %In order to successfully convey a speaker’s intended message, the $S$ $P$ sentence must clearly establish the referent of the subject NP \mht{$\leftarrow$  does this first clause already presuppose our posit that comes after (that the referent of the subject NP will be clear independently of the predicate)? i get a little confused by the phrase ``referent of the subject NP''. i feel like there is a referent, and there is a subject NP, and the subject NP is used to establish the referent in context...};
 %In order to predicate something, you need to predicate of something.
 %Listeners expect this to happen (the rference) in the subject... (this is an inforamtion structure point)
-If this expectation holds when interpreting scalar adjectives, then the influence of a speaker’s choice of noun on the comparison class will depend on whether the noun appears in the subject or the predicate.
-If the noun appears in the predicate (``That’s a big \{Great Dane, dog\}''), then it is natural to explain the speaker’s choice of noun as a cue to the intended comparison class.  
+If this expectation holds when interpreting gradable adjectives, then the influence of a speaker’s choice of noun on the comparison class will depend on whether the noun appears in the subject (for the goal of reference) or the predicate (for the goal of predication; Fig.~\ref{model-cartoon}).
+If the noun appears in the predicate (``That’s a big \{Great Dane, dog\}''), then it is natural to explain the speaker’s choice of noun as non-referential, but rather as a cue to the intended comparison class.  
 In contrast, if the noun appears in the subject (``That \{Great Dane, dog\} is big''), then the speaker’s choice of noun can potentially be \emph{explained away} as intending to help the listener establish reference of the subject, thus serving as a weaker cue to comparison class and allowing other pragmatic reasoning (e.g., world knowledge and prior expectations) to play a larger role in determining the comparison class \cite<e.g., the Great Dane is big for a dog;>{tessler2017warm}.
 
 %We examine the problem from a functional perspective---what goals are speakers trying to achieve when crafting their utterance?---and focus on the role of the noun phrase (NP) in determining the comparison class (Figure \ref{model-cartoon}). %and derive novel predictions about comparison class inferences via the interaction of syntactic cues, world knowledge, and the perceptual context.
@@ -182,8 +196,8 @@ In contrast, if the noun appears in the subject (``That \{Great Dane, dog\} is b
 %When an NP appears in a sentence with a scalar adjective, the goal of predication can be understood as indicating the comparison class by communicating the speaker's perspective on the referent; a speaker using an NP to satisfy the goal of predication (e.g., via the NP appearing in the predicate of the sentence as in ``That's a big Great Dane'') can thus serve as a cue that the NP is the comparison class (i.e., \emph{it's big relative to other Great Danes}). 
 %On the other hand, the presence of an NP in a sentence could also be explained by the goal of reference (e.g., by appearing in the subject of the sentence as in ``That Great Dane is big''), in which case the NP would less strongly constrain the comparison class and other pragmatic reasoning (e.g., with world knowledge) would serve to fill in the comparison class \cite<e.g., the Great Dane is big for a dog;>{tessler2017warm}.
 
-We test this reference -- predication trade-off hypothesis using a syntactic manipulation wherein the NP can appear either in the subject or the predicate of a sentence involving a gradable adjective (e.g., ``That Great Dane is big''~vs.~``That's a big Great Dane''). 
-The critical test of this manipulation is how humans treat these sentences in the context of a referent for whom the adjective is felicitous given one comparison class but not another (e.g., \emph{big} to describe a normal-sized Great Dane, which would be \emph{big for a dog} but not \emph{big for a Great Dane}). 
+We test this reference -- predication trade-off hypothesis using a syntactic manipulation wherein the N can appear either in the subject or the predicate of a sentence involving a gradable adjective (e.g., ``That Great Dane is big''~vs.~``That's a big Great Dane''). 
+The critical test of this manipulation is how speakers and listeners treat these sentences in the context of a referent for whom the adjective is felicitous given one comparison class but not another (e.g., \emph{big} to describe a normal-sized Great Dane, which would be big if the comparison class is \emph{dogs} but not \emph{Great Danes}). 
 We examine human judgments using three distinct dependent measures in pre-registered experiments. 
  %Across these diverse measures, we find consistent evidence for a reference-predication trade-off guiding comparison class inferences when interpreting adjectival sentences.
 % Maybe use this and drop the expt. description part in intro of Experiments?
@@ -393,6 +407,7 @@ Examining the syntax interaction in the context of NP~vs.~\emph{one} contrast, w
 Understanding language requires appreciating the context in which the words are uttered.
 Yet, speakers almost never explicitly articulate what features of context are relevant, but leave it to listeners to pragmatically reconstruct. 
 Inferring comparison classes for relative adjectives (e.g., \emph{big}) is a case study in this larger phenomenon of pragmatic reconstruction of context.
+Comparison classes are employed for understanding gradable adjectives \cite<e.g., \emph{big};>{Kennedy2007} and many other linguistic expressions that convey relative meanings, including vague quantifiers \cite<e.g., ``She ate \emph{a lot} of hot dogs'';>{scholler2017semantic} and generic language \cite<e.g., ``Dogs are friendly \emph{[relative to other animals]}'';>{tessler2019language}.
 %In this paper, we find that listeners use syntactic cues and world knowledge to adjust the comparison class. 
 The basic inference we measure is that listeners are more likely to use the noun phrase in the sentence as the comparison class when the noun appears in the predicate (``That's a big Great Dane'') than in the subject of the sentence (``That Great Dane is big''). We propose an information-structural reason for this inference: When the noun is in the subject of the sentence (especially when it combines with the deictic "That"), its usage can be explained away by its utility in reference, whereas a predicate-noun less strongly conveys reference and hence is more likely to be produced by a speaker aiming to convey the comparison class. Across three diverse dependent measures (Syntax Rating, Noun Production, Comparison Class Inferences), we found convergent evidence for such an effect. 
 
