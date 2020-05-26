@@ -1,8 +1,12 @@
-<<<<<<< HEAD
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 *.DS_Store
 *.Rproj
->>>>>>> master-holder
+writing/refpred-cogsci2020.pdf
+*.aux
+*.bbl
+*.blg
+*.log
+*.synctex.gz
