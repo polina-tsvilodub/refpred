@@ -1,0 +1,91 @@
+Var1,Var2,Freq,Rowname
+, basic_v_mean,Min.   :-0.09496  ,1
+, basic_v_mean,1st Qu.: 0.79202  ,2
+, basic_v_mean,Median : 0.98920  ,3
+, basic_v_mean,Mean   : 0.99302  ,4
+, basic_v_mean,3rd Qu.: 1.19469  ,5
+, basic_v_mean,Max.   : 2.40640  ,6
+,  sub_v_mean,Min.   :-2.4256  ,7
+,  sub_v_mean,1st Qu.:-1.5095  ,8
+,  sub_v_mean,Median :-1.3526  ,9
+,  sub_v_mean,Mean   :-1.3663  ,10
+,  sub_v_mean,3rd Qu.:-1.2077  ,11
+,  sub_v_mean,Max.   :-0.7541  ,12
+,syntax_sub_v_mean,Min.   :-1.1434  ,13
+,syntax_sub_v_mean,1st Qu.:-0.4558  ,14
+,syntax_sub_v_mean,Median :-0.3389  ,15
+,syntax_sub_v_mean,Mean   :-0.3399  ,16
+,syntax_sub_v_mean,3rd Qu.:-0.2208  ,17
+,syntax_sub_v_mean,Max.   : 0.4317  ,18
+,syntax_basic_v_mean,Min.   :-0.5364  ,19
+,syntax_basic_v_mean,1st Qu.: 0.1032  ,20
+,syntax_basic_v_mean,Median : 0.2176  ,21
+,syntax_basic_v_mean,Mean   : 0.2227  ,22
+,syntax_basic_v_mean,3rd Qu.: 0.3408  ,23
+,syntax_basic_v_mean,Max.   : 0.8829  ,24
+,syntax_context_sub_v_mean,Min.   :-0.7258558  ,25
+,syntax_context_sub_v_mean,1st Qu.:-0.1151416  ,26
+,syntax_context_sub_v_mean,Median :-0.0047975  ,27
+,syntax_context_sub_v_mean,Mean   :-0.0008784  ,28
+,syntax_context_sub_v_mean,3rd Qu.: 0.1121309  ,29
+,syntax_context_sub_v_mean,Max.   : 0.8709794  ,30
+,syntax_context_basic_v_mean,Min.   :-0.75197  ,31
+,syntax_context_basic_v_mean,1st Qu.:-0.19783  ,32
+,syntax_context_basic_v_mean,Median :-0.06436  ,33
+,syntax_context_basic_v_mean,Mean   :-0.07230  ,34
+,syntax_context_basic_v_mean,3rd Qu.: 0.05674  ,35
+,syntax_context_basic_v_mean,Max.   : 0.50991  ,36
+,  sub_v_one,Min.   :-4.0240  ,37
+,  sub_v_one,1st Qu.:-2.0338  ,38
+,  sub_v_one,Median :-1.7333  ,39
+,  sub_v_one,Mean   :-1.7396  ,40
+,  sub_v_one,3rd Qu.:-1.4068  ,41
+,  sub_v_one,Max.   :-0.2399  ,42
+, sub_v_basic,Min.   :-4.2403  ,43
+, sub_v_basic,1st Qu.:-2.6357  ,44
+, sub_v_basic,Median :-2.3451  ,45
+, sub_v_basic,Mean   :-2.3593  ,46
+, sub_v_basic,3rd Qu.:-2.0614  ,47
+, sub_v_basic,Max.   :-0.9508  ,48
+, basic_v_one,Min.   :-1.6924  ,49
+, basic_v_one,1st Qu.: 0.2443  ,50
+, basic_v_one,Median : 0.6259  ,51
+, basic_v_one,Mean   : 0.6197  ,52
+, basic_v_one,3rd Qu.: 1.0075  ,53
+, basic_v_one,Max.   : 3.4497  ,54
+,syntax_sub_v_one,Min.   :-1.9494  ,55
+,syntax_sub_v_one,1st Qu.:-0.6883  ,56
+,syntax_sub_v_one,Median :-0.4465  ,57
+,syntax_sub_v_one,Mean   :-0.4570  ,58
+,syntax_sub_v_one,3rd Qu.:-0.2236  ,59
+,syntax_sub_v_one,Max.   : 0.7834  ,60
+,syntax_sub_v_basic,Min.   :-1.8711  ,61
+,syntax_sub_v_basic,1st Qu.:-0.7510  ,62
+,syntax_sub_v_basic,Median :-0.5585  ,63
+,syntax_sub_v_basic,Mean   :-0.5626  ,64
+,syntax_sub_v_basic,3rd Qu.:-0.3713  ,65
+,syntax_sub_v_basic,Max.   : 0.5666  ,66
+,syntax_basic_v_one,Min.   :-1.2446  ,67
+,syntax_basic_v_one,1st Qu.:-0.1441  ,68
+,syntax_basic_v_one,Median : 0.1066  ,69
+,syntax_basic_v_one,Mean   : 0.1056  ,70
+,syntax_basic_v_one,3rd Qu.: 0.3486  ,71
+,syntax_basic_v_one,Max.   : 1.3632  ,72
+,context_syntax_sub_v_one,Min.   :-1.43321  ,73
+,context_syntax_sub_v_one,1st Qu.:-0.31784  ,74
+,context_syntax_sub_v_one,Median :-0.06485  ,75
+,context_syntax_sub_v_one,Mean   :-0.07406  ,76
+,context_syntax_sub_v_one,3rd Qu.: 0.16971  ,77
+,context_syntax_sub_v_one,Max.   : 1.38353  ,78
+,context_syntax_sub_v_basic,Min.   :-0.90271  ,79
+,context_syntax_sub_v_basic,1st Qu.:-0.12110  ,80
+,context_syntax_sub_v_basic,Median : 0.06857  ,81
+,context_syntax_sub_v_basic,Mean   : 0.07142  ,82
+,context_syntax_sub_v_basic,3rd Qu.: 0.25391  ,83
+,context_syntax_sub_v_basic,Max.   : 1.29860  ,84
+,context_syntax_basic_v_one,Min.   :-1.4891  ,85
+,context_syntax_basic_v_one,1st Qu.:-0.3805  ,86
+,context_syntax_basic_v_one,Median :-0.1363  ,87
+,context_syntax_basic_v_one,Mean   :-0.1455  ,88
+,context_syntax_basic_v_one,3rd Qu.: 0.1029  ,89
+,context_syntax_basic_v_one,Max.   : 0.9817  ,90
