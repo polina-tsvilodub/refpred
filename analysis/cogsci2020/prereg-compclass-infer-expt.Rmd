@@ -131,7 +131,7 @@ d_infer_main_responseCat.bs %>%
   facet_grid(~context)  
   ggsave("figs/expt3-cc-inference-revised.pdf", width = 5, height = 3.5)
 ```
-### MH analysis
+### MH post-cogsci analysis
 
 #### Subjects who only give basic-level responses
 ```{r}
@@ -157,7 +157,6 @@ d_infer_main_responseCat %>%
   group_by( context, NP, condition, target_size, item) %>%
   tidyboot_mean(column = response_num) -> d_infer_main_item_bs_basic_subNP
 ```
-
 
 ```{r}
 
@@ -185,6 +184,7 @@ d_infer_main_responseCat %>% filter(context == "basic") %>% count(condition, pic
 
 d_infer_main_responseCat %>% filter((context=='basic') & (NP == 'subordinate')) %>% group_by(submission_id) %>% summarise(mean = mean(response_num)) %>% summarise(mean(mean))
 ```
+
 #### Full by-item plot
 ```{r}
 bar.width = 0.8
@@ -219,11 +219,8 @@ d_infer_main_responseCat.full.byItem %>%
   facet_wrap(context~target, ncol = 6 )  
 ggsave('figs/cogsci-e3-full-byItem.png', height = 5, width = 8)
 ```
-#### By-adjective plot
-```{r}
 
-```
-
+#### Cogsci stats
 
 ``` {r}
 # explicit numeric coding to improve model convergence
@@ -253,7 +250,7 @@ d_infer_main_responseCat2 <- d_infer_main_responseCat %>%
         context_sum = ifelse(context == "basic", -1L, 1L))
 
 d_infer_main_responseCat2 %>%
-  select(condition, syntax_sum, context, context_sum, NP, NP_OneVsub, NP_basicVsub) %>%
+  select(condition, syntax_sum, context, context_sum, NP, NP_subVone, NP_basicVone) %>%
   View()
 # 
 #   mutate(
@@ -374,14 +371,14 @@ summary(lm.infer.fit) # full model
 ``` {r brm model}
 # Bayesian full model
 # significant effect of sub NP and context
-lm.b.infer.fit.by.target <- brm(response_num ~ syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum +
-                        (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum  || submission_id) +
-                        (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum  || pic),
+lm.b.infer.fit.by.target <- brm(response_num ~ syntax_sum * (NP_subVone + NP_basicVone) * context_sum +
+                        (1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum  || submission_id) +
+                        (1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum  || pic),
                       data = d_infer_main_responseCat2,
                       family = "bernoulli",
                       iter = 1000,
-                      cores = 3, chains = 3,
-                      control = list(adapt_delta = 0.9)) # otherwise there are divergent chains
+                      cores = 4, chains = 4,
+                      control = list(adapt_delta = 0.98)) # otherwise there are divergent chains
 
 
 
@@ -391,23 +388,26 @@ antilogit = function(x) 1 / (1 + exp(-x))
 
 
 lm.b.infer3way.by.target.fit.samples <- data.frame(
-  basic_v_mean = coda[,"b_NP_basicVsub"],
-  one_v_mean = coda[,"b_NP_OneVsub"],
-  syntax_one_v_mean = coda[, "b_syntax_sum:NP_OneVsub"],
-  syntax_basic_v_mean = coda[, "b_syntax_sum:NP_basicVsub"],
-  syntax_context_one_v_mean = coda[, "b_syntax_sum:NP_OneVsub:context_sum"],
-  syntax_context_basic_v_mean = coda[, "b_syntax_sum:NP_basicVsub:context_sum"]
+  basic_v_mean = coda[,"b_NP_basicVone"],
+  sub_v_mean = coda[,"b_NP_subVone"],
+  syntax_sub_v_mean = coda[, "b_syntax_sum:NP_subVone"],
+  syntax_basic_v_mean = coda[, "b_syntax_sum:NP_basicVone"],
+  syntax_context_sub_v_mean = coda[, "b_syntax_sum:NP_subVone:context_sum"],
+  syntax_context_basic_v_mean = coda[, "b_syntax_sum:NP_basicVone:context_sum"]
 ) %>%
   mutate(
-    one_v_sub = 2 * one_v_mean + basic_v_mean,
-    one_v_basic = one_v_mean - basic_v_mean,
-    basic_v_sub = 2* basic_v_mean + one_v_mean,
-    syntax_one_v_sub = 2 *syntax_one_v_mean + syntax_basic_v_mean,
-   syntax_one_v_basic = syntax_one_v_mean - syntax_basic_v_mean,
-   syntax_basic_v_sub = 2 * syntax_basic_v_mean + syntax_one_v_mean,
-   context_syntax_one_v_sub = 2 *syntax_context_one_v_mean + syntax_context_basic_v_mean,
-   context_syntax_one_v_basic = syntax_context_one_v_mean - syntax_context_basic_v_mean,
-   context_syntax_basic_v_sub = 2 * syntax_context_basic_v_mean + syntax_context_one_v_mean,
+    sub_v_one = 2 * sub_v_mean + basic_v_mean,
+    sub_v_basic = sub_v_mean - basic_v_mean,
+    basic_v_one = 2* basic_v_mean + sub_v_mean,
+    syntax_sub_v_one = 2 *syntax_sub_v_mean + syntax_basic_v_mean,
+    syntax_sub_v_basic = syntax_sub_v_mean - syntax_basic_v_mean,
+    syntax_basic_v_one = 2 * syntax_basic_v_mean + syntax_sub_v_mean,
+    context_syntax_sub_v_one = 2 *syntax_context_sub_v_mean +
+      syntax_context_basic_v_mean,
+    context_syntax_sub_v_basic = syntax_context_sub_v_mean -
+      syntax_context_basic_v_mean,
+    context_syntax_basic_v_one = 2 * syntax_context_basic_v_mean +
+      syntax_context_sub_v_mean,
      )
 
 
@@ -417,29 +417,40 @@ lm.b.infer3way.by.target.fit.samples %>%
   geom_histogram()+
   facet_wrap(~key)
 
-mean(lm.b.infer3way.by.target.fit.samples$one_v_sub)
-quantile(lm.b.infer3way.by.target.fit.samples$one_v_sub, probs = c(0.025, 0.975))
-mean(lm.b.infer3way.by.target.fit.samples$one_v_basic)
-quantile(lm.b.infer3way.by.target.fit.samples$one_v_basic, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$basic_v_sub, probs = c(0.025, 0.975))
+mean(lm.b.infer3way.by.target.fit.samples$sub_v_one)
+quantile(lm.b.infer3way.by.target.fit.samples$sub_v_one, probs = c(0.025, 0.975))
+mean(lm.b.infer3way.by.target.fit.samples$sub_v_basic)
+quantile(lm.b.infer3way.by.target.fit.samples$sub_v_basic, probs = c(0.025, 0.975))
+mean(lm.b.infer3way.by.target.fit.samples$basic_v_one) 
+quantile(lm.b.infer3way.by.target.fit.samples$basic_v_one, probs = c(0.025, 0.975))
 
 
-quantile(lm.b.infer3way.by.target.fit.samples$syntax_one_v_sub, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$syntax_one_v_basic, probs = c(0.025, 0.975))
+quantile(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, probs = c(0.025, 0.975))
+quantile(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, probs = c(0.025, 0.975))
 
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub)
-quantile(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub, probs = c(0.025, 0.975))
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub < 0)
+mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one)
+mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic)
+quantile(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, probs = c(0.025, 0.975))
+mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one < 0)
+mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
 
-
-quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_one_v_sub, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_one_v_basic, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_sub, probs = c(0.025, 0.975))
+quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, probs = c(0.025, 0.975))
+quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, probs = c(0.025, 0.975))
+quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, probs = c(0.025, 0.975)) -> vec
 ```
+
+``` {r}
+
+write_csv(data.frame(summary(lm.b.infer.fit.by.target)[["fixed"]]) %>%
+            mutate(Rowname = row.names(.)),
+          path = "./../../writing/R_results_TeX/expt3_full_brm_revised.csv")
+```
+
 
 ``` {r brm csv}
 myTable_infer = cbind(tibble(Rowname = row.names(summary(lm.b.infer.fit.by.target)[["fixed"]])),
                 summary(lm.b.infer.fit.by.target)[["fixed"]] %>% as_tibble())
+
 write_csv(myTable_infer, path = "R_results_TeX/cc-infer-brm.csv", col_names = T)
 lm.b.infer.summary <- summary(lm.b.infer.fit.by.target)
 write_csv(data.frame(lm.b.infer.summary[["fixed"]]) %>%
