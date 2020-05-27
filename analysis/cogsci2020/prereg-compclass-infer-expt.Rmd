@@ -399,8 +399,8 @@ mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
 ```
 
 ``` {r}
-write_csv(lm.b.infer3way.full.contrasts 
-          %>% mutate(Rowname = .$Parameter), 
+write_csv(data.frame(lm.b.infer3way.full.contrasts) %>% 
+            mutate(Rowname = Parameter), 
           path = "./../../writing/R_results_TeX/expt3_3way_full_contrasts_revised.csv")
 ```
 
@@ -482,8 +482,8 @@ mean(lm.b.infer.2way.fit.samples$syntax_sub_v_one > 0)
 
 ``` {r}
 write_csv(
-  lm.b.infer2way.full.contrasts 
-          %>% mutate(Rowname = .$Parameter), 
+  data.frame(lm.b.infer2way.full.contrasts) %>% 
+    mutate(Rowname = Parameter), 
           path = "./../../writing/R_results_TeX/expt3_2way_full_contrasts_revised.csv"
 )
 ```
