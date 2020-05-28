@@ -265,7 +265,7 @@ We examine human judgments using three distinct dependent measures in pre-regist
 Our guiding hypothesis is that when speakers compose their utterance, the utility of a noun in reference trades-off with the utility of the noun conveying a feature value of the referent (predication) \footnote{For scalar degrees, a noun conveying a feature value amounts to setting the comparison class of the respective gradable adjective}; utility in reference can then \emph{explain away} the utility of using a noun to set the comparison class. 
 We operationalize utility in reference via the syntactic frame in which the noun phrase appears: if the noun appears in the subject of the sentence (That NOUN is ADJ), it is likely to be used for reference and less likely to set the comparison class. If the noun appears in the predicate of the sentence (That's an ADJ NOUN), it is unlikely to be used for reference and more likely to set the comparison class. 
 
-In all of our experiments, we use the ADJs \emph{big} and \emph{small} because of the simplicity with which the feature value (i.e., size) can be conveyed through visual presentation and because they convey a salient feature about which participants' likely have strong expectations for members of different categories (e.g., Great Danes are generally big dogs; goldfish are generally small fish; etc.). 
+In all of our experiments, we use the ADJs \emph{big} and \emph{small} because of the simplicity with which the feature value (i.e., size) can be conveyed through visual presentation and because they convey a salient feature about which participants likely have strong expectations for members of different categories (e.g., Great Danes are generally big dogs; goldfish are generally small fish; etc.). 
 Referents were always described using the size adjective consistent with these general expectations (e.g., \emph{Great Dane -- big}, \emph{goldfish -- small}), to allow for the possibility of either subordinate (Great Dane) or basic-level (dog) comparison classes.
 %Thus, given world knowledge, both the subordinate-level or basic-level comparison class could be felicitous.%, though the basic-level is more likely \textit{a priori} (i.e., the Great Dane is likely to be \textit{big for a dog}, but could also be \textit{big for a Great Dane}).
 The preregistrations and full experimental procedures can be viewed at \url{tinyurl.com/rcsyz9f}.\footnote{All data and code can be found under \url{https://github.com/polina-tsvilodub/refpred}}
@@ -276,7 +276,6 @@ The preregistrations and full experimental procedures can be viewed at \url{tiny
 
 %In Experiment 1 (Syntax Rating), participants provide acceptability ratings of the syntactically-distinct adjectival sentences to describe an object for which the size adjective would be felicitous given one comparison class but not another. In Experiment 2 (NP Production), tests if participants produce different nouns given different syntactic frames (e.g., ``That's a big \_\_'' vs. ``That \_\_ is big''). Finally, Experiment 3 (Comparison Class Inference) investigates listeners' comparison class inferences as driven by the syntax, the noun phrase, and the immediate perceptual context in which the sentence is uttered, via participants paraphrasing a speaker's adjectival sentence with an explicit comparison class (e.g., ``It's big relative to other \_\_''), building on the empirical paradigm of \citeA{tessler2017warm}.
 %Experiment 1 tests if participants prefer one noun position in the sentence over the other to describe an object for which the size adjective \emph{big} would be felicitous given one comparison class but not another. Experiment 2 tests if speakers produce different nouns in different syntactic frames to describe the same object. Finally, Experiment 3 investigates listeners' comparison class inferences as driven by the syntax, the noun phrase, and the immediate perceptual context in which the sentence is uttered.
-
 
 \begin{figure*}[t]
 \begin{center}
@@ -316,7 +315,7 @@ Flowers* & Daisy* & Peony* \\
 
 
 
-\subsubsection{Participants} We recruited \rlgetvariable{myvars-rating.csv}{nSubj} participants from Amazon's Mechanical Turk; participants in all experiments were  restricted to those with US IP addresses and at least a 95\% work approval rating. We excluded \rlgetvariable{myvars-rating.csv}{nExcludedTotal} for self-reporting a native language other than English, for failing a comprehension check or providing the same responses on every trial.  The experiment took about 5 minutes and participants were compensated \$0.80. %\rlgetvariable{myvars-rating.csv}{nFailedWarmUp}  and \rlgetvariable{myvars-rating.csv}{nFailedMains} for  
+\subsubsection{Participants} We recruited \rlgetvariable{myvars-rating.csv}{nSubj} participants from Amazon's Mechanical Turk; participants in all experiments were restricted to those with US IP addresses and at least a 95\% work approval rating. We excluded \rlgetvariable{myvars-rating.csv}{nExcludedTotal} for self-reporting a native language other than English, for failing a comprehension check or providing the same responses on every trial. The experiment took about 5 minutes and participants were compensated \$0.80. %\rlgetvariable{myvars-rating.csv}{nFailedWarmUp}  and \rlgetvariable{myvars-rating.csv}{nFailedMains} for  
 
 
 \subsubsection{Materials} 
@@ -329,7 +328,7 @@ Within each basic-level category, we chose target objects from \emph{subordinate
 %Thus, given world knowledge, both the subordinate-level or basic-level comparison class could be felicitous.%, though the basic-level is more likely \textit{a priori} (i.e., the Great Dane is likely to be \textit{big for a dog}, but could also be \textit{big for a Great Dane}).
 
 \subsubsection{Procedure}
-Participants completed two comprehension check trials and six main trials. In the comprehension check trials, participants see a picture (e.g., a purple chair), read pairs of sentences describing it (e.g., ``The chair is blue'' and ``The chair is yellow''), and are asked to rate on slider how well each of the sentences describes the referent.
+Participants completed two comprehension check trials and six main trials. In the comprehension check trials, participants saw a picture (e.g., a purple chair), read pairs of sentences describing it (e.g., ``The chair is blue'' and ``The chair is yellow''), and were asked to rate on a slider how well each of the sentences described the referent.
 
 In the main trials, participants read: ``You and your friend see the following:'' above a context picture with other members of the same basic-level category (e.g., a group of dogs; Figure~\ref{screenshots}A). 
 Six different basic-level contexts were created from the five categories depicting groups of several members belonging to different subordinate categories (e.g., dogs of different breeds, including the target and filler subordinate categories, such as Great Danes, pugs and poodles; Table~\ref{tab:stimuli}).
@@ -343,10 +342,10 @@ Trials differed in whether the noun was the subordinate referent label (e.g., \e
 Each participant saw only one of the two possible targets for each context (e.g., either the Great Dane or the pug for the dog basic-level context).
 
 
-
 \subsubsection{Results} 
 We found no effect of the slider presentation order (syntactic conditions), so the data was collapsed across the two conditions for all analyses. 
 %shows the mean ratings provided for subordinate and basic-level NPs in the subject and predicate-NP syntactic frames.
+
 Consistent with our prediction,  participants substantially dispreferred sentences with the subordinate noun in predicate position compared to the subject position (Figure~\ref{syntax-rating}), confirmed by a Bayesian generalized linear mixed-effects model with main effects of syntax, the noun phrase, and their interaction, as well as a maximal random effects structure.\footnote{In lmer-style syntax: \texttt{rating $\sim$ syntax * NP + (1 + syntax*NP | subject) + (1 + syntax*NP | target)}}
 We found an interaction between the syntax and the noun-label  (mean and 95\% Bayesian credible interval: $\beta = \rlgetnum{expt1_brm.csv}{Rowname}{syntax:NP}{Estimate}{2}  [\rlgetnum{expt1_brm.csv}{Rowname}{syntax:NP}{l.95..CI}{2}, \rlgetnum{expt1_brm.csv}{Rowname}{syntax:NP}{u.95..CI}{2}]$), as well as an overall preference for the basic-level NPs ($\beta = \rlgetnum{expt1_brm.csv}{Rowname}{NP}{Estimate}{2} [\rlgetnum{expt1_brm.csv}{Rowname}{NP}{l.95..CI}{2},\rlgetnum{expt1_brm.csv}{Rowname}{NP}{u.95..CI}{2}] $) and subject-N syntax ($\beta = \rlgetnum{expt1_brm.csv}{Rowname}{syntax}{Estimate}{2} [\rlgetnum{expt1_brm.csv}{Rowname}{syntax}{l.95..CI}{2}, \rlgetnum{expt1_brm.csv}{Rowname}{syntax}{u.95..CI}{2}] $). 
 In exploratory analyses, we
@@ -361,35 +360,24 @@ If the syntactic position of the noun modulates the strength of the cue the noun
 
 \subsubsection{Participants}
 We recruited \rlgetvariable{myvars-np.csv}{nSubj} participants and excluded \rlgetvariable{myvars-np.csv}{nExcludedTotal} for implementation glitches, native languages other than English or failing warm-up trials more than 4 times after correction. The experiment took about 7 minutes and participants were compensated \$1.00. %\rlgetvariable{myvars-np.csv}{nNonEN} for  and \rlgetvariable{myvars-np.csv}{nFailedWarmUp} for  
-
-
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=\linewidth]{expt-syntax-rating-prereg-bars-revised.pdf}
 \end{center}
-%\vspace{-1cm}
 \caption{Experiment 1 mean ratings for how well sentences which differed in the syntactic position of the noun (x-axis)  and the noun-label (color) described the referent, a typically-sized member of the subordinate category (e.g., a normal-sized Great Dane).  Points represent participant means within condition. Error-bars denote bootstrapped 95\% confidence intervals (bootstrapping independent of random-effects structure).
 }
-%\vspace{-0.2cm}
 \label{syntax-rating}
 \end{figure}
 
 \subsubsection{Procedure}
-
-The main trials were divided into two blocks, and before each block, participants completed warm-up trials.
-The warm-up trials were designed to elicit category labels at different levels of abstraction (e.g., ``Great Dane'', ``pug'', ``dog'') by filling-in labeling sentences, for which they were provided corrective feedback.
-%Two sentences appeared below each target reading ``This is a \_\_'', and one sentence appeared at the bottom of the page reading ``These are both \_\_.''
+The main trials were divided into two blocks, and before each block, participants completed warm-up trials. The warm-up trials were designed to elicit category labels at different levels of abstraction (e.g., ``Great Dane'', ``pug'', ``dog'') by filling-in labeling sentences, for which they were provided corrective feedback. %Two sentences appeared below each target reading ``This is a \_\_'', and one sentence appeared at the bottom of the page reading ``These are both \_\_.''
 %Participants supplied an incorrect label, they were provided the correct label and were required to correct their response before proceeding.
 The same subordinate referents were used as targets in the main trials. 
-Trial order within each warm-up and main block was randomized. 
-We used the same contexts as in Experiment 1 and created four additional basic-level contexts (Table \ref{tab:stimuli}). 
-Six contexts were randomly sampled for each participant (three per block).
+Trial order within each warm-up and main block was randomized. We used the same contexts as in Experiment 1 and created four additional basic-level contexts (Table \ref{tab:stimuli}). 
+Six contexts were randomly sampled for each participant (three per block). 
 
-On the main trials, subjects saw “You see the following:” above the context picture (as in Expt.~1; Fig~\ref{screenshots}A). Below, they read “You also see this one:” and saw the picture of the referent (e.g., a Great Dane or a pug). They were told “You say to your friend:”, followed by either a subject-N or predicate-N sentence frame (between-subjects), where the noun was omitted (e.g., “That \_\_ is big“~vs.~“That’s a big \_\_ ''; Fig.~\ref{screenshots}D).
-Each participant saw only either the big or the small target for each basic-level category.
-The free-production responses were categorized by hand into subordinate or basic-level labels of the referent. 
-16 uncategorizable responses (1.4\%) were excluded from the analysis.
-
+On the main trials, subjects saw “You see the following:” above the context picture (as in Expt.~1; Fig~\ref{screenshots}A). Below, they read “You also see this one:” and saw the picture of the referent (e.g., a Great Dane or a pug). They were told “You say to your friend:”, followed by either a subject-N or predicate-N sentence frame (between-subjects), where the noun was omitted (e.g., “That \_\_ is big“~vs.~“That’s a big \_\_ ''; Fig.~\ref{screenshots}D). Each participant saw only either the big or the small target for each basic-level category. 
+The free-production responses were categorized by hand into subordinate or basic-level labels of the referent. 16 uncategorizable responses (1.4\%) were excluded from the analysis.
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=0.7\linewidth]{expt-np-prod-prereg-bars-revised.pdf}
@@ -427,12 +415,12 @@ We recruited \rlgetvariable{myvars-infer.csv}{nSubj} participants and excluded \
 %Participants had to correct their response if they provided an infelicitous comparison class. %(viable responses included: buildings, skyscrapers, constructions, houses).
 Following this comprehension test, participants completed two blocks of warm-up and main trials, akin to  Expt.~2.
 
-In the main trials, participants read \emph{You and your friend see the following:} above a context picture of either subordinate-level or basic-level distractors (Fig.~\ref{screenshots}A, B). 
-Below the context picture, they read \emph{Your friend runs far ahead of you, and you see him in the distance} and saw a cartoon of a person standing next to the referent (e.g., a Great Dane) in the distance so that the referent size could not be judged visually and hence serve as a cue to the comparison class (Fig.~\ref{screenshots}E). 
-Participants read \emph{Your friend says: [critical sentence]}, which could vary by both syntactic position of the noun (subject-~vs.~predicate-noun) as well as the noun-label's level-of-abstractness (e.g., ``That Great Dane is big'', ``That's a big dog'', ``That one is big'', etc.). 
+In the main trials, participants read "You and your friend see the following:" above a context picture of either subordinate-level or basic-level distractors (Fig.~\ref{screenshots}A, B). 
+Below the context picture, they read "Your friend runs far ahead of you, and you see him in the distance" and saw a cartoon of a person standing next to the referent (e.g., a Great Dane) in the distance so that the referent size could not be judged visually and hence serve as a cue to the comparison class (Fig.~\ref{screenshots}E). 
+Participants read "Your friend says: [critical sentence]", which could vary by both syntactic position of the noun (subject-~vs.~predicate-noun) as well as the noun-label's level-of-abstractness (e.g., ``That Great Dane is big'', ``That's a big dog'', ``That one is big'', etc.). 
 %The noun could be the subordinate target label (e.g., Great Dane), basic level label (dog), or the underspecified anaphoric \emph{one} (e.g., ``That one is big''). 
 %We used \emph{one} in order to measure the baseline effect of visual context on comparison class inferences. %and to test whether listeners infer the comparison class from visual context and world knowledge (i.e. that the basic-level comparison class is a priori more likely to be felicitous) if the NP does not provide informative cues towards the comparison class. Therefore, we expected the comparison class to be the basic-level category of the referent given basic-level context (e.g. dogs) and the subordinate category given the subordinate context (e. g. great danes), though we expected to possibly see a basic-level bias, such that “dogs” was the a priori preferred comparison class..
-Participants were asked: \emph{What do you think your friend meant?}. 
+Participants were asked: "What do you think your friend meant?". 
 They responded in the sentence frame: “It is big (small) relative to other \_\_” with whatever they thought made the most sense given the context (Fig.~\ref{screenshots}E).
 Participants completed 12 trials which could vary by condition (syntactic frame [subject vs. predicate], visual context [subordinate vs. basic], and noun [subordinate vs. basic vs. \emph{one}]).\footnote{Due to a coding error, condition balancing occurred at the level of individual factors independently but not jointly (i.e., participants completed 6 subordinate-context trials and 6 basic-context trials; 4 basic-noun, 4 subordinate-noun, and 4 \emph{one} conditions; and 6 subject-N and 6 predicate-N conditions, though they may have completed multiple unique-crosses of conditions).}
 %\pt{this is not completely correct since i messed up the randomization..}.
@@ -478,9 +466,8 @@ Of particular note, we observe that a subordinate noun can be the minority compa
 
 %We see that the basic noun vs. subordinate noun difference was maintained even in the subject position (Fig.~\ref{cc-inference}; red~vs.~blue bars), consistent with the inferential account in which the choice of noun is a cue to a speaker's conceptualization of the referent.
 
-We observe suggestive evidence in support of the Noun x Syntax interaction predicted by the reference -- predication trade-off hypothesis (Fig.~\ref{cc-inference}; red~vs.~blue bars vs. x-axis; 94.9\% of the posterior distribution of the interaction was greater than 0, analogous to a one-tailed test). \pt{check / decide how to read from csv} 
-To further explore the Noun x Syntax interaction, we built a regression model that assumed only a fixed-effect of context \footnote{\texttt{response\_category $\sim$ syntax*N + context + (1 + syntax*N || subject) + (1 + syntax*N || item) }} and confirmed the N (basic~vs.~sub) x Syntax interaction ($\beta = \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_basic}{mean}{2} [\rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_basic}{X.95.}{2}, \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_basic}{X95..}{2}]$). %($\beta = -0.49 [-0.86, -0.05]$).
-Examining the syntax interaction in the context of N~vs.~\emph{one} contrast, we found that 95.4\% of the posterior distribution of subordinate-N~vs.~\emph{one} x Syntax interaction was less than 0 ($\beta = \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_one}{mean}{2} [\rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_one}{X.95.}{2}, \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_one}{X95..}{2}]$) whereas only 63\% of the posterior of the basic-N~vs.~\emph{one} X Syntax interaction was greater than 0 ($\beta = \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_basic_v_one}{mean}{2} [\rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_basic_v_one}{X.95.}{2}, \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_basic_v_one}{X95..}{2}$), a suggestion of a difference between how reference and predication goals trade-off for the basic-~vs.~subordinate-level nouns in our basic- and subordinate-level contexts.
+We observe suggestive evidence in support of the Noun x Syntax interaction predicted by the reference -- predication trade-off hypothesis (Fig.~\ref{cc-inference}; red~vs.~blue bars vs. x-axis; 94.9\% of the posterior distribution of the interaction was greater than 0, analogous to a one-tailed test). To further explore the Noun x Syntax interaction, we built a regression model that assumed only a fixed-effect of context \footnote{\texttt{response\_category $\sim$ syntax*N + context + (1 + syntax*N || subject) + (1 + syntax*N || item) }} and confirmed the N (basic~vs.~sub) x Syntax interaction ($\beta = \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_basic}{mean}{2} [\rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_basic}{X.95.}{2}, \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_basic}{X95..}{2}]$). %($\beta = -0.49 [-0.86, -0.05]$).
+Examining the syntax interaction in the context of N~vs.~\emph{one} contrast, we found that 95.4\% of the posterior distribution of subordinate-N~vs.~\emph{one} x Syntax interaction was less than 0 ($\beta = \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_one}{mean}{2} [\rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_one}{X.95.}{2}, \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_sub_v_one}{X95..}{2}]$) whereas only 63\% of the posterior of the basic-N~vs.~\emph{one} X Syntax interaction was greater than 0 ($\beta = \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_basic_v_one}{mean}{2} [\rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_basic_v_one}{X.95.}{2}, \rlgetnum{expt3_2way_full_contrasts_revised.csv}{Rowname}{syntax_basic_v_one}{X95..}{2}]$), a suggestion of a difference between how reference and predication goals trade-off for the basic-~vs.~subordinate-level nouns in our basic- and subordinate-level contexts.
 
 %($\beta = -0.38 [-0.84, 0.07]$) whereas only 62\% of the posterior of the basic-NP~vs.~\emph{one} X Syntax interaction was greater than 0 ($\beta = 0.62 [-0.42, 0.57]$), a suggestion of a difference we return to in the discussion. 
  
@@ -520,7 +507,7 @@ In Expt.~3, we found that comparison class inferences were driven by a subordina
 We hypothesized this effect is due to the referential utility of the subordinate-noun differing by syntactic position, but we note that the context must also support this inference.
 The referential utility of the basic-level noun was not affected by the noun's syntactic position because in neither context (basic or subordinate) was the basic-noun an informative referring expression: \emph{dog} is both referentially uninformative in a context of \emph{dogs} (basic-level context) and the context of \emph{Great Danes} (subordinate-level context).
 As a result, the referential -- predicative trade-off view would not expect comparison class inferences to differ across syntactic positions for the basic-level noun label, which is indeed what we found. 
-At the same time, in the subordinate-level context, we did observe a higher rate of basic-level comparison class inferences for basic-level nouns:  since the context makes the basic-level referentially uninformative, listeners may reason that the usage of the noun was to set the comparison class.
+At the same time, in the subordinate-level context, we did observe a higher rate of basic-level comparison class inferences for basic-level nouns:  since the context makes the basic-level noun referentially uninformative, listeners may reason that the usage of the noun was to set the comparison class.
 %\pt{do we want to mention anything about the higher basic-level inference rate for basic Ns in %subordinate context?}
 Further tests of this account should experimentally manipulate the referential utility of the noun \cite<e.g.,  ``dog'' in the context of other animals;>{graf2016animal} and confirm its impact on inferences about the comparison class. 
 
