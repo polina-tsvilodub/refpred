@@ -171,8 +171,8 @@ grid.arrange(E1.fig, E2.fig, ncol=2)
 # contrast coding: explicitly numeric, to avoid strange behavior of random effects estimation
 # subject NP -1, predicate NP 1
 # basic-level NP -1, subordinate NP 1
-d_rate_main_full <- d_rate_main_full %>% mutate(syntax = ifelse(syntax =="subject", -1, 1 ),
-                                                NP = ifelse( NP == "basic", -1, 1   ),
+d_rate_main_full <- d_rate_main_full %>% mutate(syntax = ifelse(syntax =="subject", 1, -1 ),
+                                                NP = ifelse( NP == "basic", 1, -1   ),
                                                 # predicate | subject is -1 , subject|predictae is 1
                                                 order = ifelse(sentence_order == "0|1", -1 , 1),
                                                 target_size_contr = ifelse(target_size == "big", 1, -1)

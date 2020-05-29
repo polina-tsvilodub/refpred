@@ -148,10 +148,10 @@ d_infer_main_responseCat.bs %>%
 
 ``` {r}
 # explicit numeric coding to improve model convergence
-# DUMMY AND DEVIATION CODING
+# DUMMY AND CONTRAST CODING
 d_infer_main_responseCat <- d_infer_main_responseCat %>%
   mutate(syntax_contr = ifelse(condition == "predicative", 0.5, -0.5), # contrast coded
-         NP_basic = ifelse(NP == "basic", 1, 0), # treatment coded
+         NP_basic = ifelse(NP == "basic", 1, 0), # dummy coded
          NP_sub = ifelse(NP == "subordinate", 1, 0),
          context_sub = ifelse(context == "subordinate", 1, 0))
 
@@ -174,7 +174,7 @@ d_infer_main_responseCat2 <- d_infer_main_responseCat %>%
                         NP == "basic" ~  1L, # target
                         TRUE      ~ 0L),
         syntax_sum = ifelse(condition == "predicative", -1L, 1L),
-        context_sum = ifelse(context == "basic", -1L, 1L))
+        context_sum = ifelse(context == "basic", 1L, -1L))
 
 d_infer_main_responseCat2 %>%
   select(condition, syntax_sum, context, context_sum, NP, NP_subVone, NP_basicVone) %>%
@@ -189,13 +189,13 @@ d_infer_main_responseCat2 %>%
 #     NP_sub2 = contr.sum(3)[NP_num,][2]
 #     )
 
-rs.glm <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub,
+rs.glm <- glm(response_num~syntax_contr * (NP_subVone + NP_basicVone) * context_sub,
     data = d_infer_main_responseCat2,
     family = 'binomial')
 
 summary(rs.glm)
 
-rs.glm0 <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub - (NP_sub1 + NP_sub2) : syntax_contr,
+rs.glm0 <- glm(response_num~syntax_contr * (NP_subVone + NP_basicVone) * context_sub - (NP_subVone + NP_basicVone) : syntax_contr,
     data = d_infer_main_responseCat2,
     family = 'binomial')
 
@@ -203,7 +203,7 @@ summary(rs.glm)
 
 anova(rs.glm0,rs.glm,test="Chisq")
 
-rs.glm.noint <- glm(response_num~syntax_contr * (NP_sub1 + NP_sub2) * context_sub - syntax_contr : (NP_sub1 + NP_sub2) : context_sub,
+rs.glm.noint <- glm(response_num~syntax_contr * (NP_subVone + NP_basicVone) * context_sub - syntax_contr : (NP_subVone + NP_basicVone) : context_sub,
     data = d_infer_main_responseCat2,
     family = 'binomial')
 
@@ -211,9 +211,9 @@ anova(rs.glm.noint,rs.glm,test="Chisq")
 ```
 
 ```{r}
-rs.glmer <- glmer(response_num~syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum + 
-                    (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum || submission_id)  + 
-                    (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) * context_sum || item),
+rs.glmer <- glmer(response_num~syntax_sum * (NP_subVone + NP_basicVone) * context_sum + 
+                    (1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum || submission_id)  + 
+                    (1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum || item),
     data = d_infer_main_responseCat2, 
     family = 'binomial',
     control=glmerControl(optimizer="bobyqa",
@@ -224,11 +224,11 @@ summary(rs.glmer)
 
 
 ```{r}
-rs.glmer.basicContext <- glmer(response_num~syntax_sum * (NP_OneVsub + NP_basicVsub) + 
+rs.glmer.basicContext <- glmer(response_num~syntax_sum * (NP_subVone + NP_basicVone) + 
                     (1 | submission_id)  + 
                     (1 | item),
-                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || submission_id)  + 
-                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || item),
+                    # (1 + syntax_sum * (NP_subVone + NP_basicVone) || submission_id)  + 
+                    # (1 + syntax_sum * (NP_subVone + NP_basicVone) || item),
     data = d_infer_main_responseCat2 %>% 
       filter(context == "basic"), 
     family = 'binomial')
@@ -241,21 +241,21 @@ rs.glmer.basicContext.summary$varcor
 ```
 
 ```{r}
-rs.glmer.basicContext.noOne <- glmer(response_num~syntax_sum * NP_basicVsub + 
+rs.glmer.basicContext.noOne <- glmer(response_num~syntax_sum * NP_basicVone + 
                     (1 | submission_id)  + 
                     (1 | item),
-                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || submission_id)  + 
-                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || item),
+                    # (1 + syntax_sum * (NP_subVone + NP_basicVone) || submission_id)  + 
+                    # (1 + syntax_sum * (NP_subVone + NP_basicVone) || item),
     data = d_infer_main_responseCat2 %>% 
       filter(context == "basic", NP != "one"), 
     family = 'binomial')
   #  control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
 
-rs.glmer.subContext.noOne <- glmer(response_num~syntax_sum * NP_basicVsub + 
+rs.glmer.subContext.noOne <- glmer(response_num~syntax_sum * NP_basicVone + 
                     (1 | submission_id),
                     #(1 | item),
-                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || submission_id)  + 
-                    # (1 + syntax_sum * (NP_OneVsub + NP_basicVsub) || item),
+                    # (1 + syntax_sum * (NP_subVone + NP_basicVone) || submission_id)  + 
+                    # (1 + syntax_sum * (NP_subVone + NP_basicVone) || item),
     data = d_infer_main_responseCat2 %>% 
       filter(context == "subordinate", NP != "one"), 
     family = 'binomial')
@@ -314,116 +314,14 @@ unique(d_infer_main_responseCat2$syntax_sum)
 # significant effect of sub NP and context
 lm.b.infer.fit.by.target <- brm(response_num ~ syntax_sum * (NP_subVone + NP_basicVone) * context_sum +
                         (1 + syntax_sum  + NP_subVone + NP_basicVone + context_sum  || submission_id) +
-                        #(1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum  || submission_id) +
                         (1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum  || pic),
                       data = d_infer_main_responseCat2,
                       family = "bernoulli",
                       iter = 2000,
-                      cores = 2, chains = 2,
+                      cores = 4, chains = 4,
                       control = list(adapt_delta = 0.98)) # otherwise there are divergent chains
 ```
 
-``` {r}
-write_csv(data.frame(summary(lm.b.infer.fit.by.target)[["fixed"]]) %>%
-            mutate(Rowname = row.names(.)),
-          path = "./../../writing/R_results_TeX/expt3_full_brm_revised.csv")
-```
-
-```{r}
-# get posterior samples 
-coda = brms::posterior_samples(lm.b.infer.fit.by.target)
-antilogit = function(x) 1 / (1 + exp(-x))
-
-# get respective contrasts 
-lm.b.infer3way.by.target.fit.samples <- data.frame(
-  basic_v_mean = coda[,"b_NP_basicVone"],
-  sub_v_mean = coda[,"b_NP_subVone"],
-  syntax_sub_v_mean = coda[, "b_syntax_sum:NP_subVone"],
-  syntax_basic_v_mean = coda[, "b_syntax_sum:NP_basicVone"],
-  syntax_context_sub_v_mean = coda[, "b_syntax_sum:NP_subVone:context_sum"],
-  syntax_context_basic_v_mean = coda[, "b_syntax_sum:NP_basicVone:context_sum"]
-) %>%
-  mutate(
-    sub_v_one = 2 * sub_v_mean + basic_v_mean,
-    sub_v_basic = sub_v_mean - basic_v_mean,
-    basic_v_one = 2* basic_v_mean + sub_v_mean,
-    syntax_sub_v_one = 2 *syntax_sub_v_mean + syntax_basic_v_mean,
-    syntax_sub_v_basic = syntax_sub_v_mean - syntax_basic_v_mean,
-    syntax_basic_v_one = 2 * syntax_basic_v_mean + syntax_sub_v_mean,
-    context_syntax_sub_v_one = 2 *syntax_context_sub_v_mean +
-      syntax_context_basic_v_mean,
-    context_syntax_sub_v_basic = syntax_context_sub_v_mean -
-      syntax_context_basic_v_mean,
-    context_syntax_basic_v_one = 2 * syntax_context_basic_v_mean +
-      syntax_context_sub_v_mean,
-     )
-
-lm.b.infer3way.by.target.fit.samples %>%
-  gather(key, val) %>%
-  ggplot(., aes( x= val))+
-  geom_histogram()+
-  facet_wrap(~key)
-
-# compute means and CIs (cogsci stuff, to be removed if the stuff below works fine)
-mean(lm.b.infer3way.by.target.fit.samples$sub_v_one)
-quantile(lm.b.infer3way.by.target.fit.samples$sub_v_one, probs = c(0.025, 0.975))
-mean(lm.b.infer3way.by.target.fit.samples$sub_v_basic)
-quantile(lm.b.infer3way.by.target.fit.samples$sub_v_basic, probs = c(0.025, 0.975))
-mean(lm.b.infer3way.by.target.fit.samples$basic_v_one) 
-quantile(lm.b.infer3way.by.target.fit.samples$basic_v_one, probs = c(0.025, 0.975))
-
-quantile(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, probs = c(0.025, 0.975))
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one)
-mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic)
-quantile(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, probs = c(0.025, 0.975))
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one < 0)
-mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
-quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, probs = c(0.025, 0.975))
-quantile(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, probs = c(0.025, 0.975)) 
-```
-
-```{r}
-# here is a convenience function to get contrast statistics to easier write the corresponding TeX csv
-summarize_sample_vector <- function(samples, name = '') {
-    tibble(
-      Parameter = name,
-      '|95%' = quantile(samples, probs = c(0.025, 0.975))[[1]],
-      mean  = mean(samples),
-      '95%|' = quantile(samples, probs = c(0.025, 0.975))[[2]]
-    )
-}
-```
-
-``` {r}
-# polina's revisions 
-rbind(
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_one, 'sub_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_basic, 'sub_v_basic'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_one, 'basic_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, 'syntax_basic_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, 'syntax_sub_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, 'syntax_sub_v_basic'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, 'context_syntax_basic_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, 'context_syntax_sub_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, 'context_syntax_sub_v_basic')
-) -> lm.b.infer3way.full.contrasts
-
-# not sure how to put these in a csv
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one < 0)
-mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
-
-```
-
-``` {r}
-write_csv(data.frame(lm.b.infer3way.full.contrasts) %>% 
-            mutate(Rowname = Parameter), 
-          path = "./../../writing/R_results_TeX/expt3_3way_full_contrasts_revised.csv")
-```
-
-#### Two-way + context main effect models
-##### Polina's revisions
 
 ``` {r}
 # SUM CODED 
@@ -434,12 +332,105 @@ lm.b.infer.fit.two.way2.sum <- brm(response_num ~ syntax_sum + NP_subVone + NP_b
                         syntax_sum:NP_subVone + syntax_sum:NP_basicVone || item),
                       data = d_infer_main_responseCat2,
                       family = "bernoulli",
-                      iter = 1000,
-                      cores = 2, chains, 2
+                      iter = 2000,
+                      cores = 4, chains = 4,
                       control = list(adapt_delta = 0.95))
 
 lm.b.infer.fit.two.way2.sum.summary <- summary(lm.b.infer.fit.two.way2.sum)
 ```
+
+
+
+
+
+
+
+``` {r}
+#write_csv(data.frame(summary(lm.b.infer.fit.by.target)[["fixed"]]) %>%
+ #           mutate(Rowname = row.names(.)),
+  #        path = "./../../writing/R_results_TeX/expt3_full_brm_revised.csv")
+```
+
+```{r}
+# get posterior samples 
+#coda = brms::posterior_samples(lm.b.infer.fit.by.target)
+#antilogit = function(x) 1 / (1 + exp(-x))
+
+# get respective contrasts 
+#lm.b.infer3way.by.target.fit.samples <- data.frame(
+ # basic_v_mean = coda[,"b_NP_basicVone"],
+  #sub_v_mean = coda[,"b_NP_subVone"],
+#  syntax_sub_v_mean = coda[, "b_syntax_sum:NP_subVone"],
+#  syntax_basic_v_mean = coda[, "b_syntax_sum:NP_basicVone"],
+#  syntax_context_sub_v_mean = coda[, "b_syntax_sum:NP_subVone:context_sum"],
+#  syntax_context_basic_v_mean = coda[, "b_syntax_sum:NP_basicVone:context_sum"]
+#) %>%
+ # mutate(
+  #  sub_v_one = 2 * sub_v_mean + basic_v_mean,
+   # sub_v_basic = sub_v_mean - basic_v_mean,
+#    basic_v_one = 2* basic_v_mean + sub_v_mean,
+ #   syntax_sub_v_one = 2 *syntax_sub_v_mean + syntax_basic_v_mean,
+  #  syntax_sub_v_basic = syntax_sub_v_mean - syntax_basic_v_mean,
+   # syntax_basic_v_one = 2 * syntax_basic_v_mean + syntax_sub_v_mean,
+   # context_syntax_sub_v_one = 2 *syntax_context_sub_v_mean +
+#      syntax_context_basic_v_mean,
+ #   context_syntax_sub_v_basic = syntax_context_sub_v_mean -
+  #    syntax_context_basic_v_mean,
+   # context_syntax_basic_v_one = 2 * syntax_context_basic_v_mean +
+    #  syntax_context_sub_v_mean,
+     #)
+
+#lm.b.infer3way.by.target.fit.samples %>%
+ # gather(key, val) %>%
+  #ggplot(., aes( x= val))+
+  #geom_histogram()+
+  #facet_wrap(~key)
+
+```
+
+```{r}
+# here is a convenience function to get contrast statistics to easier write the corresponding TeX csv
+#summarize_sample_vector <- function(samples, name = '') {
+ #   tibble(
+  #    Parameter = name,
+   #   '|95%' = quantile(samples, probs = c(0.025, 0.975))[[1]],
+    #  mean  = mean(samples),
+     # '95%|' = quantile(samples, probs = c(0.025, 0.975))[[2]]
+    #)
+#}
+```
+
+``` {r}
+# polina's revisions 
+#rbind(
+ # summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_one, #'sub_v_one'),
+ # summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_basic, 'sub_v_basic'),
+ # summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_one, 'basic_v_one'),
+  #summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, 'syntax_basic_v_one'),
+  #summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, 'syntax_sub_v_one'),
+  #summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, 'syntax_sub_v_basic'),
+  #summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, 'context_syntax_basic_v_one'),
+  #summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, 'context_syntax_sub_v_one'),
+  #summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, 'context_syntax_sub_v_basic')
+#) -> lm.b.infer3way.full.contrasts
+
+# not sure how to put these in a csv
+#mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one < 0)
+#mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
+
+```
+
+``` {r}
+#write_csv(data.frame(lm.b.infer3way.full.contrasts) %>% 
+   #         mutate(Rowname = Parameter), 
+    #      path = "./../../writing/R_results_TeX/expt3_3way_full_contrasts_revised.csv")
+```
+
+#### Two-way + context main effect models
+##### Polina's revisions
+
+
+
 
 ``` {r}
 write_csv(data.frame(lm.b.infer.fit.two.way2.sum.summary[["fixed"]]) %>%
@@ -472,16 +463,6 @@ lm.b.infer.2way.fit.samples %>%
   geom_histogram()+
   facet_wrap(~key)
 
-# cogsci stuff, not sure what to keep
-mean(lm.b.infer.2way.fit.samples$sub_v_one)
-quantile(lm.b.infer.2way.fit.samples$sub_v_one, probs = c(0.025, 0.975))
-mean(lm.b.infer.2way.fit.samples$sub_v_one<0)
-mean(lm.b.infer.2way.fit.samples$sub_v_basic)
-quantile(lm.b.infer.2way.fit.samples$sub_v_basic, probs = c(0.025, 0.975))
-mean(lm.b.infer.2way.fit.samples$basic_v_one)
-quantile(lm.b.infer.2way.fit.samples$basic_v_one, probs = c(0.025, 0.975))
-mean(lm.b.infer.2way.fit.samples$basic_v_one>0)
-
 ```
 
 ``` {r}
@@ -508,12 +489,12 @@ write_csv(
 ```{r}
 # NOT SURE WHAT THE DIFFERENCE IS TO PREVIOUS ONE 
 # two-way analysis
-lm.b.infer.fit.two.way2.item <- brm(response_num ~ syntax_sum + NP_OneVsub + NP_basicVsub + context_sum  +
-                        syntax_sum:NP_OneVsub + syntax_sum:NP_basicVsub +
-                        (1 + syntax_sum + NP_OneVsub + NP_basicVsub + context_sum  +
-                        syntax_sum:NP_OneVsub +  syntax_sum:NP_basicVsub || submission_id) +
-                        (1 + syntax_sum + NP_OneVsub + NP_basicVsub + context_sum  +
-                        syntax_sum:NP_OneVsub + syntax_sum:NP_basicVsub || item),
+lm.b.infer.fit.two.way2.item <- brm(response_num ~ syntax_sum + NP_subVone + NP_basicVone + context_sum  +
+                        syntax_sum:NP_subVone + syntax_sum:NP_basicVone +
+                        (1 + syntax_sum + NP_subVone + NP_basicVone + context_sum  +
+                        syntax_sum:NP_subVone +  syntax_sum:NP_basicVone || submission_id) +
+                        (1 + syntax_sum + NP_subVone + NP_basicVone + context_sum  +
+                        syntax_sum:NP_subVone + syntax_sum:NP_basicVone || item),
                       data = d_infer_main_responseCat2,
                       family = "bernoulli",
                       iter = 1500,
@@ -524,16 +505,9 @@ summary(lm.b.infer.fit.two.way) # 1000 iterations and by-target radom effects
 
 lm.b.infer.fit.two.way.by.item.summary <- summary(lm.b.infer.fit.two.way2)
 lm.b.infer.fit.two.way3.summary <- summary(lm.b.infer.fit.two.way3)
-write_csv(data.frame(lm.b.infer.fit.two.way3.summary[["fixed"]]) %>%
-            mutate(Rowname = row.names(.)),
-          path = "R_results_TeX/expt3_2_way_full_brm.csv")
-```
-
-
-``` {r csv}
-write_csv(data.frame(lm.b.infer.fit.two.way.by.item.summary[["fixed"]]) %>%
-            mutate(Rowname = row.names(.)),
-          path = "R_results_TeX/expt3_2_way_brm.csv")
+#write_csv(data.frame(lm.b.infer.fit.two.way3.summary[["fixed"]]) %>%
+ #           mutate(Rowname = row.names(.)),
+  #        path = "R_results_TeX/expt3_2_way_full_brm.csv")
 ```
 
 ``` {r}
