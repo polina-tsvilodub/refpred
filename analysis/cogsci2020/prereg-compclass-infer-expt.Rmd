@@ -72,35 +72,53 @@ myvars <- as_tibble(myvars)
 
 
 ``` {r categorization}
-d_infer_main <- d_infer_filt1 %>% filter((trial_name == "custom_main_text1")|
-                                          (trial_name == "custom_main_text2")) %>%
-  filter(submission_id != 1548) %>% filter(submission_id != 1549) %>%
-  mutate(context = factor(pic_spec, levels = c(0, 1),
-                          labels = c("basic",
-                                     "subordinate")),
-         NP = ifelse(ref_spec == 2, "one",
-                     ifelse(ref_spec == 1, "subordinate", "basic")),
-         condition = ifelse(condition == 0, "prenominal", "predicative")) %>%
-  select(submission_id, trial_number, context, item, response, condition,
-        pic, target_size, NP)
+d_infer_main <- d_infer_filt1 %>%
+  filter((trial_name == "custom_main_text1") |
+    (trial_name == "custom_main_text2")) %>%
+  filter(submission_id != 1548) %>%
+  filter(submission_id != 1549) %>%
+  mutate(
+    context = factor(pic_spec,
+      levels = c(0, 1),
+      labels = c(
+        "basic",
+        "subordinate"
+      )
+    ),
+    NP = ifelse(ref_spec == 2, "one",
+      ifelse(ref_spec == 1, "subordinate", "basic")
+    ),
+    condition = ifelse(condition == 0, "prenominal", "predicative")
+  ) %>%
+  select(
+    submission_id, trial_number, context, item, response, condition,
+    pic, target_size, NP
+  )
 
 # categorize responses
-d_infer_main %>% distinct(response) %>% View()
+d_infer_main %>%
+  distinct(response) %>%
+  View()
 # exclude invalid responses
-d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c("that man is big", "that's small boy", "that is big one", "that's a small doberman",
-                                                                      "that bird compare small", "that boy is small", "me is big", "but some one small", "that pug small",
-                                                                      "you are small", "beauty for fish", "yes", "aim", "growth", "honest", "medicine", "heathy", "dogs name", "trees name",
-                                                                      "big", "tall", "small", "cute", "good", "bushes",
-                                                                      "why it in land", "what is this flower", "fish nose", "labrador")))
+d_infer_valid <- d_infer_main %>% subset(., !(tolower(response) %in% c(
+  "that man is big", "that's small boy", "that is big one", "that's a small doberman",
+  "that bird compare small", "that boy is small", "me is big", "but some one small", "that pug small",
+  "you are small", "beauty for fish", "yes", "aim", "growth", "honest", "medicine", "heathy", "dogs name", "trees name",
+  "big", "tall", "small", "cute", "good", "bushes",
+  "why it in land", "what is this flower", "fish nose", "labrador"
+)))
 d_infer_main_responseCat <- d_infer_valid %>%
   rowwise() %>%
-  mutate(  
+  mutate(
     response_cat =
       ifelse( # do be extended dependent on responses provided
-        tolower(response) %in% c("birds", "bird", "dogs", "fish", "flowers", "birds in the sky", "big dogs", "fower", "tress", "things", "objects", "dogs.", "dogd",
-                                 "burds", "dogs that we see", "fish that we see", "birds that we see",
-                                 "flower", "trees","tree", "animal", "the other birds", "the other dogs", "digs", "treees", "weeds", "small flowers", "fishs",
-                                 "fishes", "dog", "large dogs", "giant trees", "breeds", "plant", "variety of dogs", "long trees"), "basic", "subordinate"),
+        tolower(response) %in% c(
+          "birds", "bird", "dogs", "fish", "flowers", "birds in the sky", "big dogs", "fower", "tress", "things", "objects", "dogs.", "dogd",
+          "burds", "dogs that we see", "fish that we see", "birds that we see",
+          "flower", "trees", "tree", "animal", "the other birds", "the other dogs", "digs", "treees", "weeds", "small flowers", "fishs",
+          "fishes", "dog", "large dogs", "giant trees", "breeds", "plant", "variety of dogs", "long trees"
+        ), "basic", "subordinate"
+      ),
 
     response_num = ifelse(response_cat == "basic", 1, 0),
     response_label = "basic"
@@ -180,7 +198,7 @@ d_infer_main_responseCat2 %>%
   select(condition, syntax_sum, context, context_sum, NP, NP_subVone, NP_basicVone) %>%
   View()
 ```
-
+ 
 #### Exploratory lmer stats
 ``` {r}
 # 
@@ -318,8 +336,8 @@ lm.b.infer.fit.by.target <- brm(response_num ~ syntax_sum * (NP_subVone + NP_bas
                         (1 + syntax_sum * (NP_subVone + NP_basicVone) * context_sum  || pic),
                       data = d_infer_main_responseCat2,
                       family = "bernoulli",
-                      iter = 2000,
-                      cores = 4, chains = 4,
+                      iter = 1500,
+                      cores = 3, chains = 3,
                       control = list(adapt_delta = 0.98)) # otherwise there are divergent chains
 summary(lm.b.infer.fit.by.target)
 ```
@@ -377,37 +395,50 @@ lm.b.infer3way.by.target.fit.samples %>%
 
 ```{r}
 # here is a convenience function to get contrast statistics to easier write the corresponding TeX csv
-summarize_sample_vector <- function(samples, name = '') {
-    tibble(
-      Parameter = name,
-      '|95%' = quantile(samples, probs = c(0.025, 0.975))[[1]],
-      mean  = mean(samples),
-      '95%|' = quantile(samples, probs = c(0.025, 0.975))[[2]]
-    )
-}
+# summarize_sample_vector <- function(samples, name = '') {
+#     tibble(
+#       Parameter = name,
+#       '|95%' = quantile(samples, probs = c(0.025, 0.975))[[1]],
+#       mean  = mean(samples),
+#       '95%|' = quantile(samples, probs = c(0.025, 0.975))[[2]]
+#     )
+# }
 ```
 
 ``` {r}
 # polina's revisions 
-rbind(
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_one, 'sub_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_basic, 'sub_v_basic'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_sub, 'basic_v_sub'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_one, 'basic_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_one_v_mean, 'context_one_v_mean'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, 'syntax_basic_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, 'syntax_sub_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, 'syntax_sub_v_basic'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub, 'syntax_basic_v_sub'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, 'context_syntax_basic_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, 'context_syntax_sub_v_one'),
-  summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, 'context_syntax_sub_v_basic')
-) -> lm.b.infer3way.full.contrasts
+
+# rbind(
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_one, 'sub_v_one'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_basic, 'sub_v_basic'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_sub, 'basic_v_sub'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_one, 'basic_v_one'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_one_v_mean, 'context_one_v_mean'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, 'syntax_basic_v_one'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, 'syntax_sub_v_one'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, 'syntax_sub_v_basic'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub, 'syntax_basic_v_sub'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, 'context_syntax_basic_v_one'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, 'context_syntax_sub_v_one'),
+#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, 'context_syntax_sub_v_basic')
+# ) -> lm.b.infer3way.full.contrasts
+# 
+
+lm.b.infer3way.by.target.fit.samples %>% 
+  gather(key, val) %>% 
+  group_by(key) %>%
+  summarize(
+    '|95%' = quantile(val, probs = c(0.025, 0.975))[[1]],
+    'mean'  = mean(val),
+    'u95%' = quantile(val, probs = c(0.025, 0.975))[[2]],
+    prob_gt_0 = mean(val > 0),
+    prob_lt_0 = mean(val < 0)
+  ) -> lm.b.infer3way.full.contrasts
 
 # not sure how to put these in a csv
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one > 0)
-mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
-mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub > 0)
+# mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one > 0)
+# mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
+# mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub > 0)
 ```
 
 ``` {r}
