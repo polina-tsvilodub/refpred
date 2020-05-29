@@ -393,37 +393,7 @@ lm.b.infer3way.by.target.fit.samples %>%
 
 ```
 
-```{r}
-# here is a convenience function to get contrast statistics to easier write the corresponding TeX csv
-# summarize_sample_vector <- function(samples, name = '') {
-#     tibble(
-#       Parameter = name,
-#       '|95%' = quantile(samples, probs = c(0.025, 0.975))[[1]],
-#       mean  = mean(samples),
-#       '95%|' = quantile(samples, probs = c(0.025, 0.975))[[2]]
-#     )
-# }
-```
-
 ``` {r}
-# polina's revisions 
-
-# rbind(
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_one, 'sub_v_one'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$sub_v_basic, 'sub_v_basic'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_sub, 'basic_v_sub'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$basic_v_one, 'basic_v_one'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_one_v_mean, 'context_one_v_mean'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one, 'syntax_basic_v_one'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_one, 'syntax_sub_v_one'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic, 'syntax_sub_v_basic'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub, 'syntax_basic_v_sub'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_basic_v_one, 'context_syntax_basic_v_one'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_one, 'context_syntax_sub_v_one'),
-#   summarize_sample_vector(lm.b.infer3way.by.target.fit.samples$context_syntax_sub_v_basic, 'context_syntax_sub_v_basic')
-# ) -> lm.b.infer3way.full.contrasts
-# 
-
 lm.b.infer3way.by.target.fit.samples %>% 
   gather(key, val) %>% 
   group_by(key) %>%
@@ -431,20 +401,17 @@ lm.b.infer3way.by.target.fit.samples %>%
     '|95%' = quantile(val, probs = c(0.025, 0.975))[[1]],
     'mean'  = mean(val),
     'u95%' = quantile(val, probs = c(0.025, 0.975))[[2]],
-    prob_gt_0 = mean(val > 0),
-    prob_lt_0 = mean(val < 0)
+    prob_gt_0 = mean(val > 0)*100,
+    prob_lt_0 = mean(val < 0)*100
   ) -> lm.b.infer3way.full.contrasts
 
-# not sure how to put these in a csv
-# mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_one > 0)
-# mean(lm.b.infer3way.by.target.fit.samples$syntax_sub_v_basic < 0)
-# mean(lm.b.infer3way.by.target.fit.samples$syntax_basic_v_sub > 0)
+
 ```
 
 ``` {r}
 write_csv(data.frame(lm.b.infer3way.full.contrasts) %>% 
-            mutate(Rowname = Parameter), 
-          path = "./../../writing/R_results_TeX/expt3_3way_full_contrasts_revised2.csv")
+            mutate(Rowname = key), 
+          path = "./../../writing/R_results_TeX/expt3_3way_full_contrasts_wProbs.csv")
 ```
 
 #### Two-way + context main effect models
@@ -503,24 +470,24 @@ lm.b.infer.2way.fit.samples %>%
 ```
 
 ``` {r}
-# get contrast stats 
-rbind(
-  summarize_sample_vector(lm.b.infer.2way.fit.samples$syntax_sub_v_one, 'syntax_sub_v_one'),
-  summarize_sample_vector(lm.b.infer.2way.fit.samples$syntax_sub_v_basic, 'syntax_sub_v_basic'),
-  summarize_sample_vector(lm.b.infer.2way.fit.samples$syntax_basic_v_sub, 'syntax_basic_v_sub'),
-  summarize_sample_vector(lm.b.infer.2way.fit.samples$syntax_basic_v_one, 'syntax_basic_v_one')
-) -> lm.b.infer2way.full.contrasts
 
-# not sure how to put these into a csv:
-mean(lm.b.infer.2way.fit.samples$syntax_basic_v_one > 0)
-mean(lm.b.infer.2way.fit.samples$syntax_sub_v_one < 0)
+lm.b.infer.2way.fit.samples %>% 
+  gather(key, val) %>% 
+  group_by(key) %>%
+  summarize(
+    '|95%' = quantile(val, probs = c(0.025, 0.975))[[1]],
+    'mean'  = mean(val),
+    'u95%' = quantile(val, probs = c(0.025, 0.975))[[2]],
+    prob_gt_0 = mean(val > 0)*100,
+    prob_lt_0 = mean(val < 0)*100
+  ) -> lm.b.infer2way.full.contrasts
 ```
 
 ``` {r}
 write_csv(
   data.frame(lm.b.infer2way.full.contrasts) %>% 
-    mutate(Rowname = Parameter), 
-          path = "./../../writing/R_results_TeX/expt3_2way_full_contrasts_revised2.csv"
+    mutate(Rowname = key), 
+          path = "./../../writing/R_results_TeX/expt3_2way_full_contrasts_wProbs.csv"
 )
 ```
 
