@@ -232,7 +232,6 @@ rs.glmer.basicContext <- glmer(response_num~syntax_sum * (NP_subVone + NP_basicV
     data = d_infer_main_responseCat2 %>% 
       filter(context == "basic"), 
     family = 'binomial')
-  #  control=glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=2e5)))
 
 
 rs.glmer.basicContext.summary <- summary(rs.glmer.basicContext)
@@ -269,6 +268,8 @@ summary(rs.glmer.subContext.noOne)
 
 
 ``` {r lmer}
+# dummy / contrast coded exploratory models 
+
 # random effects correlation must be set to 0 to estimate the model
 # significant effect of context and sub NP
 lm.infer.fit <- glmer(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
@@ -299,7 +300,7 @@ summary(lm.infer.fit) # full model
 
 ```
 
-#### Sum coded Bayesian models 
+#### Sum coded Bayesian models (reported)
 
 ##### Polina's revisions 
 ``` {r brm model}
@@ -516,13 +517,6 @@ lm.b.infer.fit.two.way3.summary <- summary(lm.b.infer.fit.two.way3)
   #        path = "R_results_TeX/expt3_2_way_full_brm.csv")
 ```
 
-``` {r}
-d_infer_main_responseCat <- d_main_responseCat %>%
-  mutate(syntax_sum = ifelse(syntax == "subject", 0, 1),
-         NP_sum = ifelse(NP == "basic", 0, 1),
-         context_sum = ifelse(context == "basic", 0, 1))
-```
-
 ```{r}
 # two-way analysis, DUMMY / CONTRAST CODED
 lm.b.infer.fit.two.way3 <- brm(response_num ~ syntax_contr + NP_basic + NP_sub + context_sub  +
@@ -543,7 +537,7 @@ NP_subVone
 ```
 
 
-
+##### By-target size plot
 ``` {r by-size}
 d_infer_main_responseCat %>%  
   group_by( context, NP, condition, target_size) %>%
