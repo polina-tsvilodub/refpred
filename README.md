@@ -1,4 +1,4 @@
-## Supporting materials for Tessler, Tsvilodub, Snedeker, & Levy (2020) "Informational goals, sentence structure, and comparison class inference". *Proceedings of the 42nd Annual Meeting of the Cognitive Science Society.*
+### Supporting materials for Tessler, Tsvilodub, Snedeker, & Levy (2020) "Informational goals, sentence structure, and comparison class inference". *Proceedings of the 42nd Annual Meeting of the Cognitive Science Society.*
 
 The paper can be found [here](https://psyarxiv.com/n8eyj/).
 
