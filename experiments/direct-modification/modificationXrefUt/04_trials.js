@@ -14,7 +14,7 @@ const target_size = _.shuffle([0,0,0,1,1,1])
 
 const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
 console.log(contexts)
-const synt_adj0 = _.shuffle(["congr_subj", "congr_pred", "congr_subj", "congr_pred"]);
+const synt_adj0 = _.shuffle(["congr_subj_0", "congr_pred_0", "congr_subj_1", "congr_pred_1"]);
 console.log(synt_adj0)
 // console.log(synt_adj)
 const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_subj", "congr_subj"]);
@@ -30,49 +30,49 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
   const expt_views = []
   // the iterator iterates over all the contexts and takes one target per context (either big or small)
   for ( i = 0; i < num_trials; i ++) {
-
+    const critical_size = synt_adj0[i].split("_")[2]
     const view = {
       trial_type: "critical",
-      context: items[contexts[i]][target_size[i]].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
-      context_picture: items[contexts[i]][target_size[i]].context_picture, // context picture is chose (it is the same for both big and small targets)
+      context: items[contexts[i]][critical_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
+      context_picture: items[contexts[i]][critical_size].context_picture, // context picture is chose (it is the same for both big and small targets)
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
-      target_picture: items[contexts[i]][target_size[i]].target, // target picture, differs for bis and small target
+      target_picture: items[contexts[i]][critical_size].target, // target picture, differs for bis and small target
       item: contexts[i],
-      target: items[contexts[i]][target_size[i]].item,
-      target_size: items[contexts[i]][target_size[i]].adj_congr,
-      ref_np: items[contexts[i]][target_size[i]].reference
+      target: items[contexts[i]][critical_size].item,
+      target_size: items[contexts[i]][critical_size].adj_congr,
+      ref_np: items[contexts[i]][critical_size].reference
     }
     // modify utterance etc depending on specific condition
     if (synt_adj0[i].split("_")[0] == "congr") {
 
-      view.adj = items[contexts[i]][target_size[i]].adj_congr;
+      view.adj = items[contexts[i]][critical_size].adj_congr;
       view.adj_cond = "congruent";
 
       if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
-        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][target_size[i]].adj_congr + " " + items[contexts[i]][target_size[i]].item + " is a " + items[contexts[i]][target_size[i]].reference + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj_congr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][target_size[i]].adj_congr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].adj_congr + " " + items[contexts[i]][critical_size].item + " is a " + items[contexts[i]][critical_size].reference + ".</b>";
+        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_congr + " relative to?";
+        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_congr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         view.syntax = "pred";
-        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][target_size[i]].reference + " is a "  + items[contexts[i]][target_size[i]].adj_congr + " " + items[contexts[i]][target_size[i]].item + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj_congr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][target_size[i]].adj_congr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].reference + " is a "  + items[contexts[i]][critical_size].adj_congr + " " + items[contexts[i]][critical_size].item + ".</b>";
+        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_congr + " relative to?";
+        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_congr + " relative to other " ;// paraphrase template
       }
 
     } else { // incongruent condition
-      view.adj = items[contexts[i]][target_size[i]].adj_incongr;
+      view.adj = items[contexts[i]][critical_size].adj_incongr;
       view.adj_cond = "incongruent";
       if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
-        view.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][target_size[i]].adj_incongr + " " + items[contexts[i]][target_size[i]].item + " is a " + items[contexts[i]][target_size[i]].reference + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj_incongr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][target_size[i]].adj_incongr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][critical_size].adj_incongr + " " + items[contexts[i]][critical_size].item + " is a " + items[contexts[i]][critical_size].reference + ".</b>";
+        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
+        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_incongr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         view.syntax = "pred";
-        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][target_size[i]].reference + " is a "  + items[contexts[i]][target_size[i]].adj_incongr + " " + items[contexts[i]][target_size[i]].item + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][target_size[i]].adj_incongr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][target_size[i]].adj_incongr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].reference + " is a "  + items[contexts[i]][critical_size].adj_incongr + " " + items[contexts[i]][critical_size].item + ".</b>";
+        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
+        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_incongr + " relative to other " ;// paraphrase template
       }
     }
     // end of critical view creation
@@ -87,7 +87,7 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       }
     }
 
-    const filler_size = check_size(target_size[i])
+    const filler_size = check_size(critical_size)
     const filler = {
       trial_type: "filler",
       context: "You and your friend see the following:", // target_size indicates if the target is big or small within the given context
@@ -105,7 +105,7 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       filler.adj = items[contexts[i]][filler_size].adj_congr;
       filler.adj_cond = "congruent";
 
-      if (filler_cond[i].split("_")[1] == "subj") {
+      if (synt_adj0[i].split("_")[1] == "pred") { // if critical trials is predicate N, do subject N filler
         filler.syntax = "subj";
         filler.utterance = "Your friend says: <br/><b>" + "That "  + items[contexts[i]][filler_size].item + " is " + items[contexts[i]][filler_size].adj_congr + ".</b>";
         filler.question = "What do you think your friend is saying is it " + items[contexts[i]][filler_size].adj_congr + " relative to?";
@@ -120,7 +120,7 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
     } else { // incongruent condition
       filler.adj = items[contexts[i]][filler_size].adj_incongr;
       filler.adj_cond = "incongruent";
-      if (filler_cond[i].split("_")[1] == "subj") {
+      if (synt_adj0[i].split("_")[1] == "pred") {
         filler.syntax = "subj";
         filler.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][filler_size].item + " is " + items[contexts[i]][filler_size].adj_incongr + ".</b>";
         filler.question = "What do you think your friend is saying is it " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
@@ -303,7 +303,7 @@ const warmup_trials = {
     item: "dogs1",
     picture1: "warmup/chihuahua1.png",
     picture2: "warmup/doberman1.png",
-    text: "This one is done for you.",
+    text: "Please look at the objects below.",
     question1: "This is a chihuahua.",
     question3: "This is a doberman."
    },
@@ -313,8 +313,10 @@ const warmup_trials = {
     picture2: "warmup/doberman2.png",
     correct1: ["chihuahua"], // correct labels for the feedback
     correct2: ["doberman"],
-    text: "Your turn! Please label the pictures below.",
+    correct3: "dogs",
+    text: "Please label the pictures below.",
     question1: "This is a ",
+    question2: "These are both ",
     question3: "This is a "
   },
   ref: {
@@ -331,7 +333,7 @@ dogs2: {
   picture2: "warmup/great-dane1.png",
   default1: ["pug"],
   default2: ["great dane"],
-  text: "This one is done for you.",
+  text: "Please look at the objects below.",
   question1: "This is a pug.",
   question3: "This is a Great Dane."
   },
@@ -341,8 +343,10 @@ dogs2: {
   picture2: "warmup/great-dane2.png",
   correct1: ["pug"],
   correct2: ["great dane"],
-  text: "Your turn! Please label the pictures below.",
+  correct3: "dogs",
+  text: "Please label the pictures below.",
   question1: "This is a ",
+  question2: "These are both ",
   question3: "This is a "
 },
 ref: {
@@ -359,7 +363,7 @@ birds: {
   picture2: "warmup/eagle1.png",
   default1: ["hummingbird"],
   default2: ["eagle"],
-  text: "This one is done for you.",
+  text: "Please look at the objects below.",
   question1: "This is a hummingbird.",
   question3: "This is an eagle."
   },
@@ -369,8 +373,10 @@ birds: {
   picture2: "warmup/eagle2.png",
   correct1: ["hummingbird"],
   correct2: ["eagle"],
-  text: "Your turn! Please label the pictures below.",
+  correct3: "birds",
+  text: "Please label the pictures below.",
   question1: "This is a ",
+  question2: "These are both ",
   question3: "This is an "
 },
 ref: {
@@ -387,7 +393,7 @@ flowers: {
   picture2: "warmup/sunflower1.png",
   default1: ["dandelion"],
   default2: ["sunflower"],
-  text: "This one is done for you.",
+  text: "Please look at the objects below.",
   question1: "This is a dandelion.",
   question3: "This is a sunflower."
   },
@@ -397,8 +403,10 @@ flowers: {
   picture2: "warmup/sunflower2.png",
   correct1: ["dandelion"],
   correct2: ["sunflower"],
-  text: "Your turn! Please label the pictures below.",
+  correct3: "flowers",
+  text: "Please label the pictures below.",
   question1: "This is a ",
+  question2: "These are both ",
   question3: "This is a "
 },
 ref: {
@@ -437,7 +445,7 @@ trees: {
   picture2: "warmup/bonsai1.png",
   default1: ["redwood"],
   default2: ["bonsai"],
-  text: "This one is done for you.",
+  text: "Please look at the objects below.",
   question1: "This is a redwood.",
   question3: "This is a bonsai."
   },
@@ -447,8 +455,10 @@ trees: {
   picture2: "warmup/bonsai2.png",
   correct1: "redwood or sequoia (choose one)",
   correct2: ["bonsai"],
-  text: "Your turn! Please label the pictures below.",
+  correct3: "trees",
+  text: "Please label the pictures below.",
   question1: "This is a ",
+  question2: "These are both ",
   question3: "This is a "
 },
 ref: {

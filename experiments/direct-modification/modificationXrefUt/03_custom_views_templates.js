@@ -352,49 +352,50 @@ const custom_textfield_warmup = function(config, startingTime) {
 
     next1.on("click" , function() {
 // render the fill-in view
-      $("main").html(`<div class='magpie-view'>
-      <h1 class='magpie-view-title'>Warm-up trials</h1>
-      <section class="magpie-text-container">
-        <p class="magpie-view-question">${config.data[CT].label.text}</p>
-      </section>
-
-    <div style="width:100%;">
-     <div style="width:50%;height:400px;float:left;position:relative;align:center;">
-        <div style="position:absolute;bottom:0;right:20px;">
-          <div class="picture"  align="center" >
-            <img src="${config.data[CT].label.picture2}">
-          </div>
-          <div  class='magpie-view-answer-container'>
-            <p id='1' class='magpie-view-text'>${config.data[CT].label.question3}
-              <textarea id='textbox-input1' rows=1 cols=15 class='textbox-input' />
-            </p>
-            <p class = 'correct-answer1 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct2}</p>
+        $("main").html(`<div class='magpie-view'>
+        <h1 class='magpie-view-title'>Warm-up trials</h1>
+        <section class="magpie-text-container">
+          <p class="magpie-view-question">${config.data[CT].label.text}</p>
+        </section>
+        <div style="width:100%;">
+        <div style="width:50%;height:400px;float:left;position:relative;align:center;">
+          <div style="position:absolute;bottom:0;right:20px;">
+            <div class="picture"  align="center" >
+              <img src="${config.data[CT].label.picture1}">
+            </div>
+            <div  class='magpie-view-answer-container'>
+              <p id='1' class='magpie-view-text'>${config.data[CT].label.question1}
+                <textarea id='textbox-input1' rows=1 cols=15 class='textbox-input'/>
+              </p>
+              <p class = 'correct-answer1 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct1}</p>
+            </div>
           </div>
         </div>
-    </div>
-    <div style="width:50%;height:400px;float:right; position:relative;align:center;">
-      <div style="position:absolute;bottom:0;left:20px;">
-          <div  class="picture" align="center" >
-            <img src="${config.data[CT].label.picture1}">
-          </div>
-          <div class='magpie-view-answer-container' >
-            <p id='2' class='magpie-view-text'>${config.data[CT].label.question1}
-              <textarea id='textbox-input2' rows=1 cols=15 class='textbox-input'/>
-            </p>
-            <p class = 'correct-answer2 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct1}</p>
-          </div>
-      </div>
-      </div>
-    </div>
-
-    <div  class='magpie-view-answer-container'>
-
-      <p class = 'correct-answer4 magpie-nodisplay'>Please enter the correct labels to proceed</p>
-    </div>
-
-          <button id='next' class='magpie-view-button magpie-nodisplay'>next</button>
-    </div>  `);
-
+        <div style="width:50%;height:400px;float:right; position:relative;align:center;">
+        <div style="position:absolute;bottom:0;left:20px;">
+            <div  class="picture" align="center" >
+              <img src="${config.data[CT].label.picture2}">
+            </div>
+            <div class='magpie-view-answer-container' >
+              <p id='2' class='magpie-view-text'>${config.data[CT].label.question3}
+                <textarea id='textbox-input2' rows=1 cols=15 class='textbox-input'/>
+              </p>
+              <p class = 'correct-answer2 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct2}</p>
+            </div>
+        </div>
+        </div>
+        </div>
+        <div  class='magpie-view-answer-container'>
+        <p id='3' class='magpie-view-text'>${config.data[CT].label.question2}
+          <textarea id='textbox-input3' rows=1 cols=15 class='textbox-input'/>
+        <p id='4'></p>
+        <p class = 'correct-answer3 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct3}</p>
+        </p>
+        <br />
+        <p class = 'correct-answer4 magpie-nodisplay'>Please enter the correct labels to proceed</p>
+        </div>
+            <button id='next' class='magpie-view-button magpie-nodisplay'>next</button>
+        </div>  `)
     // function delayButton() {
     //   setTimeout( function() {document.getElementById('next1').removeClass("magpie-nodisplay")}, 4000);
     // }
@@ -402,7 +403,7 @@ const custom_textfield_warmup = function(config, startingTime) {
         let next;
         let textInput1;
         let textInput2;
-        // let textInput3;
+        let textInput3;
 
 
         const minChars = config.data[CT].min_chars === undefined ? 2 : config.data[CT].min_chars;
@@ -410,26 +411,68 @@ const custom_textfield_warmup = function(config, startingTime) {
         next = $("#next");
         textInput1 = $("#textbox-input1")
         textInput2 = $("#textbox-input2")
-
+        textInput3 = $("#textbox-input3")
         // attach event listeners to the text input boxes
         // if the text is longer than (in this case) 2 characters without the spaces in all textboxes
         // the 'next' button appears
+        // attach event listeners to the text input boxes
         textInput1.on("keyup", function() {
-          if (textInput1.val().trim().length > minChars) {
-            textInput2.on("keyup", function() {
-              if (textInput2.val().trim().length > minChars) {
-                next.removeClass("magpie-nodisplay");
-              }
-            });
-          } else if (textInput2.val().trim().length > minChars) {
-            textInput1.on("keyup", function() {
-              if (textInput1.val().trim().length > minChars) {
-                      next.removeClass("magpie-nodisplay");
-                  }
+            // if the text is longer than (in this case) 2 characters without the spaces in all textboxes
+            // the 'next' button appears
+            if (textInput1.val().trim().length > minChars)  {
+              textInput2.on("keyup", function() {
+                if (textInput2.val().trim().length > minChars) {
+                  textInput3.on("keyup", function() {
+                    if (textInput3.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                    }
+                  });
+                } else if (textInput3.val().trim().length > minChars) {
+                    textInput2.on("keyup", function() {
+                      if (textInput2.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                       }
+                    })
+                };
               });
-          } else {
-              next.addClass("magpie-nodisplay");
-          }
+            } else if (textInput2.val().trim().length > minChars) {
+              textInput1.on("keyup", function() {
+                if (textInput1.val().trim().length > minChars) {
+                  textInput3.on("keyup", function() {
+                    if (textInput3.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                    }
+                  });
+                } else if (textInput3.val().trim().length > minChars) {
+                    textInput1.on("keyup", function() {
+                      if (textInput1.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                       }
+                    })
+                };
+              });
+            } else if (textInput3.val().trim().length > minChars) {
+              textInput1.on("keyup", function() {
+                if (textInput1.val().trim().length > minChars) {
+                  textInput2.on("keyup", function() {
+                    if (textInput2.val().trim().length > minChars) {
+
+                        next.removeClass("magpie-nodisplay");
+
+                    }
+                  });
+                } else if (textInput2.val().trim().length > minChars) {
+                    textInput1.on("keyup", function() {
+                      if (textInput1.val().trim().length > minChars) {
+                        next.removeClass("magpie-nodisplay");
+                       }
+                    })
+                };
+              });
+
+            } else {
+                next.addClass("magpie-nodisplay");
+            }
         });
 
         var attempts = 0;
@@ -441,7 +484,8 @@ const custom_textfield_warmup = function(config, startingTime) {
               trial_number: CT + 1,
               attempts: attempts, // record how often participants re-enter labels
               response1: textInput1.val().trim(),
-              response2: textInput2.val().trim()
+              response2: textInput2.val().trim(),
+              response3: textInput3.val().trim()
 
           };
           trial_data = magpieUtils.view.save_config_trial_data(config.data[CT].label, trial_data);
@@ -449,7 +493,7 @@ const custom_textfield_warmup = function(config, startingTime) {
 
           var flag = true;
           // check if all the labels are correct
-          if (config.data[CT].label.correct2.includes(textInput1.val().trim().toLowerCase()) == false) {
+          if (config.data[CT].label.correct1.includes(textInput1.val().trim().toLowerCase()) == false) {
             flag = false;
             $(".correct-answer1").removeClass("magpie-nodisplay")
             $(".correct-answer4").removeClass("magpie-nodisplay")
@@ -457,12 +501,20 @@ const custom_textfield_warmup = function(config, startingTime) {
             $(".correct-answer1").addClass("magpie-nodisplay")
           }
 
-          if (config.data[CT].label.correct1.includes(textInput2.val().trim().toLowerCase()) == false) {
+          if (config.data[CT].label.correct2.includes(textInput2.val().trim().toLowerCase()) == false) {
             flag = false;
             $(".correct-answer2").removeClass("magpie-nodisplay")
             $(".correct-answer4").removeClass("magpie-nodisplay")
           } else {
             $(".correct-answer2").addClass("magpie-nodisplay")
+          }
+
+          if (config.data[CT].label.correct3.includes(textInput3.val().trim().toLowerCase()) == false) {
+            flag = false;
+            $(".correct-answer3").removeClass("magpie-nodisplay")
+            $(".correct-answer4").removeClass("magpie-nodisplay")
+          } else {
+            $(".correct-answer3").addClass("magpie-nodisplay")
           }
 
           // proceed if all the labels match the input

@@ -10,4 +10,4 @@ writing/refpred-cogsci2020.pdf
 *.blg
 *.log
 *.synctex.gz
-*/node_modules/
+experiments/direct-modification/modificationXrefUt/node_modules/
