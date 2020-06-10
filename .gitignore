@@ -5,9 +5,12 @@
 *.DS_Store
 *.Rproj
 writing/refpred-cogsci2020.pdf
+writing/paper/refpred-cogsci2020.pdf
 *.aux
 *.bbl
 *.blg
+*.fff
+*.ttt
 *.log
 *.synctex.gz
 experiments/direct-modification/modificationXrefUt/node_modules/

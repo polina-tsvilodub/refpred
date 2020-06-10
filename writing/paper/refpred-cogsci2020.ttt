@@ -1,0 +1,28 @@
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+[t]
+\small{
+\begin{center}
+\caption{Experimental items: each basic-level context had two potential targets from an either saliently small or saliently big subordinate category within the basic-level class. Items marked with * were used in Expt. 2.}
+\label{tab:stimuli}
+\vskip 0.12in
+\fontsize{10}{11}\selectfont
+\begin{tabularx}{\linewidth}{lll}
+\hline
+ Basic-level category & Smaller referent & Bigger referent\\
+\hline
+ Dogs & Pug & Great Dane \\
+ Dogs & Chihuahua & Doberman\\
+ Birds & Hummingbird & Eagle  \\
+ Fish & Goldfish & Swordfish \\
+ Flowers & Dandelion & Sunflower\\
+ Trees & Bonsai & Redwood\\
+Birds* & Sparrow* & Goose* \\
+Birds* & Canary* & Swan* \\
+Fish* & Clownfish* & Tuna* \\
+Flowers* & Daisy* & Peony* \\
+\hline
+\end{tabularx}
+\end{center}
+}
+\end{table*}
