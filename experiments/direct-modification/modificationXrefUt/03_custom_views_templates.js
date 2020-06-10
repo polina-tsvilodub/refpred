@@ -361,26 +361,26 @@ const custom_textfield_warmup = function(config, startingTime) {
         <div style="width:50%;height:400px;float:left;position:relative;align:center;">
           <div style="position:absolute;bottom:0;right:20px;">
             <div class="picture"  align="center" >
-              <img src="${config.data[CT].label.picture1}">
+              <img src="${config.data[CT].label.picture2}">
             </div>
             <div  class='magpie-view-answer-container'>
-              <p id='1' class='magpie-view-text'>${config.data[CT].label.question1}
+              <p id='1' class='magpie-view-text'>${config.data[CT].label.question3}
                 <textarea id='textbox-input1' rows=1 cols=15 class='textbox-input'/>
               </p>
-              <p class = 'correct-answer1 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct1}</p>
+              <p class = 'correct-answer1 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct2}</p>
             </div>
           </div>
         </div>
         <div style="width:50%;height:400px;float:right; position:relative;align:center;">
         <div style="position:absolute;bottom:0;left:20px;">
             <div  class="picture" align="center" >
-              <img src="${config.data[CT].label.picture2}">
+              <img src="${config.data[CT].label.picture1}">
             </div>
             <div class='magpie-view-answer-container' >
-              <p id='2' class='magpie-view-text'>${config.data[CT].label.question3}
+              <p id='2' class='magpie-view-text'>${config.data[CT].label.question1}
                 <textarea id='textbox-input2' rows=1 cols=15 class='textbox-input'/>
               </p>
-              <p class = 'correct-answer2 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct2}</p>
+              <p class = 'correct-answer2 magpie-nodisplay'>A possible answer is: ${config.data[CT].label.correct1}</p>
             </div>
         </div>
         </div>
@@ -493,7 +493,7 @@ const custom_textfield_warmup = function(config, startingTime) {
 
           var flag = true;
           // check if all the labels are correct
-          if (config.data[CT].label.correct1.includes(textInput1.val().trim().toLowerCase()) == false) {
+          if (config.data[CT].label.correct2.includes(textInput1.val().trim().toLowerCase()) == false) {
             flag = false;
             $(".correct-answer1").removeClass("magpie-nodisplay")
             $(".correct-answer4").removeClass("magpie-nodisplay")
@@ -501,7 +501,7 @@ const custom_textfield_warmup = function(config, startingTime) {
             $(".correct-answer1").addClass("magpie-nodisplay")
           }
 
-          if (config.data[CT].label.correct2.includes(textInput2.val().trim().toLowerCase()) == false) {
+          if (config.data[CT].label.correct1.includes(textInput2.val().trim().toLowerCase()) == false) {
             flag = false;
             $(".correct-answer2").removeClass("magpie-nodisplay")
             $(".correct-answer4").removeClass("magpie-nodisplay")
