@@ -9,7 +9,9 @@
 // const syntactic_cond = _.shuffle([0,0,0,1,1,1])
 
 const target_size = _.shuffle([0,0,0,1,1,1])
-
+const pic_order = function() {
+  return _.shuffle([0,1])
+}
 // const syntax = ["subject", "predicate"]
 
 const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
@@ -51,12 +53,12 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
         view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].adj_congr + " " + items[contexts[i]][critical_size].item + " is a " + items[contexts[i]][critical_size].reference + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_congr + " relative to?";
+        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_congr + " relative to?";
         view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_congr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         view.syntax = "pred";
         view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].reference + " is a "  + items[contexts[i]][critical_size].adj_congr + " " + items[contexts[i]][critical_size].item + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_congr + " relative to?";
+        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_congr + " relative to?";
         view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_congr + " relative to other " ;// paraphrase template
       }
 
@@ -66,12 +68,12 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
         view.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][critical_size].adj_incongr + " " + items[contexts[i]][critical_size].item + " is a " + items[contexts[i]][critical_size].reference + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
+        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
         view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_incongr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         view.syntax = "pred";
         view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].reference + " is a "  + items[contexts[i]][critical_size].adj_incongr + " " + items[contexts[i]][critical_size].item + ".</b>";
-        view.question = "What do you think your friend is saying is it " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
+        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
         view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_incongr + " relative to other " ;// paraphrase template
       }
     }
@@ -108,12 +110,12 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       if (synt_adj0[i].split("_")[1] == "pred") { // if critical trials is predicate N, do subject N filler
         filler.syntax = "subj";
         filler.utterance = "Your friend says: <br/><b>" + "That "  + items[contexts[i]][filler_size].item + " is " + items[contexts[i]][filler_size].adj_congr + ".</b>";
-        filler.question = "What do you think your friend is saying is it " + items[contexts[i]][filler_size].adj_congr + " relative to?";
+        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_congr + " relative to?";
         filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_congr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         filler.syntax = "pred";
         filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[contexts[i]][filler_size].adj_congr + " " + items[contexts[i]][filler_size].item + ".</b>";
-        filler.question = "What do you think your friend is saying is it " + items[contexts[i]][filler_size].adj_congr + " relative to?";
+        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_congr + " relative to?";
         filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_congr + " relative to other " ;// paraphrase template
       }
 
@@ -123,12 +125,12 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
       if (synt_adj0[i].split("_")[1] == "pred") {
         filler.syntax = "subj";
         filler.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][filler_size].item + " is " + items[contexts[i]][filler_size].adj_incongr + ".</b>";
-        filler.question = "What do you think your friend is saying is it " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
+        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
         filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_incongr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         filler.syntax = "pred";
         filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[contexts[i]][filler_size].adj_incongr + " " + items[contexts[i]][filler_size].item + ".</b>";
-        filler.question = "What do you think your friend is saying is it " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
+        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
         filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_incongr + " relative to other " ;// paraphrase template
       }
     }
@@ -157,7 +159,7 @@ const items = {
      target: "images/doberman.png",
      target_filler: "images/doberman_filler.png",
      // first array is subject  , second is predicate
-     reference: "service animal" // critical utterances
+     reference: "service-animal" // critical utterances
    },
    // second set contains the subordinate context
    {
@@ -170,7 +172,7 @@ const items = {
     target: "images/chihuahua.png",
     target_filler: "images/chihuahua_filler.png",
     // first array are utterances in predicate, second is subject utterances
-    reference: "service animal"
+    reference: "service-animal"
     }
   ],
   // "_s" are the small referents
@@ -301,6 +303,8 @@ const warmup_trials = {
   dogs1: {
     train: {
     item: "dogs1",
+    examples: _.shuffle([{picture:"warmup/chihuahua1.png", question:"This is a chihuahua."},
+                         {picture: "warmup/doberman1.png", question: "This is a doberman."}]),
     picture1: "warmup/chihuahua1.png",
     picture2: "warmup/doberman1.png",
     text: "Please look at the objects below.",
@@ -309,10 +313,12 @@ const warmup_trials = {
    },
   label: {
     item: "dogs1",
-    picture1: "warmup/chihuahua2.png",
-    picture2: "warmup/doberman2.png",
-    correct1: ["chihuahua"], // correct labels for the feedback
-    correct2: ["doberman"],
+    examples: _.shuffle([{picture:"warmup/chihuahua2.png", correct: ["chihuahua"], question: "This is a "},
+               {picture: "warmup/doberman2.png", correct:  ["doberman"], question: "This is a "}]),
+    // picture1: "warmup/chihuahua2.png",
+    // picture2: "warmup/doberman2.png",
+    // correct1: ["chihuahua"], // correct labels for the feedback
+    // correct2: ["doberman"],
     correct3: "dogs",
     text: "Please label the pictures below.",
     question1: "This is a ",
@@ -323,12 +329,14 @@ const warmup_trials = {
     item: "dogs1",
     picture1: "warmup/beagle_service.png",
     picture2: "warmup/doberman_service.png",
-    question: " <br> These are service animals."
+    question: " <br> These dogs are service-animals. Notice the leash on them."
   }
 },
 dogs2: {
   train: {
   item: "dogs2",
+  examples: _.shuffle([{picture:"warmup/pug1.png", question:"This is a pug."},
+                       {picture: "warmup/great-dane1.png", question: "This is a Great Dane."}]),
   picture1: "warmup/pug1.png",
   picture2: "warmup/great-dane1.png",
   default1: ["pug"],
@@ -339,10 +347,12 @@ dogs2: {
   },
   label: {
   item: "dogs2",
-  picture1: "warmup/pug2.png",
-  picture2: "warmup/great-dane2.png",
-  correct1: ["pug"],
-  correct2: ["great dane"],
+  examples: _.shuffle([{picture: "warmup/pug2.png", question: "This is a ", correct: ["pug"]},
+                       {picture: "warmup/great-dane2.png",question: "This is a ", correct: ["great dane"]}]),
+  // picture1: "warmup/pug2.png",
+  // picture2: "warmup/great-dane2.png",
+  // correct1: ["pug"],
+  // correct2: ["great dane"],
   correct3: "dogs",
   text: "Please label the pictures below.",
   question1: "This is a ",
@@ -353,12 +363,14 @@ ref: {
   item: "dogs2",
   picture1: "warmup/pug_prize.png",
   picture2: "warmup/great-dane_prize.png",
-  question:" <br>These are prize-winners."
+  question:" <br>These dogs are prize-winners. Notice the bow on them."
 }
 },
 birds: {
   train: {
   item: "birds",
+  examples: _.shuffle([{picture:"warmup/hummingbird1.png", question:"This is a hummingbird."},
+                       {picture: "warmup/eagle1.png", question: "This is an eagle."}]),
   picture1: "warmup/hummingbird1.png",
   picture2: "warmup/eagle1.png",
   default1: ["hummingbird"],
@@ -369,10 +381,12 @@ birds: {
   },
   label: {
   item: "birds",
-  picture1: "warmup/hummingbird2.png",
-  picture2: "warmup/eagle2.png",
-  correct1: ["hummingbird"],
-  correct2: ["eagle"],
+  examples: _.shuffle([{picture: "warmup/hummingbird2.png", question: "This is a ", correct: ["hummingbird"]},
+                       {picture: "warmup/eagle2.png",question: "This is an ", correct: ["eagle"]}]),
+  // picture1: "warmup/hummingbird2.png",
+  // picture2: "warmup/eagle2.png",
+  // correct1: ["hummingbird"],
+  // correct2: ["eagle"],
   correct3: "birds",
   text: "Please label the pictures below.",
   question1: "This is a ",
@@ -383,12 +397,14 @@ ref: {
   item: "birds",
   picture1: "warmup/hummingbird_rescue.png",
   picture2: "warmup/eagle_rescue.png",
-  question: " <br> These are rescues."
+  question: " <br> These are rescue animals (or, rescues). Notice the tag on them."
 }
 },
 flowers: {
   train: {
   item: "flowers",
+  examples: _.shuffle([{picture:"warmup/dandelion1.png", question:"This is a dandelion."},
+                       {picture: "warmup/sunflower1.png", question: "This is a sunflower."}]),
   picture1: "warmup/dandelion1.png",
   picture2: "warmup/sunflower1.png",
   default1: ["dandelion"],
@@ -399,10 +415,12 @@ flowers: {
   },
   label: {
   item: "flowers",
-  picture1: "warmup/dandelion2.png",
-  picture2: "warmup/sunflower2.png",
-  correct1: ["dandelion"],
-  correct2: ["sunflower"],
+  examples: _.shuffle([{picture: "warmup/dandelion2.png", question: "This is a ", correct: ["dandelion"]},
+                       {picture: "warmup/sunflower2.png",question: "This is a ", correct: ["sunflower"]}]),
+  // picture1: "warmup/dandelion2.png",
+  // picture2: "warmup/sunflower2.png",
+  // correct1: ["dandelion"],
+  // correct2: ["sunflower"],
   correct3: "flowers",
   text: "Please label the pictures below.",
   question1: "This is a ",
@@ -413,7 +431,7 @@ ref: {
   item: "flowers",
   picture1: "warmup/dandelion_gift.png",
   picture2: "warmup/sunflower_gift.png",
-  question: " <br> These are gifts."
+  question: " <br> These flowers are gifts. Notice the bows on the pots."
 }
 },
 // fish: {
@@ -441,6 +459,8 @@ ref: {
 trees: {
   train: {
   item: "trees",
+  examples: _.shuffle([{picture:"warmup/redwood1.png", question:"This is a redwood."},
+                       {picture: "warmup/bonsai1.png", question: "This is a bonsai."}]),
   picture1: "warmup/redwood1.png",
   picture2: "warmup/bonsai1.png",
   default1: ["redwood"],
@@ -451,10 +471,12 @@ trees: {
   },
   label: {
   item: "trees",
-  picture1: "warmup/redwood2.png",
-  picture2: "warmup/bonsai2.png",
-  correct1: "redwood or sequoia (choose one)",
-  correct2: ["bonsai"],
+  examples: _.shuffle([{picture: "warmup/redwood2.png", question: "This is a ", correct: "redwood or sequoia (choose one)"},
+                       {picture: "warmup/bonsai2.png",question: "This is a ", correct: ["bonsai"]}]),
+  // picture1: "warmup/redwood2.png",
+  // picture2: "warmup/bonsai2.png",
+  // correct1: "redwood or sequoia (choose one)",
+  // correct2: ["bonsai"],
   correct3: "trees",
   text: "Please label the pictures below.",
   question1: "This is a ",
@@ -465,7 +487,7 @@ ref: {
   item: "trees",
   picture1: "warmup/redwood_landmark.png",
   picture2: "warmup/tree_landmark.png",
-  question: " <br> These are landmarks."
+  question: " <br> These trees are landmarks. Notice the signs on them."
 }
 }
 }
