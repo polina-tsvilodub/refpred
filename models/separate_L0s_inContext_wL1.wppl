@@ -101,21 +101,22 @@ var statePrior = function(cc) {
 
 var context = {
   // basic-level context, with a 2 members from three different subordinate categories
-  super: [ {referent: "dog1", property: 1, name: "A"},
-         {referent: "dog1", property: 1.6, name: "B"},
-         {referent: "dog2", property: 0, name: "C"},
-         {referent: "dog2", property: 0.2, name: "D"},
-         {referent: "dog3", property: -1, name: "E"},
-         {referent: "dog3", property: -1, name: "F"}
+  super: [ {referent: "dog1", property: 1, name: "A", subordinate : "high"},
+         {referent: "dog1", property: 1.6, name: "B", subordinate: "high"},
+         {referent: "dog2", property: 0, name: "C", subordinate: "medium"},
+         {referent: "dog2", property: 0.2, name: "D", subordinate : "medium"},
+         {referent: "dog3", property: -1, name: "E", subordinate: "low"},
+         {referent: "dog3", property: -1, name: "F", subordinate: "low"}
   ],
-  sub: [ {referent: "dog1", property: 1, name: "A"},
-         {referent: "dog1", property: 1, name: "B"},
-         {referent: "dog1", property: 1, name: "C"},
-         {referent: "dog1", property: 1, name: "D"},
-         {referent: "dog1", property: 1, name: "E"},
-         {referent: "dog1", property: 1, name: "F"}
+  sub: [ {referent: "dog1", property: 1, name: "A", subordinate : "high"},
+         {referent: "dog1", property: 1, name: "B", subordinate : "high"},
+         {referent: "dog1", property: 1, name: "C", subordinate : "high"},
+         {referent: "dog1", property: 1, name: "D", subordinate : "high"},
+         {referent: "dog1", property: 1, name: "E", subordinate : "high"},
+         {referent: "dog1", property: 1, name: "F", subordinate : "high"}
   ]
 }
+
 // possible statePrior parameters are adjusted to represent three different subordinate categories (above)
 
 // additionally to the context representation, there is a variable whether the target referent
@@ -308,13 +309,14 @@ var speakerContext = cache(function(state, context, establishRef, form, threshol
 // and the reverse happens in sub context (predicate -- basic CC, subject -- sub CC)
 // I strongly assume that these things are happening because of the decoupled reference & predication
 
-var pragmaticListener = function(utterance, subordinate, form, cont) {
+var pragmaticListener = function(utterance, form, cont) {
   Infer({model: function(){
     // uncertainty about the comparison class (super vs. sub)
     var c = sample(classPrior)
     var currentContext = context[cont]
     // sample target
     var target = sample(targetPrior(currentContext))
+    var subordinate = target.subordinate
     // sample establishReference variable
     var isReference = sample(establishRef)
     var currentStatePrior = statePrior(subordinate)
@@ -328,13 +330,13 @@ var pragmaticListener = function(utterance, subordinate, form, cont) {
 
 // marginals are easier to parse
 display("Subject vs predicate sub N in basic context")
-viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "high", "positive", "super"))
-viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "high", "positive", "super"))
+viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "super"))
+viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super"))
 
 display("Sub N in predicate condition in basic vs sub context")
-viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "high", "positive", "super"))
-viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "high", "positive", "sub"))
+viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super"))
+viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "sub"))
 
 display("Basic N in predicate vs subject position in basic context")
-viz.marginals(pragmaticListener({subject: "that", predicate: "big dog"}, "high", "positive", "super"))
-viz.marginals(pragmaticListener({subject: "dog", predicate: "big"}, "high", "positive", "super"))
+viz.marginals(pragmaticListener({subject: "that", predicate: "big dog"}, "positive", "super"))
+viz.marginals(pragmaticListener({subject: "dog", predicate: "big"}, "positive", "super"))
