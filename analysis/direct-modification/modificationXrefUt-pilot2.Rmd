@@ -1,0 +1,195 @@
+---
+title: "Double Modification Pilot 6"
+author: "Polina Tsvilodub"
+date: "6/24/2020"
+output: github_document
+---
+
+This pilot is a continuation of the double-modification pilot 5. Data from n = 36 participants was collected.
+The experiment consists of two blocks, each having a warm-up and a main phase.
+
+First, participants see warm-up trials, wherein they first are shown labeled instances of subordinate members from different basic categories, which later appear as members of the context pictures; and subsequently have to label other instances of same subordinate classes themselves. 
+Then, they see instances of features described by the second noun presented in the critical sentences. For example, they see dogs with prize bows on them and read: "These dogs are prize-winners. Notice the bow on them.". Then, they complete one comparison class paraphrase warm-up trial. 
+
+In the main trials, participants complete 4 trials - two critical and two 'filler' trials. On the critical trials, the *subordinate* directly modified noun appears in the subject or in the predicate of the sentence including a second feature-noun, e.g. "That big Great Dane is a prize-winner" (Subject N) or "That prize-winner is a big Great Dane" (predicate N). Critical sentences appear in a context where two of the objects are instances of the same subordinate category as the target, and two instances have the same additional feature (e.g. being a prize-winner) as the target (the feature does not fully overlap with the subordinate category).
+The filler trials are trials from CogSci experiment 3: the sentences have only one, subordinate noun which appears in the subject or in the predicate of the sentence. The context includes two other subordinate members. 
+
+In one block, two distinct context are used, and the critical and the filler trial use one of the possible targets each (i.e., if the critical sentence describes the Great Dane in the dog context, the filler sentence in the same block describes the pug in the dog context). The trial types (critical vs filler), syntax (subject vs predicate N), and size of the targets (big vs small) are balanced within-participant, resulting in 8 unique trials (4 per block).
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lmerTest)
+library(brms)
+library(tidyboot)
+library(jsonlite)
+```
+
+
+```{r}
+data <- read_csv("../../data/direct-modification/results_35_double-modXrefUt-pilot2.csv")
+```
+
+## Data Exclusion
+
+One participant was excluded for not reporting their native language. One is excluded for failing the comparison class warm-up trial, two are excluded for failing labeling trials (mostly due to typos).
+```{r clean}
+# exclude participants who report glitches
+data %>% select(workerid, comments, problems) %>% distinct() %>% View()
+d_modRef_woGlitches <- data 
+
+# exclude non-native English speakers
+d_modRef_woGlitches %>% distinct(languages) %>% View()
+
+d_modRef_Native <- d_modRef_woGlitches %>% 
+  filter(grepl("en", languages, ignore.case = T)) 
+
+# cleaning warm-up trials
+# comparison class paraphrase trial
+d_failed_cc_warmup <- d_modRef_Native %>% 
+  filter( trial_name == "comp_class_warmup") %>%
+  group_by(workerid) %>% count() %>%
+  filter( n > 4 )
+d_failed_label_warmup <- d_modRef_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(workerid) %>%
+  filter(attempts > 4)
+d_label_warmup_more1 <- d_modRef_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(workerid) %>%
+  filter(attempts > 1) %>% ungroup() %>% 
+  select(workerid, picture1, response1, picture2, response2, attempts)
+
+d_modRef_filter <- anti_join(d_modRef_Native, d_failed_cc_warmup, by = c("workerid"))
+d_modRef_filter <- anti_join(d_modRef_filter, d_failed_label_warmup, by = c("workerid"))
+```
+
+```{r}
+d_modRef_filter %>% count(trial_type, syntax, target_size)
+```
+
+## Response Classification
+
+Data from n = 32 subjects is classified into responses *not matching* the critical subordinate N (i.e. basic-level, superordinate or feature-nouns) vs *matching* (i.e. subordinate) nouns. 6 (1 %) invalid responses where participants fail to establish correct reference or produce nonsense are excluded. 
+``` {r}
+d_modRef_main <- d_modRef_filter %>% filter((trial_name == "custom_main_text1") |
+                                (trial_name == "custom_main_text2")) %>%
+  select(workerid, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type )
+```
+
+``` {r}
+d_modRef_main %>% distinct(response) %>% View()
+
+d_modRef_valid <- d_modRef_main %>% 
+  subset(., !(tolower(response) %in% c("height", "size", "height and weight", "distance", "wings", "width")))
+
+d_modRef_main_responseCat <- d_modRef_valid %>% 
+  mutate(response_cat = ifelse(
+    tolower(response) %in% 
+      c("flowers", "flower", "trees", "tree", "birds", "bird",  "dogs", "dog", "plants", "other trees", "animal", "other tree", "other birds", "nearby trees.", "animals", "gift flowers", "prize flowers", "prize dogs", "prize winning dogs", "rescue birds", "landmark", "gift", "prize winner", "rescues", "gifts", "prize-winners", "service-animals", "service dogs", "floral gifts", "service animals", "other landmarks", "prize winners"), 
+    "nonmatch", "match"
+  ),
+  response_num = ifelse(response_cat == "nonmatch", 1, 0)
+  )
+```
+
+
+# Proportion of responses not matching critical N by-syntax and by-trial type
+
+The proportion of responses which don't match the critical subordinate Ns is plotted against the syntax by-trial type.
+
+### Pilot 6
+
+```{r plot, echo=FALSE}
+bar.width = 0.8
+d_modRef_main_responseCat %>%  
+  group_by(syntax, trial_type) %>%
+  tidyboot_mean(column = response_num) -> d_modRef_main_responseCat.bs
+
+d_modRef_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper, fill=syntax)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width,
+           alpha = 0.5, color="black", size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = c(0, 0.5, 1))+
+  ylab("Proportion of non-matching responses") +
+  #theme_bw() +
+  facet_grid(~trial_type)
+```
+### Pilot 5 + Pilot 6
+
+```{r, include = F}
+data_pilot5 <- read_csv("../../data/direct-modification/results_35_modXrefUt_pilot1_nonMatchClassified_tidy.csv") %>% rename('workerid' = submission_id,
+                                                                                                                             'response_num' = response_numMatch
+                                                                                                                             
+                                                                                                            
+          ) %>% select(-NP_match)
+
+df_resps_tidy_5_6 <- rbind(d_modRef_main_responseCat %>% select(.,-response_cat), data_pilot5)
+```
+
+```{r}
+df_resps_tidy_5_6 %>% 
+  group_by(trial_type, syntax) %>%
+  tidyboot_mean(column = response_num) -> df_resps_tidy_5_6.bs
+
+df_resps_tidy_5_6.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper, fill=syntax)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width,
+           alpha = 0.5, color="black", size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = c(0, 0.5, 1))+
+  ylab("Proportion of non-matching responses") +
+  facet_grid(~trial_type)
+```
+
+# Stats
+
+### Pilot 6, critical trials 
+We fit a Bayesian regression model with maximal random effect structure on the *critical trial data* (n = 31), predicting the response type (non-matching vs. matching) by the syntax (subject vs predicate, deviation-coded).
+```{r}
+d_modRef_main_responseCat %>% 
+  mutate(syntax_dev = factor(syntax, levels = c("subj", "pred"))) -> d_modRef_main_responseCat
+
+contrasts(d_modRef_main_responseCat$syntax_dev) <- contr.sum(2)
+
+d_modRef_main_responseCat_critical <- d_modRef_main_responseCat %>% filter(trial_type == "critical")
+
+blm.critical <- brm(
+  response_num ~ syntax_dev + (1 + syntax_dev | workerid) + (1 + syntax_dev | target),
+  data = d_modRef_main_responseCat_critical,
+  family = "bernoulli",
+  cores = 4,
+  control = list(adapt_delta = 0.9)
+) 
+
+summary(blm.critical)
+```
+
+### Pilot 5 + 6, critical trials 
+
+A Bayesian regression model on data from *critical trials collapsed across pilot 5 and pilot 6* (n = 47), including a maximal random effect structure: 
+
+```{r}
+df_resps_tidy_5_6 %>% 
+  mutate(syntax_dev = factor(syntax, levels = c("subj", "pred"))) -> df_resps_tidy_5_6
+contrasts(df_resps_tidy_5_6$syntax_dev) <- contr.sum(2)
+df_resps_tidy_5_6_critical <- df_resps_tidy_5_6 %>% filter(trial_type == "critical")
+
+blm.collapsed.critical <- brm(
+  response_num ~ syntax_dev + (1 + syntax_dev | workerid) + (1 + syntax_dev | target),
+  data = df_resps_tidy_5_6_critical,
+  family = "bernoulli",
+  cores = 4,
+  control = list(adapt_delta = 0.95)
+) 
+
+summary(blm.collapsed.critical)
+```
