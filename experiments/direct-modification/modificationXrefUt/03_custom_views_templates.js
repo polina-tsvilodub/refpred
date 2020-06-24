@@ -492,11 +492,11 @@ const custom_textfield_warmup = function(config, startingTime) {
               correct2: config.data[CT].label.examples[1].correct.toString()
 
           };
-          console.log(trial_data);
+          //console.log(trial_data);
           var data_to_record = config.data[CT].label;
           // const (item, correct3, text, question1, question2, question3) = data_to_record;
           var {examples, ...data_to_record} = data_to_record;
-          console.log(data_to_record);
+          //console.log(data_to_record);
           trial_data = magpieUtils.view.save_config_trial_data(data_to_record, trial_data);
           magpie.trial_data.push(trial_data);
 
