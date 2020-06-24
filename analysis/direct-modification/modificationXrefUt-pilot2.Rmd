@@ -90,8 +90,32 @@ d_modRef_main_responseCat <- d_modRef_valid %>%
   ),
   response_num = ifelse(response_cat == "nonmatch", 1, 0)
   )
+
+# analysis of non-matching responses
+d_modRef_main_responseCat_nonmatch <- d_modRef_main_responseCat %>%
+  mutate(
+    response_cat = ifelse(
+      tolower(response) %in% 
+        c("flowers", "flower", "trees", "tree", "birds", "bird",  "dogs", "dog", "plants", "other trees", "animal", "other tree", "other birds", "nearby trees.", "animals", "gift flowers", "prize flowers", "prize dogs", "prize winning dogs", "rescue birds", "service dogs"
+          
+        ), "basic",
+      ifelse( tolower(response) %in% c("landmark", "gift", "prize winner", "rescues", "gifts", "prize-winners", "service-animals", "floral gifts", "service animals", "other landmarks", "prize winners"), "N2", "subordinate")
+    )
+  )
 ```
 
+```{r}
+d_modRef_main_responseCat_nonmatch %>% count(response_cat, syntax, trial_type)
+```
+
+```{r}
+d_modRef_main_responseCat_nonmatch %>%
+  filter(trial_type == "critical") %>%
+  ggplot(., aes(x = response_cat, fill = response_cat)) +
+  geom_bar(alpha = 0.8) +
+  facet_grid(~syntax) +
+  ggtitle("Response category counts in critical trials")
+```
 
 # Proportion of responses not matching critical N by-syntax and by-trial type
 

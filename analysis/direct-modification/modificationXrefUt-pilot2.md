@@ -141,7 +141,48 @@ d_modRef_main_responseCat <- d_modRef_valid %>%
   ),
   response_num = ifelse(response_cat == "nonmatch", 1, 0)
   )
+
+# analysis of non-matching responses
+d_modRef_main_responseCat_nonmatch <- d_modRef_main_responseCat %>%
+  mutate(
+    response_cat = ifelse(
+      tolower(response) %in% 
+        c("flowers", "flower", "trees", "tree", "birds", "bird",  "dogs", "dog", "plants", "other trees", "animal", "other tree", "other birds", "nearby trees.", "animals", "gift flowers", "prize flowers", "prize dogs", "prize winning dogs", "rescue birds", "service dogs"
+          
+        ), "basic",
+      ifelse( tolower(response) %in% c("landmark", "gift", "prize winner", "rescues", "gifts", "prize-winners", "service-animals", "floral gifts", "service animals", "other landmarks", "prize winners"), "N2", "subordinate")
+    )
+  )
 ```
+
+``` r
+d_modRef_main_responseCat_nonmatch %>% count(response_cat, syntax, trial_type)
+```
+
+    ## # A tibble: 10 x 4
+    ##    response_cat syntax trial_type     n
+    ##    <chr>        <chr>  <chr>      <int>
+    ##  1 basic        pred   critical      31
+    ##  2 basic        pred   filler        36
+    ##  3 basic        subj   critical      30
+    ##  4 basic        subj   filler        47
+    ##  5 N2           pred   critical       5
+    ##  6 N2           subj   critical      15
+    ##  7 subordinate  pred   critical      26
+    ##  8 subordinate  pred   filler        26
+    ##  9 subordinate  subj   critical      17
+    ## 10 subordinate  subj   filler        15
+
+``` r
+d_modRef_main_responseCat_nonmatch %>%
+  filter(trial_type == "critical") %>%
+  ggplot(., aes(x = response_cat, fill = response_cat)) +
+  geom_bar(alpha = 0.8) +
+  facet_grid(~syntax) +
+  ggtitle("Response category counts in critical trials")
+```
+
+![](modificationXrefUt-pilot2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 # Proportion of responses not matching critical N by-syntax and by-trial type
 
@@ -186,7 +227,7 @@ df_resps_tidy_5_6.bs %>%
   facet_grid(~trial_type)
 ```
 
-![](modificationXrefUt-pilot2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](modificationXrefUt-pilot2_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 # Stats
 
@@ -232,28 +273,28 @@ summary(blm.critical)
     ## Group-Level Effects: 
     ## ~target (Number of levels: 10) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.75      0.54     0.03     2.01 1.00     1233
-    ## sd(syntax_dev1)                0.69      0.53     0.02     2.00 1.00     1249
-    ## cor(Intercept,syntax_dev1)     0.07      0.57    -0.94     0.95 1.00     2289
+    ## sd(Intercept)                  0.75      0.53     0.04     2.04 1.00     1328
+    ## sd(syntax_dev1)                0.67      0.53     0.02     1.98 1.01     1092
+    ## cor(Intercept,syntax_dev1)     0.03      0.56    -0.94     0.94 1.00     2096
     ##                            Tail_ESS
-    ## sd(Intercept)                  1731
-    ## sd(syntax_dev1)                1720
-    ## cor(Intercept,syntax_dev1)     2310
+    ## sd(Intercept)                  2007
+    ## sd(syntax_dev1)                1914
+    ## cor(Intercept,syntax_dev1)     2078
     ## 
     ## ~workerid (Number of levels: 31) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  2.59      0.85     1.30     4.61 1.00     1084
-    ## sd(syntax_dev1)                0.87      0.62     0.06     2.34 1.00      929
-    ## cor(Intercept,syntax_dev1)     0.32      0.52    -0.82     0.98 1.00     2191
+    ## sd(Intercept)                  2.52      0.83     1.26     4.45 1.01      688
+    ## sd(syntax_dev1)                0.82      0.60     0.04     2.25 1.00      921
+    ## cor(Intercept,syntax_dev1)     0.30      0.52    -0.86     0.98 1.00     1835
     ##                            Tail_ESS
-    ## sd(Intercept)                  1801
-    ## sd(syntax_dev1)                1400
-    ## cor(Intercept,syntax_dev1)     1948
+    ## sd(Intercept)                  2020
+    ## sd(syntax_dev1)                1885
+    ## cor(Intercept,syntax_dev1)     2255
     ## 
     ## Population-Level Effects: 
     ##             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept       1.26      0.69     0.06     2.72 1.00     1520     1088
-    ## syntax_dev1     0.77      0.52    -0.12     1.97 1.00     1746     1054
+    ## Intercept       1.23      0.65     0.03     2.67 1.00     1539     2125
+    ## syntax_dev1     0.75      0.49    -0.07     1.86 1.00     1563     1340
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -300,28 +341,28 @@ summary(blm.collapsed.critical)
     ## Group-Level Effects: 
     ## ~target (Number of levels: 10) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.41      0.33     0.01     1.22 1.00     1982
-    ## sd(syntax_dev1)                0.61      0.46     0.03     1.73 1.00     1123
-    ## cor(Intercept,syntax_dev1)     0.12      0.57    -0.93     0.96 1.00     1778
+    ## sd(Intercept)                  0.43      0.34     0.02     1.29 1.00     1528
+    ## sd(syntax_dev1)                0.62      0.47     0.02     1.77 1.00      766
+    ## cor(Intercept,syntax_dev1)     0.16      0.57    -0.92     0.98 1.00     1491
     ##                            Tail_ESS
-    ## sd(Intercept)                  2083
-    ## sd(syntax_dev1)                1747
-    ## cor(Intercept,syntax_dev1)     2240
+    ## sd(Intercept)                  1831
+    ## sd(syntax_dev1)                1140
+    ## cor(Intercept,syntax_dev1)     2156
     ## 
     ## ~workerid (Number of levels: 47) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  2.80      0.73     1.65     4.44 1.00     1251
-    ## sd(syntax_dev1)                0.63      0.48     0.02     1.81 1.00     1093
-    ## cor(Intercept,syntax_dev1)     0.31      0.54    -0.86     0.97 1.00     2554
+    ## sd(Intercept)                  2.80      0.72     1.63     4.41 1.00      998
+    ## sd(syntax_dev1)                0.65      0.50     0.03     1.90 1.00      746
+    ## cor(Intercept,syntax_dev1)     0.31      0.55    -0.86     0.98 1.00     1907
     ##                            Tail_ESS
-    ## sd(Intercept)                  2297
-    ## sd(syntax_dev1)                1928
-    ## cor(Intercept,syntax_dev1)     2765
+    ## sd(Intercept)                  1523
+    ## sd(syntax_dev1)                1379
+    ## cor(Intercept,syntax_dev1)     1852
     ## 
     ## Population-Level Effects: 
     ##             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept       1.58      0.58     0.58     2.85 1.00     1594     1896
-    ## syntax_dev1     0.79      0.44     0.03     1.76 1.00     2279     1979
+    ## Intercept       1.59      0.57     0.56     2.75 1.00     1170     1735
+    ## syntax_dev1     0.81      0.44     0.09     1.80 1.00     1402     1405
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
