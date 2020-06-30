@@ -101,19 +101,19 @@ var statePrior = function(cc) {
 
 var context = {
   // basic-level context, with a 2 members from three different subordinate categories
-  super: [ {referent: "dog1", property: 1, name: "A", subordinate : "high"},
-         {referent: "dog1", property: 1.6, name: "B", subordinate: "high"},
-         {referent: "dog2", property: 0, name: "C", subordinate: "medium"},
-         {referent: "dog2", property: 0.2, name: "D", subordinate : "medium"},
-         {referent: "dog3", property: -1, name: "E", subordinate: "low"},
-         {referent: "dog3", property: -1, name: "F", subordinate: "low"}
+  super: [ {referent: "dog1", property: 1, name: "A"},
+         {referent: "dog1", property: 1.6, name: "B"},
+         {referent: "dog2", property: 0, name: "C"},
+         {referent: "dog2", property: 0.2, name: "D"},
+         {referent: "dog3", property: -1, name: "E"},
+         {referent: "dog3", property: -1, name: "F"}
   ],
-  sub: [ {referent: "dog1", property: 1, name: "A", subordinate : "high"},
-         {referent: "dog1", property: 1, name: "B", subordinate : "high"},
-         {referent: "dog1", property: 1, name: "C", subordinate : "high"},
-         {referent: "dog1", property: 1, name: "D", subordinate : "high"},
-         {referent: "dog1", property: 1, name: "E", subordinate : "high"},
-         {referent: "dog1", property: 1, name: "F", subordinate : "high"}
+  sub: [ {referent: "dog1", property: 1, name: "A"},
+         {referent: "dog1", property: 1, name: "B"},
+         {referent: "dog1", property: 1, name: "C"},
+         {referent: "dog1", property: 1, name: "D"},
+         {referent: "dog1", property: 1, name: "E"},
+         {referent: "dog1", property: 1, name: "F"}
   ]
 }
 
@@ -168,8 +168,8 @@ var Nposition = function(){
 // for a given target (i.e. when reference is true and state == target (e.g. 'dog2'), and the utterance is e.g. 'dog1')
 /////////////////////
 
-var meaningContext = function(utterance, state) { // assume utterance is subject only
-  var truthVal = utterance == 'that' ? true : utterance == "dog" ? true : utterance == state.referent ? flip(0.999) : flip(0.001)
+var meaningContext = function(utterance, state, establishRef) { // assume utterance is subject only
+  var truthVal = establishRef == true ? true: utterance == 'that' ? true : utterance == "dog" ? true : utterance == state.referent // ? flip(0.999) : flip(0.001)
   return truthVal
 }
 
@@ -203,7 +203,7 @@ var literalListenerRefInContext = cache(function(utterance, context, establishRe
       // (constraining the general world knowledge to specific individuals)
       var state = establishRef == true ? target : uniformDraw(context);
       // get the meaning
-      var m = meaningContext(utterance, state)
+      var m = meaningContext(utterance, state, establishRef)
       // the context representation includes names of the single individuals
       // otherwise, the given basic level context is treated as consisting of 3 individuals
       // having the individual names does not really influence qualitative behaviour,
@@ -223,7 +223,7 @@ var literalListenerRefInContext = cache(function(utterance, context, establishRe
 // but if separating them is legitimate this way it's clearer and the meaning function doesn't
 // depend on the QUD (MH's comment)
 
-var literalListenerPredInContext = cache(function(utterance, context, estalishRef, target, cc, threshold, subordinate){
+var literalListenerPredInContext = cache(function(utterance, context, establishRef, target, cc, threshold, subordinate){
   Infer({
     model: function(){
   // as before, the CC influences sampling the state from prior knowledge
@@ -233,13 +233,13 @@ var literalListenerPredInContext = cache(function(utterance, context, estalishRe
       var explicitCC = splitPred.length == 1 ? cc : splitPred[1];
    // get the category of the CC
       var cc = explicitCC == "dog" ?  "super" :
-              explicitCC == "dog1" ? "high" : explicitCC == "dog2" ? "medium" : explicitCC == "dog3" ? "low" : explicitCC == "sub" ? subordinate : explicitCC
+               explicitCC == "sub" ? subordinate : explicitCC
       var state = {
         property: sample(statePrior(cc))//["property"]
         }
       var m = meaningPred(splitPred[0], threshold, state)
       condition(m)
-      return state.property
+      return {property: state.property, c: cc}
       }
   })
 }, 10000)
@@ -264,7 +264,7 @@ var speakerContext = cache(function(state, context, establishRef, form, threshol
       // compute the two utilities
       // again, I assume subject accomplishes reference, predicate accomplishes predication
       var refUt = L0ref.score({referent: state.referent, name: state.name})
-      var predUt = L0pred.score(state.property)
+      var predUt = L0pred.score({property: state.property, c: cc})
       // maximize sum utility (alpha randomly set to 3)
       factor(3*(refUt + predUt))
       return utt
@@ -316,7 +316,7 @@ var pragmaticListener = function(utterance, form, cont) {
     var currentContext = context[cont]
     // sample target
     var target = sample(targetPrior(currentContext))
-    var subordinate = target.subordinate
+    var subordinate = target.referent
     // sample establishReference variable
     var isReference = sample(establishRef)
     var currentStatePrior = statePrior(subordinate)
