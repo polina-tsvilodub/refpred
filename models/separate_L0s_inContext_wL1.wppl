@@ -19,9 +19,9 @@ var round = function(x){
 
 // introduce parameters for three possible subordinate and a basic category
 var stateParams = {
-  high: {mu: 1, sigma: 0.5},
-  medium: {mu: 0, sigma: 0.5},
-  low: {mu: -1, sigma: 0.5},
+  dog1: {mu: 1, sigma: 0.5},
+  dog2: {mu: 0, sigma: 0.5},
+  dog3: {mu: -1, sigma: 0.5},
   super: {mu: 0, sigma: 1}
 };
 
@@ -169,7 +169,7 @@ var Nposition = function(){
 /////////////////////
 
 var meaningContext = function(utterance, state, establishRef) { // assume utterance is subject only
-  var truthVal = establishRef == true ? true: utterance == 'that' ? true : utterance == "dog" ? true : utterance == state.referent // ? flip(0.999) : flip(0.001)
+  var truthVal = establishRef == true ? true: utterance == 'that' ? true : utterance == "dog" ? true : utterance == state.referent ? flip(0.999) : flip(0.001)
   return truthVal
 }
 
@@ -261,10 +261,11 @@ var speakerContext = cache(function(state, context, establishRef, form, threshol
       var L0ref = literalListenerRefInContext(subject, context, establishRef, state)
       // get predication
       var L0pred = literalListenerPredInContext(predicate, context, establishRef, state, cc, threshold, subordinate)
+      var cc2assign = cc == 'sub' ? subordinate : "super";
       // compute the two utilities
       // again, I assume subject accomplishes reference, predicate accomplishes predication
       var refUt = L0ref.score({referent: state.referent, name: state.name})
-      var predUt = L0pred.score({property: state.property, c: cc})
+      var predUt = L0pred.score({property: state.property, c: cc2assign})
       // maximize sum utility (alpha randomly set to 3)
       factor(3*(refUt + predUt))
       return utt
