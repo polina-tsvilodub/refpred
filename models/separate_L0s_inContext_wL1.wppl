@@ -185,9 +185,9 @@ var meaningPred = function(utterance, threshold, state){ // assume utterance is 
 
 // only 1 N can occur in the utterance, its position Npos is randomly sampled by S1
 var utterance = function(form, Npos) {
-  var subject = Npos == "subj" ? uniformDraw(["dog1", "dog"]) : "that";
-  var predicate = Npos == "pred" ? form == "positive" ? uniformDraw(["big dog1", "big dog"]) :
-                                       uniformDraw(["small dog1", "small dog"]):
+  var subject = Npos == "subj" ? uniformDraw(["dog1", "dog2", "dog3",  "dog"]) : "that";
+  var predicate = Npos == "pred" ? form == "positive" ? uniformDraw(["big dog1", "big dog2", "big dog3", "big dog"]) :
+                                       uniformDraw(["small dog1", "small dog2", "small dog3", "small dog"]):
                                   form == "positive" ? "big" : "small";
   return {subject, predicate}
 }
