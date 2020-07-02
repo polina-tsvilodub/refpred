@@ -72,7 +72,7 @@ var thresholdPrior = function(form, stateSupport){
 
 // discourse representation theory provides the framework, in the sense that there is
 // some common discourse represented by the context, and then the referent (and its property)
-// are accomodated upon receiving the utterance
+// are accommodated upon receiving the utterance
 
 // by this we hope to introduce context-sensitivity of the different utterances
 // and to solve the problem of literal semantics of 'that'
@@ -84,6 +84,9 @@ var thresholdPrior = function(form, stateSupport){
 // allowing utterances with one N only
 // include 'world knowledge' (i e statPrior) for 3 different sub categories
 // there are 2 distinct L0s for the 2 QUDs
+
+// now, there are also utterances for every subordinate category
+
 /////////////////////////////
 
 var statePrior = function(cc) {
@@ -91,8 +94,6 @@ var statePrior = function(cc) {
 //    method: 'MCMC',
     model: function() {
     return categorical({vs: stateVals, ps: stateProbs(cc)})
-//       referent: categorical({vs:["dog1", "dog2", "dog3"], ps: [1,1,1]}),
-
 
    }
   })
@@ -120,7 +121,7 @@ var context = {
 // possible statePrior parameters are adjusted to represent three different subordinate categories (above)
 
 // additionally to the context representation, there is a variable whether the target referent
-// is already accomodated or not, i.e. if reference is established or not
+// is already accommodated or not, i.e. if reference is established or not
 
 /////////////////////////////
 // functions for the L1
@@ -205,13 +206,11 @@ var literalListenerRefInContext = cache(function(utterance, context, establishRe
       // alternatively: var state = uniformDraw(context);
       // get the meaning
       var m = meaningContext(utterance, state, establishRef)
-      // var cond = establishRef == true ? (m && (state == target)) : m
       // the context representation includes names of the single individuals
       // otherwise, the given basic level context is treated as consisting of 3 individuals
       // having the individual names does not really influence qualitative behaviour,
       // but makes L0s performance kind of 'conceptually complete'
       condition(m)
-      // condition(cond)
       return {referent: state.referent, name: state.name}
     }
   })
@@ -242,13 +241,14 @@ var literalListenerPredInContext = cache(function(utterance, context, establishR
         }
       var m = meaningPred(splitPred[0], threshold, state)
       condition(m)
+      // by returning the cc here and conditioning on it in S1, we make sure that only correct comparison classes can be used to talk about a referent
       return {property: state.property, c: cc}
       }
   })
 }, 10000)
-// viz(literalListenerPredInContext('big', context['super'], false, {referent: 'dog1', property: 0.6}, "high", 0))
+// viz(literalListenerPredInContext('big', context['super'], false, {referent: 'dog1', property: 0.6}, "dog1", 0))
 // viz(literalListenerPredInContext('big dog', context['super'], false, {referent: 'dog1', property: 0.6}, "super", 0))
-// viz(literalListenerPredInContext('big dog', context['super'], false, {referent: 'dog1', property: 0.6}, "low", 0))
+// viz(literalListenerPredInContext('big dog', context['super'], false, {referent: 'dog1', property: 0.6}, "dog3", 0))
 // viz(literalListenerPredInContext('big dog1', context['super'], false, {referent: 'dog1', property: 0.6}, "super", 0))
 
 // the speaker has a state in mind, a context, knows whether reference was established,
@@ -264,12 +264,13 @@ var speakerContext = cache(function(state, context, establishRef, form, threshol
       var L0ref = literalListenerRefInContext(subject, context, establishRef, state)
       // get predication
       var L0pred = literalListenerPredInContext(predicate, context, establishRef, state, cc, threshold, subordinate)
-      var cc2assign = cc == 'sub' ? subordinate : "super";
+      var c = cc == 'sub' ? subordinate : "super";
       // compute the two utilities
       // again, I assume subject accomplishes reference, predicate accomplishes predication
       var refUt = L0ref.score({referent: state.referent, name: state.name})
-      var predUt = L0pred.score({property: state.property, c: cc2assign})
-      // maximize sum utility (alpha randomly set to 3)
+      // conditioning on cc here makes L1's comparison class predictions go in the correct direction
+      var predUt = L0pred.score({property: state.property, c: c})
+      // maximize sum utility (alpha arbitrarily set to 3)
       factor(3*(refUt + predUt))
       return utt
     }
@@ -284,34 +285,31 @@ var speakerContext = cache(function(state, context, establishRef, form, threshol
 // this is because all referring expression have equal utility in sub context
 
 // display("Basic context, big Great Dane, reference = T")
-// viz(speakerContext({referent: 'dog1', property: 1.6, name:"A"}, context['super'], true, "positive", 0, "super", "high") )
+// viz(speakerContext({referent: 'dog1', property: 1.6, name:"A"}, context['super'], true, "positive", 0, "super", "dog1") )
 // display("Basic context, big Great Dane, reference = F")
-// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['super'], false, "positive", 0, "super", "high") )
+// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['super'], false, "positive", 0, "super", "dog1") )
 // display("Sub context, big Great Dane, reference = T")
 // viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['sub'], true, "positive", 0, "super") )
 // display("Sub context, big Great Dane, reference = F")
 // viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['sub'], false, "positive", 0, "super") )
 // display("CC = sub")
 // display("Basic context, big Great Dane, reference = T")
-// viz(speakerContext({referent: 'dog1', property: 1.6, name:"A"}, context['super'], true, "positive", 0, "high") )
+// viz(speakerContext({referent: 'dog1', property: 1.6, name:"A"}, context['super'], true, "positive", 0, "dog1") )
 // display("Basic context, big Great Dane, reference = F")
-// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['super'], false, "positive", 0, "high") )
+// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['super'], false, "positive", 0, "dog1") )
 // display("Sub context, big Great Dane, reference = T")
-// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['sub'], true, "positive", 0, "high") )
+// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['sub'], true, "positive", 0, "dog1") )
 // display("Sub context, big Great Dane, reference = F")
-// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['sub'], false, "positive", 0, "high") )
+// viz(speakerContext({referent: 'dog1', property: 1.6, name: "A"}, context['sub'], false, "positive", 0, "dog1") )
 
 
 /////////////////////
 // the pragmatic listener model was added
 // assume that L1 samples the target from the perceptual context only, and notably has perfect access to the context (i.e. perfect knowledge of the size of the targets)
 ////////////////////
+
 // the model works and makes relatively reasonable predications for some aspects: basic CC is more likely in basic than in sub context
 // ref = T is more likely in predicate than in subject-N condition, but only in basic context
-// but it fails at the critical comparison class X syntax prediction -- it predicts the opposite direction
-// it also makes weird predictions for the basic N: it predicts a more likely sub CC for predicate, but not subject N in basic context
-// and the reverse happens in sub context (predicate -- basic CC, subject -- sub CC)
-// I strongly assume that these things are happening because of the decoupled reference & predication
 
 var pragmaticListener = function(utterance, form, cont) {
   Infer({model: function(){

@@ -256,7 +256,7 @@ var pragmaticListener = function(utterance, form, cont, referent) {
 
 // L1 makes nice predictions:
 // the comparison class corresponding to the N is more likely when it appears in the predicate
-// the inferred size dsitribution corresponds to the inferred comparison classes
+// the inferred size distribution corresponds to the inferred comparison classes (it shifts more extremely for predicate-N)
 // the cc inferred from subject-N sentences is biases corresponding to the context
 
 display("The referent is a dog1, in basic context")
