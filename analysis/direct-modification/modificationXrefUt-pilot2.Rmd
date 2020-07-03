@@ -238,3 +238,22 @@ blm.collapsed.critical <- brm(
 
 summary(blm.collapsed.critical)
 ```
+
+### Stats Pilot 5 + 6, all trials
+
+By including the filler conditions which match the E3 conditions in the analysis as a predictor, we could show if there is an interaction, hence directly checking for an effect of modification. 
+``` {r}
+df_resps_tidy_5_6 <- df_resps_tidy_5_6 %>% 
+  mutate(trial_dev = factor(trial_type, levels = c("filler", "critical")))
+contrasts(df_resps_tidy_5_6$trial_dev) <- contr.sum(2)
+
+blm.collapsed.trialE <- brm(
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid) + (1 + syntax_dev*trial_dev | target),
+  data = df_resps_tidy_5_6,
+  family = "bernoulli",
+  cores = 4,
+  control = list(adapt_delta = 0.95)
+) 
+
+summary(blm.collapsed.trialE)
+```
