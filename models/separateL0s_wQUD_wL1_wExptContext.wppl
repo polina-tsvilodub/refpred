@@ -87,13 +87,8 @@ var thresholdPrior = function(form, stateSupport){
 
 var statePrior = function(cc) {
   Infer({
-//    method: 'MCMC',
     model: function() {
       return categorical({vs: stateVals, ps: stateProbs(cc)})
-//     return {
-//       referent: categorical({vs:["dog1", "dog2", "dog3"], ps: [1,1,1]}),
-//       property: categorical({vs: stateVals, ps: stateProbs(cc)})
-//     }
    }
   })
 };
@@ -152,19 +147,17 @@ var classPrior = Infer({
 
 
 // prior N position distribution (uniform)
-var Nposition = function(qud) {
-  Infer({ // think if Infer is necessary here
+var Nposition = function() {
+  Infer({
     model: function(){
-      //return uniformDraw(['subj', 'pred'])
-      var syntax = qud == "ref" ? flip(0.8) ? "subj" : "pred" : flip(0.8) ? "pred" : "subj"
-      return syntax
+      return uniformDraw(['subj', 'pred'])
     }
   })
 }
 
 
 
-// now meaning of the referential utteraqnce depends on establishRef:
+// now meaning of the referential utterance depends on establishRef:
 // if T: state matches the target that L0 gets from S1.
 // if F: state (i e the referent) needs to be sampled from the context
 // this allows to have a generic meaning representation of all the utterances,
@@ -177,10 +170,6 @@ var meaningContext = function(utterance, state, establishRef) { // assume uttera
   return truthVal // still can't get rid of the flips because of the sub context condition
 } // I cannot get rid of the flips because of the conditions when ref = T and hence state = target
 
-// var meaningContext = function(utterance, state, establishRef) { // assume utterance is subject only
-//   var truthVal = utterance == 'that' ? true : utterance == "dog" ? true : establishRef == true? true: utterance == state.referent
-//   return truthVal
-// }
 
 // standard adjective meaning
 var meaningPred = function(utterance, threshold, state){ // assume utterance is adjective only
@@ -198,34 +187,16 @@ var utterance = function(form, Npos) {
   return {subject, predicate}
 }
 
-// "dog2", "dog3",
 // L0 accomplishing reference
 var literalListenerRefInContext = function(utterance, context, target){
   Infer({
     model: function(){
-      // under this representation, the context and reference influence
-      // the representation of the (possible) states:
-      // having established a referent constrains the set of possible states,
-      // whereas no reference is formalised via the context which provides the possible states
-      // (constraining the general world knowledge to specific individuals)
-//       var state =  uniformDraw(context); //establishRef == true ? target :
-//       var state = establishRef == true ? target : uniformDraw(context);
-//       print(target)
+
       var state = uniformDraw(_.union(context, [target]));
-//       print(_.union(context, [target]))
       // get the meaning
       var m = meaningContext(utterance, state)
-      // the context representation includes names of the single individuals
-      // otherwise, the given basic level context is treated as consisting of 3 individuals
-      // having the individual names doe not really influence qualitative behavior,
-      // but makes L0s preformance kind of 'conceptually complete'
-//       establishRef == true ? (condition(m) && condition(state === target)) : condition(m)
-//       var cond = establishRef == true ? (m && (state.referent == target.referent)) : m
-      var cond = m && (state.referent == target.referent)
-      //       print(cond)
-//       condition(cond)
       condition(m)
-      return {referent: state.referent }//, name: state.name}
+      return {referent: state.referent }
     }
   })
 }
@@ -245,9 +216,7 @@ var literalListenerRefInContext = function(utterance, context, target){
 
 
 // L0 accomplishing predication
-// NB: I could also put the two L0s into one and add a QUD variable (like in the previous model version),
-// but if separating them is legitimate this way it's clearer and the meaning function doesn't
-// depend on the QUD (MH's comment)
+
 
 var literalListenerPredInContext = function(utterance, context, target, cc, threshold, subordinate){
   Infer({
@@ -266,10 +235,8 @@ var literalListenerPredInContext = function(utterance, context, target, cc, thre
         }
 //       print(state)
       var m = meaningPred(splitPred[0], threshold, state)
-//       print(m)
       condition(m)
-
-//       return {property: target.property, c: cc}//
+      // returning cc makes sure only felicious CCs can be used
       return {property: state.property, c: cc}
       }
   })
@@ -292,70 +259,60 @@ var speakerContext = function(state, context, qud, form, threshold, cc, subordin
       var predicate = utt.predicate
       // get reference
       var L0ref = literalListenerRefInContext(subject, context, state)
-//       print("L0ref")
-//       print(L0ref)
+
       // get predication
       var L0pred = literalListenerPredInContext(predicate, context, state, cc, threshold, subordinate)
-//       print("L0pred")
-//       print(L0pred)
-//       compute the two utilities
+
+//       get correct subordinate class
       var cc2assign = cc == 'sub' ? subordinate : "super";
+
       // again, I assume subject accomplishes reference, predicate accomplishes predication
       var refUt = L0ref.score({referent: state.referent})//, name: state.name})
       var predUt = L0pred.score({property: state.property, c: cc2assign})
       // maximize sum utility (alpha randomly set to 3)
+      // masiximize the utility corresponding to the QUD under discussion
       var cond = qud == "ref" ? refUt : predUt
-//       factor(3*(refUt + predUt))
       factor(3*cond)
       return utt
     }
   })
 }
 
-// the model makes nice predictions:
-// when reference = T, it prefers a N in predicate position and
-// disprefers the sub N with decreasing size of the referent (plot 1 vs plot 5)
-// when reference = F, it preferes a sub N in subject position given basic level context (e g plot 2 vs plot 1)
-// however, as predicted in sub context there is no difference in subj N preference when reference varies:
-// this is because all referring expression have equal utility in sub context
 
 // display("Basic context, big Great Dane, reference = T")
-// viz(speakerContext({referent: 'dog1', property: 1, name:"A"}, context['sub'], "pred", "positive", -2.1, "sub", "dog1") )
+// viz(speakerContext({referent: 'dog1', property: 1, name:"A"}, context['sub'], "pred", "positive", -2.1, "super", "dog1") )
 // viz(speakerContext({referent: 'dog1', property: 1, name:"A"}, context['super'], "pred", "positive", -2.1, "sub", "dog1") )
 // viz(speakerContext({referent: 'dog3', property: -1, name:"E"}, context['super'], "pred", "negative", 0, "sub", "dog3") )
-// viz(speakerContext({referent: 'dog2', property: 1, name:"C"}, context['super'], "pred", "positive", 0, "super", "dog2") )
+// viz(speakerContext({referent: 'dog2', property: 1, name:"C"}, context['super'], "pred", "positive", 0, "sub", "dog2") )
 
 
 // for a more plausible implementation of our experimental set-up, the L1 knows
-// the subordinate category of the referent and its 'name' (let's see if we actually need it)
+// the subordinate category of the referent and its 'name'
 // what is unknown, is its precise size -- sampled from a state prior over the
 // corresponding subordinate distribution (as in original CC model)
-// referent = {sub: , name: 'X'}
+
 var pragmaticListener = function(utterance, form, cont, referent) {
   Infer({model: function(){
     // uncertainty about the comparison class (super vs. sub)
-//     var c = sample(classPrior)
+
     // add the context as potential comparison class
     var c = uniformDraw(['sub', 'super', cont])
 //     print(c)
     var currentContext = context[cont]
-//     var target = sample(targetPrior(currentContext))
+
     var subordinate = referent.sub;
     // L1 doesn't know the exact size of the referent
     var size = sample(statePrior(subordinate))
 //     print(size)
     var target = {referent: referent.sub, property: size, name: referent.name}
-    // var subordinate = target.referent
-//     print(target)
-//     var isReference = sample(establishRef)
+// sample QUD
     var qud = sample(qudPrior)
-//     print(isReference)
+
     var currentStatePrior = statePrior(subordinate)
     var threshold = sample(thresholdPrior(form, currentStatePrior.support() ))
-//     print(threshold)
-//     print(state)
+
     var S1 = speakerContext(target, currentContext, qud, form, threshold, c, subordinate);
-//     print(S1)
+
     observe(S1, utterance);
     return { comparisonClass: c, state: size, QUD: qud}
   }})
@@ -366,14 +323,6 @@ viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "posit
 // viz.marginals(pragmaticListener({subject: "dog3", predicate: "small"}, "negative", "super", {sub: "dog3", name: "C"}))
 // viz.marginals(pragmaticListener({subject: "that", predicate: "small dog3"}, "negative", "super", {sub: "dog3", name: "C"}))
 
-
 display("sub")
 viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "sub", {sub: "dog1", name: "C"}))
 viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "sub", {sub: "dog1", name: "C"}))
-
-
-// viz.marginals(pragmaticListener({subject: "that dog1", predicate: "big"}, "positive", "super"))
-// var currentStatePrior = statePrior("high")
-// sample(thresholdPrior("positive", currentStatePrior.support() ))
-// // currentStatePrior
-// literalListenerRefInContext("dog3", context["super"], true, {"referent":"dog1","property":1,"name":"A"})
