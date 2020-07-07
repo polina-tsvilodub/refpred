@@ -1,23 +1,3 @@
-% 
-% Annual Cognitive Science Conference
-% Sample LaTeX Paper -- Proceedings Format
-% 
-
-% Original : Ashwin Ram (ashwin@cc.gatech.edu)       04/01/1994
-% Modified : Johanna Moore (jmoore@cs.pitt.edu)      03/17/1995
-% Modified : David Noelle (noelle@ucsd.edu)          03/15/1996
-% Modified : Pat Langley (langley@cs.stanford.edu)   01/26/1997
-% Latex2e corrections by Ramin Charles Nakisa        01/28/1997 
-% Modified : Tina Eliassi-Rad (eliassi@cs.wisc.edu)  01/31/1998
-% Modified : Trisha Yannuzzi (trisha@ircs.upenn.edu) 12/28/1999 (in process)
-% Modified : Mary Ellen Foster (M.E.Foster@ed.ac.uk) 12/11/2000
-% Modified : Ken Forbus                              01/23/2004
-% Modified : Eli M. Silk (esilk@pitt.edu)            05/24/2005
-% Modified : Niels Taatgen (taatgen@cmu.edu)         10/24/2006
-% Modified : David Noelle (dnoelle@ucmerced.edu)     11/19/2014
-% Modified : Roger Levy (rplevy@mit.edu)     12/31/2018
-
-
 
 \documentclass[a4paper,man,natbib]{apa6}
 
@@ -150,9 +130,14 @@ The utterance ``That Great Dane is big'' informs the listener that the referent 
 How do human listeners determine the comparison class when faced with multiple \textit{a priori} reasonable options? 
 
 Simple models of semantic composition posit that when an adjective combines syntactically with a noun, an interpretable adjectival phrase is produced by using the noun as the comparison class \citep<e.g., big(Great Dane) $\rightarrow$ \textit{big for a Great Dane},  small(goldfish) $\rightarrow$ \textit{small for a goldfish};>{Kamp1975, Cresswell1976}. 
-There are intuitive reasons to doubt that such a simple mapping between the modified noun and the comparison class will work in general \citep<e.g., a \emph{rich Fortune-500 CEO} might not be rich relative to other \textit{Fortune-500 CEOs};>{Bierwisch1989, Kennedy2007}, but research on comparison classes has eschewed the question of how to determine the comparison class, instead focusing on representational issues about how to integrate a comparison class (once determined) into a compositional semantics \citep{Kennedy2007, Solt2009, Bale2011}.
-The simple syntactic account could be generalized into one in which non-modified nouns in the sentence could be used as the comparison class (e.g., ``That Great Dane is big'' $\rightarrow$ \emph{big for a Great Dane}). 
-These syntactic mechanisms, however, would have nothing to say about the role that world knowledge or the physical environment might play in influencing comparison classes.
+There are intuitive reasons to doubt that such a simple mapping between the modified noun and the comparison class will work in general \citep<e.g., a \emph{rich Fortune-500 CEO} might not be rich relative to other \textit{Fortune-500 CEOs};>{Bierwisch1989, Kennedy2007}
+%, but research on comparison classes has eschewed the question of how to determine the comparison class, instead focusing on representational issues about how to integrate a comparison class (once determined) into a compositional semantics \citep{Kennedy2007, Solt2009, Bale2011}.
+
+Additionally, such a syntactic modification-oriented account would require to posit additional mechanisms for interpreting the same adjectives occuring in the predicate of a simple copular sentence (e.g., "That dog is big."). While the exact nature of the relation between attributive and predicative adjectives is debated in the literature (e.g. \cite{Kamp1975}, \cite{McNally2010} among others), investigations of comaprison classes mainly focus on attributive adjectives. 
+The most straight-forward hypothesis for predicative gradable adjective interpretation could generalize the simple syntactic account into one in which non-modified nouns in the sentence could be used as the comparison class (e.g., ``That Great Dane is big'' $\rightarrow$ \emph{big for a Great Dane}). More sophisticated accounts might predict interpretative differences between attributive and predicative adjectives precisely bacause of the difference in syntactic modification, stipulating the modificational account for attributive adjectives, but to our knowledge there are no specific proposals with respect to comparison class determination of predicative gradable adjectives.  \pt{potential for an inferential explanation could go here}
+
+However, these syntactic hypotheses wherein only the noun combining with the adjective is taken to be a relevant comparison class candidate would have nothing to say about the role that world knowledge or the physical environment might play in influencing comparison classes.
+
 
 %The reference -- predication hypothesis can be contrasted with a number of syntactic hypotheses.
 %A purely syntactic-modification perspective might similarly predict the comparison class would be determined by the N when it is syntactically-modified by the adjective (our predicate N sentence frame), but would not have anything to say about how nouns could influence the comparison class when they are not syntactically-modified. 
@@ -178,12 +163,12 @@ We consider the problem of comparison class inference from a functional perspect
 In order to communicate a property of a referent, a speaker must achieve two informational goals: \emph{reference} (identifying the right target object) and \emph{predication} (ascribing a property to the referent) \cite{Reboul2001}. 
 In simple sentences of the form ``\emph{Subject Predicate}'', we posit that listeners expect reference to be established by the \emph{Subject} (independent of the \emph{Predicate} asserted to hold of the subject) and that speakers aim to satisfy this expectation.\footnote{Of course, it cannot always be taken for granted that the referent is established by the subject noun (e.g., insofar as one can infer who \emph{he} is in the sentence ``He's making those outrageous tweets again.'', it is because the predicate provides a cue to the referent). We posit this relation between subject noun and reference as an expectation that listeners may hold, perhaps due to information structural reasons.
 }
-From this perspective, the noun in a sentence is a cue to the comparison class (Fig.~\ref{model-cartoon}):
+From this perspective, the noun in a sentence is a cue to the comparison class that is integrated with other pragmatic aspects of the utterance (Fig.~\ref{model-cartoon}):
 If the noun appears in the predicate (``That’s a big Great Dane''), the speaker’s noun choice is likely non-referential, and rather a cue to the intended comparison class.  
 In contrast, if the noun appears in the subject (``That Great Dane is big''), then the speaker’s choice of noun can be \emph{explained away} as intending to help the listener establish reference of the subject; the noun would then serve as a weaker cue to the comparison class and allow for other pragmatic reasoning (e.g., world knowledge and perceptual cues) to play a more substantial role in determining the comparison class \cite<e.g., the Great Dane is big for a dog;>{tessler2017warm}.
 
 
-We test this reference -- predication trade-off hypothesis using a syntactic manipulation wherein the noun appears either in the subject or the predicate of a sentence involving a gradable adjective (e.g., ``That Great Dane is big''~vs.~``That's a big Great Dane''). 
+We test this reference -- predication trade-off hypothesis using a syntactic manipulation wherein the noun appears either in the subject or the predicate of a sentence involving a gradable adjective (e.g., ``That Great Dane is big''~vs.~``That's a big Great Dane''). Additionally, we test the hypothesis for syntactically modified nouns appearing in the subject or in the predicate (e.g., ``That big sunflower is a gift'' ~vs.~``That gift is a big sunflower''), thus controlling for confounding with modification effects.
 The critical test is how speakers and listeners treat these sentences in the context of a referent for whom the adjective is felicitous given one comparison class but not another (e.g., \emph{big} to describe a normal-sized Great Dane, which would be big if the comparison class is \emph{dogs} but not \emph{Great Danes}). 
 We examine human judgments using three distinct dependent measures in pre-registered experiments. 
 
