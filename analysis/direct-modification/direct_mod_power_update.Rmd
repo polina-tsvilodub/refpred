@@ -34,7 +34,7 @@ pilot_data <- rbind(pilot5, pilot6)
 ```
 
 First, the seed model is computed on pilot data. Main effects are deviation-coded. 
-``` {r}
+``` {r, results = "hide"}
 # sum coding of main effects
 pilot_data <- pilot_data %>% 
   mutate(trial_dev = factor(trial_type, levels = c("filler", "critical")),
@@ -50,19 +50,22 @@ pilot_model <- brm(
   family = "bernoulli",
   chains = 4,
   iter = 2000, 
-  cores = 4
-  #control = list(adapt_delta = 0.95)
+  cores = 4,
+  control = list(adapt_delta = 0.95)
 )
+```
 
+``` {r}
 summary(pilot_model)
 ```
+
 We are mainly interested in the effect of syntax in the critical condition:
-``` {r}
+``` {r, warnings = F}
 predicted_draws <- pilot_model %>%
   spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
   mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
          critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         syntax_critical = 2*b_syntax_dev1 - 2*`b_syntax_dev1:trial_dev1`,
+         syntax_critical = critical_subj - critical_pred,
          filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
          filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
          syntax_filler = filler_subj - filler_pred) %>%
@@ -74,7 +77,8 @@ predicted_draws <- pilot_model %>%
     lower = quantile(val, probs = 0.025),
     upper = quantile(val, probs = 0.975)
   )
-  
+
+predicted_draws  
 ```
 
 Here, the first batch of posterior samples is drawn from the fitted model. A new model is fit on these samples.
@@ -108,10 +112,10 @@ predicted_fit_draws <- predicted_fit %>%
   spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
   mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
          critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         syntax_critical = 2*b_syntax_dev1 - 2*`b_syntax_dev1:trial_dev1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
          filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
          filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
-         syntax_filler = filler_subj - filler_pred) %>%
+         syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate
   select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
   gather(key, val) %>%
   group_by(key) %>%
@@ -123,6 +127,7 @@ predicted_fit_draws <- predicted_fit %>%
   
 summary(predicted_fit)
 ```
+
 ### Simulate data & fit the model
 ``` {r}
 
@@ -174,10 +179,10 @@ sim_data_fit <- function(seed, N) {
     # extract contrasts of interest, especially effect of syntax by-trial 
   mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
          critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         syntax_critical = 2*b_syntax_dev1 - 2*`b_syntax_dev1:trial_dev1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs pred syntax
          filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
          filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
-         syntax_filler = filler_subj - filler_pred) %>%
+         syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate syntax
   select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
   gather(key, val) %>%
   group_by(key) %>%
@@ -193,12 +198,12 @@ sim_data_fit <- function(seed, N) {
 
 ### Power analysis
 
-Here is a small test run of the simulation for 47 participants:
+Small simulation over 100 iterations for 70 participants:
 
 ```{r}
 sim1 <-
   tibble(seed = 1:100) %>% 
-  mutate(tidy = map(seed, sim_data_fit, 0)) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 23)) %>% 
   unnest(tidy)
 
 ```
@@ -207,51 +212,37 @@ sim1 <-
 # power for effect of syntax
 # power for the syntax effect for 47 participants is around 0.75
 sim1 %>%
-  filter(term == "syntax_critical") %>%
+  filter(key == "syntax_critical") %>%
   mutate(check_syntax = ifelse(lower > 0, 1, 0)) %>%
   summarise(power_syntax = mean(check_syntax))
 
 # power for interaction 
-sim1 %>%
-  filter(term == "b_syntax_dev1:trial_dev1") %>%
-  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
-  summarise(power_interaction = mean(check_interaction))
+#sim1 %>%
+#  filter(term == "b_syntax_dev1:trial_dev1") %>%
+#  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
+#  summarise(power_interaction = mean(check_interaction))
 ```
 
-Simulation of 60 participants over 1000 iterations:
+Simulation of 80 participants over 100 iterations:
 ``` {r, results = "hide"}
-# simulate data and analysis for 60 participants
+# simulate data and analysis for 80 participants
 sim2 <-
-  tibble(seed = 1:1000) %>% 
-  mutate(tidy = map(seed, sim_data_fit, 13)) %>% 
+  tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 33)) %>% 
   unnest(tidy)
 ```
 
 ``` {r}
 # power for effect of syntax
 sim2 %>%
-  filter(term == "b_syntax_devpred") %>%
-  mutate(check_syntax = ifelse(upper < 0, 1, 0)) %>%
+  filter(key == "syntax_critical") %>%
+  mutate(check_syntax = ifelse(lower > 0, 1, 0)) %>%
   summarise(power_syntax = mean(check_syntax))
 
 # power for interaction 
-sim2 %>%
-  filter(term == "b_syntax_devpred:trial_devcritical") %>%
-  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
-  summarise(power_interaction = mean(check_interaction))
-```
-
-``` {r}
-sim2 %>% 
-  filter((term == "b_Intercept" )| (term == "b_syntax_devpred") | (term == "b_trial_devcritical") | (term == "b_syntax_devpred:trial_devcritical")) %>%
-  select(seed, term, estimate) %>%
-  spread(key = term, value = estimate) -> sim_wide
-
-sim_wide %>%
-  mutate(syntax_critical = b_Intercept + b_trial_devcritical) %>%
-  summarise(mean = mean(syntax_critical),
-            lower = quantile(syntax_critical, probs = 0.025),
-            upper = quantile(syntax_critical, probs = 0.975))
-
+#sim2 %>%
+#  filter(key == "b_syntax_devpred:trial_devcritical") %>%
+#  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
+#  summarise(power_interaction = mean(check_interaction))
 ```
 
