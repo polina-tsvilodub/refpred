@@ -1,0 +1,257 @@
+---
+title: "Direct Modification Power Analysis"
+author: "Polina Tsvilodub"
+date: "7/13/2020"
+output: github_document
+---
+In this document a simulation-based power analysis for the direct modification study series can be found. 
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lmerTest)
+library(brms)
+library(tidyboot)
+library(jsonlite)
+library(tidybayes)
+library(broom)
+```
+
+This power analysis is based on pilot data from pilots 5 and 6 (see `modificationXrefUt-pilot2.Rmd`).
+The maximal model including main effects of syntax (subject vs predicate-N), trial type (critical vs. filler), their interaction and maximal random effect structure (by-subject and by-item random intercepts and random slope effects of the main predictors and their interaction) is assumed.  
+
+The power analysis proceeds as follows: the desired model described above is fit on (tidy & classified) pilot data (n = 47 subjects); then, posterior predictive samples for a given number of participants are generated from the fitted model based on the pilot data. The desired model is re-computed on these posterior samples and the parameters of interest (i.e. the syntax coefficient and the interaction coefficient) are extracted. This process is repeated (1000 iterations), and the power for the given number of participants is calculated as the proportion of critical coefficients that were estimated in the predicted direction (i.e. CrI for effect syntax > 0, and CrI for the interaction estimate including 0). 
+The number of simulated participants is incremented, starting at 47 (the number used in the pilots). 
+
+### Pilot Model
+``` {r, warnings=FALSE}
+# read pilot data
+pilot5 <- read_csv("../../data/direct-modification/results_35_modXrefUt_pilot1_nonMatchClassified_tidy.csv") %>%
+  rename('workerid' = submission_id, 
+         'response_num' = response_numMatch
+          ) %>% select(-NP_match)
+pilot6 <- read_csv("../../data/direct-modification/results_35_double-modXrefUt-pilot2_tidy.csv")
+pilot_data <- rbind(pilot5, pilot6)
+```
+
+First, the seed model is computed on pilot data. Main effects are deviation-coded. 
+``` {r}
+# sum coding of main effects
+pilot_data <- pilot_data %>% 
+  mutate(trial_dev = factor(trial_type, levels = c("filler", "critical")),
+         syntax_dev = factor(syntax, levels = c("subj", "pred")))
+contrasts(pilot_data$trial_dev) <- contr.sum(2)
+contrasts(pilot_data$syntax_dev) <- contr.sum(2)
+
+# fit full desired model on pilot data
+pilot_model <- brm(
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid) 
+  + (1 + syntax_dev*trial_dev | target),
+  data = pilot_data,
+  family = "bernoulli",
+  chains = 4,
+  iter = 2000, 
+  cores = 4
+  #control = list(adapt_delta = 0.95)
+)
+
+summary(pilot_model)
+```
+We are mainly interested in the effect of syntax in the critical condition:
+``` {r}
+predicted_draws <- pilot_model %>%
+  spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+         syntax_critical = 2*b_syntax_dev1 - 2*`b_syntax_dev1:trial_dev1`,
+         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+         syntax_filler = filler_subj - filler_pred) %>%
+  select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+  summarise(
+    mean = mean(val),
+    lower = quantile(val, probs = 0.025),
+    upper = quantile(val, probs = 0.975)
+  )
+  
+```
+
+Here, the first batch of posterior samples is drawn from the fitted model. A new model is fit on these samples.
+``` {r}
+# add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
+# predictions are based on pilot data, i.e. grouped by original pilot input rows  
+# corresponds to brms::redict.brmsfit()
+
+# the new draws are added in the column .prediction
+# simulates 47 participants, as in the original dataset 
+predicted_data <- add_predicted_draws(model=pilot_model, newdata = pilot_data, n = 1) %>% 
+  mutate(workerid = paste(workerid, letters[1], sep = "_")) # mutate the workerid to simulate adding more participants
+
+# deviation code main effects
+contrasts(predicted_data$trial_dev) <- contr.sum(2)
+contrasts(predicted_data$syntax_dev) <- contr.sum(2)
+
+predicted_fit <- brm(
+  `.prediction` ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid) 
+  + (1 + syntax_dev*trial_dev | target),
+  data = predicted_data,
+  family = "bernoulli",
+  chains = 4,
+  iter = 3000, 
+  cores = 4,
+  control = list(adapt_delta = 0.94)
+)
+
+# extract contrasts of interest
+predicted_fit_draws <- predicted_fit %>%
+  spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+         syntax_critical = 2*b_syntax_dev1 - 2*`b_syntax_dev1:trial_dev1`,
+         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+         syntax_filler = filler_subj - filler_pred) %>%
+  select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+  summarise(
+    mean = mean(val),
+    lower = quantile(val, probs = 0.025),
+    upper = quantile(val, probs = 0.975)
+  )
+  
+summary(predicted_fit)
+```
+### Simulate data & fit the model
+``` {r}
+
+# helper function to get posterior predictive draws for a subset of participants of size N, N <= 47 
+# d is the a dataframe with posterior predictive draws for 47 participants based on the pilot data set 
+get_new_data <- function(d, N) {
+    if(N == 0) {
+      data <- d
+    } else {
+      data <- add_predicted_draws(model=pilot_model, 
+                                     newdata = pilot_data %>% 
+                                       filter(workerid %in% sample(unique(pilot_data$workerid), N, replace = F)),
+                                     n = 1) %>% 
+                 mutate(workerid = paste(workerid, letters[1], sep = "_")) %>%
+                   rbind(., d)
+    }
+    
+  }
+```
+
+Here, new data are simulated over `seed` number of iterations; for each new data set, the model fit on the first posterior samples batch (`predicted_fit`) is updated. The summary statistics of estimated coefficients are saved as a nested data frame. 
+``` {r}
+# simulate data and updat
+# n is number of participants to be added to the pilot baseline of 47, cannot exceed 47
+sim_data_fit <- function(seed, N) {
+  set.seed(seed)
+  
+# add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
+# predictions are based on pilot data, i.e. grouped by original pilot input rows  
+# corresponds to brms::redict.brmsfit()
+
+# the new draws are added in the column .prediction
+# simulates 47 participants, as in the original dataset
+  d <- add_predicted_draws(model=pilot_model, newdata = pilot_data, n = 1)
+  
+  # possibly add more participants
+  data <- get_new_data(d, N)
+  
+  # deviation code main effects
+  contrasts(data$trial_dev) <- contr.sum(2)
+  contrasts(data$syntax_dev) <- contr.sum(2)
+  
+  # update model fit with new data
+  update(predicted_fit,
+         newdata = data,
+         seed = seed) %>% 
+    # extract posterior draws
+    spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
+    # extract contrasts of interest, especially effect of syntax by-trial 
+  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+         syntax_critical = 2*b_syntax_dev1 - 2*`b_syntax_dev1:trial_dev1`,
+         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+         syntax_filler = filler_subj - filler_pred) %>%
+  select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+    # compute summary statistics 
+  summarise( 
+    mean = mean(val),
+    lower = quantile(val, probs = 0.025),
+    upper = quantile(val, probs = 0.975)
+  )
+  
+}
+```
+
+### Power analysis
+
+Here is a small test run of the simulation for 47 participants:
+
+```{r}
+sim1 <-
+  tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 0)) %>% 
+  unnest(tidy)
+
+```
+
+``` {r}
+# power for effect of syntax
+# power for the syntax effect for 47 participants is around 0.75
+sim1 %>%
+  filter(term == "syntax_critical") %>%
+  mutate(check_syntax = ifelse(lower > 0, 1, 0)) %>%
+  summarise(power_syntax = mean(check_syntax))
+
+# power for interaction 
+sim1 %>%
+  filter(term == "b_syntax_dev1:trial_dev1") %>%
+  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
+  summarise(power_interaction = mean(check_interaction))
+```
+
+Simulation of 60 participants over 1000 iterations:
+``` {r, results = "hide"}
+# simulate data and analysis for 60 participants
+sim2 <-
+  tibble(seed = 1:1000) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 13)) %>% 
+  unnest(tidy)
+```
+
+``` {r}
+# power for effect of syntax
+sim2 %>%
+  filter(term == "b_syntax_devpred") %>%
+  mutate(check_syntax = ifelse(upper < 0, 1, 0)) %>%
+  summarise(power_syntax = mean(check_syntax))
+
+# power for interaction 
+sim2 %>%
+  filter(term == "b_syntax_devpred:trial_devcritical") %>%
+  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
+  summarise(power_interaction = mean(check_interaction))
+```
+
+``` {r}
+sim2 %>% 
+  filter((term == "b_Intercept" )| (term == "b_syntax_devpred") | (term == "b_trial_devcritical") | (term == "b_syntax_devpred:trial_devcritical")) %>%
+  select(seed, term, estimate) %>%
+  spread(key = term, value = estimate) -> sim_wide
+
+sim_wide %>%
+  mutate(syntax_critical = b_Intercept + b_trial_devcritical) %>%
+  summarise(mean = mean(syntax_critical),
+            lower = quantile(syntax_critical, probs = 0.025),
+            upper = quantile(syntax_critical, probs = 0.975))
+
+```
+
