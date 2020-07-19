@@ -131,11 +131,18 @@ summary(predicted_fit)
 ### Simulate data & fit the model
 ``` {r}
 
-# helper function to get posterior predictive draws for a subset of participants of size N, N <= 47 
+# helper function to get posterior predictive draws for a subset of participants of size N
 # d is the a dataframe with posterior predictive draws for 47 participants based on the pilot data set 
 get_new_data <- function(d, N) {
     if(N == 0) {
       data <- d
+    } else if (N > 47) {
+      data <- add_predicted_draws(model=pilot_model, 
+                                     newdata = pilot_data %>% 
+                                       filter(workerid %in% sample(unique(pilot_data$workerid), N, replace = T)),
+                                     n = 1) %>% 
+                 mutate(workerid = paste(workerid, letters[1], sep = "_")) %>%
+                   rbind(., d)
     } else {
       data <- add_predicted_draws(model=pilot_model, 
                                      newdata = pilot_data %>% 
@@ -200,7 +207,7 @@ sim_data_fit <- function(seed, N) {
 
 Small simulation over 100 iterations for 70 participants:
 
-```{r}
+```{r, results = "hide"}
 sim1 <-
   tibble(seed = 1:100) %>% 
   mutate(tidy = map(seed, sim_data_fit, 23)) %>% 
@@ -216,11 +223,6 @@ sim1 %>%
   mutate(check_syntax = ifelse(lower > 0, 1, 0)) %>%
   summarise(power_syntax = mean(check_syntax))
 
-# power for interaction 
-#sim1 %>%
-#  filter(term == "b_syntax_dev1:trial_dev1") %>%
-#  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
-#  summarise(power_interaction = mean(check_interaction))
 ```
 
 Simulation of 80 participants over 100 iterations:
@@ -239,10 +241,49 @@ sim2 %>%
   mutate(check_syntax = ifelse(lower > 0, 1, 0)) %>%
   summarise(power_syntax = mean(check_syntax))
 
-# power for interaction 
-#sim2 %>%
-#  filter(key == "b_syntax_devpred:trial_devcritical") %>%
-#  mutate(check_interaction = ifelse(((lower < 0) & (upper > 0)), 1, 0)) %>%
-#  summarise(power_interaction = mean(check_interaction))
+```
+``` {r, results="hide"}
+# 500 iterations for 94 participants
+sim3 <- tibble(seed = 1:500) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 47)) %>% 
+  unnest(tidy)
 ```
 
+``` {r}
+# power for effect of syntax
+sim3 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(check_syntax = ifelse(lower > 0, 1, 0)) %>%
+  summarise(power_syntax = mean(check_syntax),
+            lower = quantile(check_syntax, probs = 0.025),
+            upper = quantile(check_syntax, probs = 0.975))
+```
+``` {r. results = "hide"}
+# helper function iterating over seeds (=iterations of the simulation)
+sim.power <- function(n.subj, n.sim) {
+  sim <- tibble( seed = 1:n.sim) %>%
+    mutate(
+      tidy = map(seed, sim_data_fit, n.subj) %>%
+        unnest(tidy)
+    )
+  print(n.sim)
+}
+
+# iterate over different subject numbers (total of 97 - 297, in steps of 20)
+analyse_power <- tibble(n.subj = seq(50, 250, 20)) %>%
+  mutate(
+    tidy = map(n.subj, sim.power, n.sim = 100)
+  ) %>%
+  unnest(tidy)
+```
+
+``` {r}
+# pull out power for the effect of syntax in the critical condition  
+analyse_power %>%
+  filter(key == "syntax_critical") %>%
+  mutate(check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)) %>%
+  group_by(n.subj)
+  summarise(power_syntax = mean(check_syntax),
+            lower = quantile(check_syntax, probs = 0.025),
+            upper = quantile(check_syntax, probs = 0.975))
+```
