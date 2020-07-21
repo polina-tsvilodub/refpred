@@ -1,0 +1,374 @@
+workerid,trial_number,context_picture,response,target_size,adj,syntax,target,item,adj_cond,trial_type,response_num,trial_dev,syntax_dev
+2255,1,images/flower-parade-basic_filler.png,sunflowers,big,big,subj,sunflower,flowers,congruent,filler,0,filler,subj
+2255,2,images/tree-parade-basic.png,redwoods,big,big,subj,redwood,trees,congruent,critical,0,critical,subj
+2255,3,images/tree-parade-basic_filler.png,bonsais,small,small,subj,bonsai,trees,congruent,filler,0,filler,subj
+2255,4,images/flower-parade-basic.png,dandelions,small,small,pred,dandelion,flowers,congruent,critical,0,critical,pred
+2255,1,images/bird-parade-basic_filler.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,filler,0,filler,pred
+2255,2,images/dog-parade-basic_filler.png,dobermans,big,big,pred,doberman,dogs1,congruent,filler,0,filler,pred
+2255,3,images/dog-parade-basic.png,chihuahuas,small,small,pred,chihuahua,dogs1,congruent,critical,0,critical,pred
+2255,4,images/bird-parade-basic.png,eagles,big,big,subj,eagle,birds,congruent,critical,0,critical,subj
+2254,1,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+2254,2,images/dog-parade-basic.png,dogs,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+2254,3,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+2254,4,images/dog-parade-basic2.png,dogs,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+2254,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+2254,2,images/flower-parade-basic_filler.png,dandelions,small,small,pred,dandelion,flowers,congruent,filler,0,filler,pred
+2254,3,images/flower-parade-basic.png,sunflowers,big,big,pred,sunflower,flowers,congruent,critical,0,critical,pred
+2254,4,images/bird-parade-basic.png,birds,small,small,subj,hummingbird,birds,congruent,critical,1,critical,subj
+2253,1,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+2253,2,images/flower-parade-basic.png,gifts,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+2253,3,images/dog-parade-basic2.png,dogs,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+2253,4,images/dog-parade-basic2_filler.png,pugs,small,small,subj,pug,dogs2,congruent,filler,0,filler,subj
+2253,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+2253,2,images/bird-parade-basic.png,rescues,small,small,pred,hummingbird,birds,congruent,critical,1,critical,pred
+2253,3,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+2253,4,images/dog-parade-basic.png,chihuahuas,small,small,pred,chihuahua,dogs1,congruent,critical,0,critical,pred
+2252,1,images/bird-parade-basic_filler.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,filler,0,filler,pred
+2252,2,images/tree-parade-basic_filler.png,bonsai,small,small,pred,bonsai,trees,congruent,filler,0,filler,pred
+2252,3,images/bird-parade-basic.png,rescues,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+2252,4,images/tree-parade-basic.png,landmarks,big,big,subj,redwood,trees,congruent,critical,1,critical,subj
+2252,1,images/dog-parade-basic2_filler.png,Great danes,big,big,subj,Great Dane,dogs2,congruent,filler,0,filler,subj
+2252,2,images/dog-parade-basic2.png,pugs,small,small,pred,pug,dogs2,congruent,critical,0,critical,pred
+2252,3,images/dog-parade-basic.png,chihuahuas,small,small,subj,chihuahua,dogs1,congruent,critical,0,critical,subj
+2252,4,images/dog-parade-basic_filler.png,dobermans,big,big,subj,doberman,dogs1,congruent,filler,0,filler,subj
+2251,1,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+2251,2,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+2251,3,images/tree-parade-basic.png,landmarks,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+2251,4,images/dog-parade-basic2.png,prizewinners,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+2251,1,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+2251,2,images/flower-parade-basic.png,gifts,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+2251,3,images/dog-parade-basic.png,service animals,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+2251,4,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+2250,1,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+2250,2,images/tree-parade-basic.png,landmarks,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+2250,3,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+2250,4,images/dog-parade-basic2.png,dogs,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+2250,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+2250,2,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+2250,3,images/flower-parade-basic.png,flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+2250,4,images/bird-parade-basic.png,birds,small,small,subj,hummingbird,birds,congruent,critical,1,critical,subj
+2249,1,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+2249,2,images/flower-parade-basic.png,flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+2249,3,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+2249,4,images/tree-parade-basic.png,landmarks,small,small,pred,bonsai,trees,congruent,critical,1,critical,pred
+2249,1,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+2249,2,images/dog-parade-basic2.png,prize winnders,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+2249,3,images/dog-parade-basic.png,dogs,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+2249,4,images/dog-parade-basic_filler.png,dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+2248,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+2248,2,images/bird-parade-basic_filler.png,birds,big,big,subj,eagle,birds,congruent,filler,1,filler,subj
+2248,3,images/bird-parade-basic.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,critical,0,critical,pred
+2248,4,images/tree-parade-basic.png,landmarks,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+2248,1,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+2248,2,images/dog-parade-basic.png,service animals,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+2248,3,images/flower-parade-basic.png,gifts,big,big,pred,sunflower,flowers,congruent,critical,1,critical,pred
+2248,4,images/dog-parade-basic_filler.png,dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+2247,1,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+2247,2,images/bird-parade-basic.png,birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+2247,3,images/tree-parade-basic.png,landmarks,small,small,pred,bonsai,trees,congruent,critical,1,critical,pred
+2247,4,images/tree-parade-basic_filler.png,landmarks,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+2247,1,images/dog-parade-basic_filler.png,service dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+2247,2,images/dog-parade-basic2.png,dogs,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+2247,3,images/dog-parade-basic.png,dogs,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+2247,4,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+2246,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+2246,2,images/flower-parade-basic.png,plants,small,small,subj,dandelion,flowers,congruent,critical,1,critical,subj
+2246,3,images/flower-parade-basic_filler.png,flowers,big,big,pred,sunflower,flowers,congruent,filler,1,filler,pred
+2246,4,images/tree-parade-basic.png,trees,small,small,pred,bonsai,trees,congruent,critical,1,critical,pred
+2246,1,images/bird-parade-basic_filler.png,birds,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+2246,2,images/dog-parade-basic.png,dogs,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+2246,3,images/bird-parade-basic.png,rescues,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+2246,4,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+2245,3,images/dog-parade-basic.png,pug,small,small,pred,chihuahua,dogs1,congruent,critical,0,critical,pred
+2245,4,images/dog-parade-basic2.png,chichu,small,small,pred,pug,dogs2,congruent,critical,0,critical,pred
+2245,1,images/flower-parade-basic_filler.png,dandelion,small,small,pred,dandelion,flowers,congruent,filler,0,filler,pred
+2245,2,images/bird-parade-basic.png,egale,small,small,subj,hummingbird,birds,congruent,critical,0,critical,subj
+2245,3,images/flower-parade-basic.png,flower,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+2245,4,images/bird-parade-basic_filler.png,eagle,big,big,pred,eagle,birds,congruent,filler,0,filler,pred
+2244,1,images/bird-parade-basic_filler.png,eagle,big,big,pred,eagle,birds,congruent,filler,0,filler,pred
+2244,2,images/dog-parade-basic2_filler.png,great dane,small,small,pred,pug,dogs2,congruent,filler,0,filler,pred
+2244,3,images/bird-parade-basic.png,himmingbird,small,small,pred,hummingbird,birds,congruent,critical,0,critical,pred
+2244,4,images/dog-parade-basic2.png,pug,big,big,subj,Great Dane,dogs2,congruent,critical,0,critical,subj
+2244,1,images/dog-parade-basic_filler.png,doberman,small,small,subj,chihuahua,dogs1,congruent,filler,0,filler,subj
+2244,2,images/flower-parade-basic.png,dandelion,big,big,subj,sunflower,flowers,congruent,critical,0,critical,subj
+2244,3,images/dog-parade-basic.png,chihuahua,big,big,pred,doberman,dogs1,congruent,critical,0,critical,pred
+2244,4,images/flower-parade-basic_filler.png,sunflower,small,small,subj,dandelion,flowers,congruent,filler,0,filler,subj
+2243,1,images/tree-parade-basic_filler.png,other trees,small,small,pred,bonsai,trees,congruent,filler,1,filler,pred
+2243,2,images/dog-parade-basic2.png,dogs,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+2243,4,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+2243,1,images/bird-parade-basic_filler.png,bird,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+2243,2,images/dog-parade-basic.png,dogs,big,big,pred,doberman,dogs1,congruent,critical,1,critical,pred
+2243,3,images/bird-parade-basic.png,birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+2243,4,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+2242,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+2242,2,images/dog-parade-basic.png,service dogs,big,big,pred,doberman,dogs1,congruent,critical,1,critical,pred
+2242,3,images/tree-parade-basic.png,landmarks,small,small,pred,bonsai,trees,congruent,critical,1,critical,pred
+2242,4,images/dog-parade-basic_filler.png,dogs,small,small,pred,chihuahua,dogs1,congruent,filler,1,filler,pred
+2242,1,images/dog-parade-basic2_filler.png,prize winners,small,small,pred,pug,dogs2,congruent,filler,1,filler,pred
+2242,2,images/dog-parade-basic2.png,prize winners,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+2242,3,images/flower-parade-basic_filler.png,gifts,small,small,subj,dandelion,flowers,congruent,filler,1,filler,subj
+2242,4,images/flower-parade-basic.png,gifts,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+2240,1,images/dog-parade-basic2_filler.png,dogs,big,big,pred,Great Dane,dogs2,congruent,filler,1,filler,pred
+2240,2,images/dog-parade-basic2.png,dogs,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+2240,3,images/flower-parade-basic.png,flowers,big,big,pred,sunflower,flowers,congruent,critical,1,critical,pred
+2240,4,images/flower-parade-basic_filler.png,flowers,small,small,subj,dandelion,flowers,congruent,filler,1,filler,subj
+2240,1,images/tree-parade-basic_filler.png,trees,small,small,subj,bonsai,trees,congruent,filler,1,filler,subj
+2240,2,images/dog-parade-basic_filler.png,dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+2240,3,images/dog-parade-basic.png,dogs,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+2240,4,images/tree-parade-basic.png,trees,big,big,subj,redwood,trees,congruent,critical,1,critical,subj
+2239,1,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+2239,2,images/tree-parade-basic.png,trees,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+2239,3,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+2239,4,images/dog-parade-basic.png,dogs,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+2239,1,images/dog-parade-basic2_filler.png,dogs,small,small,pred,pug,dogs2,congruent,filler,1,filler,pred
+2239,2,images/dog-parade-basic2.png,dogs,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+2239,3,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+2239,4,images/bird-parade-basic.png,birds,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+workerid_0001,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+workerid_0001,2,images/flower-parade-basic.png,flowers,small,small,subj,dandelion,flowers,congruent,critical,1,critical,subj
+workerid_0001,3,images/flower-parade-basic_filler.png,sunflowers,big,big,pred,sunflower,flowers,congruent,filler,0,filler,pred
+workerid_0001,4,images/tree-parade-basic.png,landmarks,small,small,pred,bonsai,trees,congruent,critical,0,critical,pred
+workerid_0001,1,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+workerid_0001,2,images/dog-parade-basic2.png,dogs,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+workerid_0001,3,images/bird-parade-basic_filler.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,filler,0,filler,pred
+workerid_0001,4,images/bird-parade-basic.png,eagles,big,big,subj,eagle,birds,congruent,critical,0,critical,subj
+workerid_0002,1,images/bird-parade-basic_filler.png,eagles,big,big,pred,eagle,birds,congruent,filler,0,filler,pred
+workerid_0002,2,images/dog-parade-basic2.png,great dane,big,big,pred,Great Dane,dogs2,congruent,critical,0,critical,pred
+workerid_0002,3,images/bird-parade-basic.png,hummingbirds,small,small,subj,hummingbird,birds,congruent,critical,0,critical,subj
+workerid_0002,4,images/dog-parade-basic2_filler.png,pugs,small,small,subj,pug,dogs2,congruent,filler,0,filler,subj
+workerid_0002,1,images/tree-parade-basic_filler.png,bonsai,small,small,pred,bonsai,trees,congruent,filler,0,filler,pred
+workerid_0002,2,images/flower-parade-basic_filler.png,sunflower,big,big,subj,sunflower,flowers,congruent,filler,0,filler,subj
+workerid_0002,3,images/tree-parade-basic.png,landmark,big,big,subj,redwood,trees,congruent,critical,1,critical,subj
+workerid_0002,4,images/flower-parade-basic.png,gift,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+workerid_0003,1,images/tree-parade-basic_filler.png,trees,small,small,subj,bonsai,trees,congruent,filler,1,filler,subj
+workerid_0003,2,images/dog-parade-basic_filler.png,dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+workerid_0003,3,images/dog-parade-basic.png,dogs,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+workerid_0003,4,images/tree-parade-basic.png,trees,big,big,pred,redwood,trees,congruent,critical,1,critical,pred
+workerid_0003,1,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+workerid_0003,2,images/dog-parade-basic2_filler.png,pugs,small,small,pred,pug,dogs2,congruent,filler,0,filler,pred
+workerid_0003,3,images/dog-parade-basic2.png,dogs,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+workerid_0003,4,images/flower-parade-basic.png,dandelions,small,small,pred,dandelion,flowers,congruent,critical,0,critical,pred
+workerid_0004,1,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+workerid_0004,2,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+workerid_0004,3,images/flower-parade-basic.png,sunflowers,big,big,subj,sunflower,flowers,congruent,critical,0,critical,subj
+workerid_0004,4,images/tree-parade-basic.png,bonsais,small,small,subj,bonsai,trees,congruent,critical,0,critical,subj
+workerid_0004,1,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+workerid_0004,2,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0004,3,images/bird-parade-basic.png,eagles,big,big,pred,eagle,birds,congruent,critical,0,critical,pred
+workerid_0004,4,images/dog-parade-basic.png,dogs,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+workerid_0006,1,images/dog-parade-basic2_filler.png,ANIMAL,small,small,pred,pug,dogs2,congruent,filler,1,filler,pred
+workerid_0006,2,images/tree-parade-basic_filler.png,OTHER TREE,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+workerid_0006,3,images/dog-parade-basic2.png,PRIZE WINNER,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+workerid_0006,4,images/tree-parade-basic.png,LANDMARK,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+workerid_0006,1,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+workerid_0006,2,images/bird-parade-basic.png,birds,small,small,pred,hummingbird,birds,congruent,critical,1,critical,pred
+workerid_0006,3,images/dog-parade-basic.png,doberman,big,big,pred,doberman,dogs1,congruent,critical,0,critical,pred
+workerid_0006,4,images/bird-parade-basic_filler.png,birds,big,big,subj,eagle,birds,congruent,filler,1,filler,subj
+workerid_0008,1,images/bird-parade-basic_filler.png,other birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0008,2,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+workerid_0008,3,images/bird-parade-basic.png,birds,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+workerid_0008,4,images/tree-parade-basic.png,nearby trees.,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+workerid_0008,1,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+workerid_0008,2,images/dog-parade-basic2_filler.png,animals,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0008,3,images/flower-parade-basic.png,gift flowers,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+workerid_0008,4,images/dog-parade-basic2.png,pugs,small,small,pred,pug,dogs2,congruent,critical,0,critical,pred
+workerid_0009,1,images/bird-parade-basic_filler.png,thats a big eagle,big,big,pred,eagle,birds,congruent,filler,0,filler,pred
+workerid_0009,2,images/tree-parade-basic.png,bonsai,small,small,pred,bonsai,trees,congruent,critical,0,critical,pred
+workerid_0009,3,images/bird-parade-basic.png,hummingbird,small,small,subj,hummingbird,birds,congruent,critical,0,critical,subj
+workerid_0009,4,images/tree-parade-basic_filler.png,redwood,big,big,subj,redwood,trees,congruent,filler,0,filler,subj
+workerid_0009,1,images/dog-parade-basic_filler.png,chihuahua,small,small,pred,chihuahua,dogs1,congruent,filler,0,filler,pred
+workerid_0009,2,images/dog-parade-basic2.png,big great dane,big,big,pred,Great Dane,dogs2,congruent,critical,0,critical,pred
+workerid_0009,3,images/dog-parade-basic.png,doberman,big,big,subj,doberman,dogs1,congruent,critical,0,critical,subj
+workerid_0009,4,images/dog-parade-basic2_filler.png,pug,small,small,subj,pug,dogs2,congruent,filler,0,filler,subj
+workerid_0010,1,images/bird-parade-basic_filler.png,birds,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+workerid_0010,2,images/bird-parade-basic.png,birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+workerid_0010,3,images/tree-parade-basic.png,trees,big,big,pred,redwood,trees,congruent,critical,1,critical,pred
+workerid_0010,4,images/tree-parade-basic_filler.png,trees,small,small,subj,bonsai,trees,congruent,filler,1,filler,subj
+workerid_0010,1,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+workerid_0010,2,images/dog-parade-basic2_filler.png,dogs,big,big,pred,Great Dane,dogs2,congruent,filler,1,filler,pred
+workerid_0010,3,images/dog-parade-basic2.png,dogs,small,small,subj,pug,dogs2,congruent,critical,1,critical,subj
+workerid_0010,4,images/dog-parade-basic.png,dogs,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+workerid_0012,1,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+workerid_0012,2,images/flower-parade-basic_filler.png,sunflowers,big,big,pred,sunflower,flowers,congruent,filler,0,filler,pred
+workerid_0012,3,images/flower-parade-basic.png,dandelions,small,small,subj,dandelion,flowers,congruent,critical,0,critical,subj
+workerid_0012,4,images/dog-parade-basic2.png,dogs,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+workerid_0012,1,images/dog-parade-basic_filler.png,dobermans,big,big,subj,doberman,dogs1,congruent,filler,0,filler,subj
+workerid_0012,2,images/dog-parade-basic.png,dogs,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+workerid_0012,3,images/tree-parade-basic_filler.png,bonsai,small,small,pred,bonsai,trees,congruent,filler,0,filler,pred
+workerid_0012,4,images/tree-parade-basic.png,trees,big,big,subj,redwood,trees,congruent,critical,1,critical,subj
+workerid_0013,1,images/flower-parade-basic_filler.png,flowers,small,small,subj,dandelion,flowers,congruent,filler,1,filler,subj
+workerid_0013,2,images/flower-parade-basic.png,flowers,big,big,pred,sunflower,flowers,congruent,critical,1,critical,pred
+workerid_0013,3,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+workerid_0013,4,images/bird-parade-basic.png,rescues,small,small,subj,hummingbird,birds,congruent,critical,1,critical,subj
+workerid_0013,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+workerid_0013,2,images/tree-parade-basic.png,trees,small,small,pred,bonsai,trees,congruent,critical,1,critical,pred
+workerid_0013,3,images/dog-parade-basic2.png,prize winner,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+workerid_0013,4,images/dog-parade-basic2_filler.png,dogs,small,small,pred,pug,dogs2,congruent,filler,1,filler,pred
+workerid_0014,1,images/bird-parade-basic_filler.png,hummingbird,small,small,pred,hummingbird,birds,congruent,filler,0,filler,pred
+workerid_0014,2,images/dog-parade-basic2.png,dogs,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+workerid_0014,3,images/bird-parade-basic.png,eagle,big,big,subj,eagle,birds,congruent,critical,0,critical,subj
+workerid_0014,4,images/dog-parade-basic2_filler.png,Great Dane,big,big,subj,Great Dane,dogs2,congruent,filler,0,filler,subj
+workerid_0014,1,images/tree-parade-basic_filler.png,bonsai,small,small,subj,bonsai,trees,congruent,filler,0,filler,subj
+workerid_0014,2,images/flower-parade-basic_filler.png,flowers,big,big,pred,sunflower,flowers,congruent,filler,1,filler,pred
+workerid_0014,3,images/flower-parade-basic.png,gifts,small,small,subj,dandelion,flowers,congruent,critical,1,critical,subj
+workerid_0014,4,images/tree-parade-basic.png,redwood,big,big,pred,redwood,trees,congruent,critical,0,critical,pred
+workerid_0015,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+workerid_0015,2,images/tree-parade-basic.png,bonsais,small,small,pred,bonsai,trees,congruent,critical,0,critical,pred
+workerid_0015,3,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0015,4,images/bird-parade-basic.png,eagles,big,big,pred,eagle,birds,congruent,critical,0,critical,pred
+workerid_0015,1,images/dog-parade-basic2_filler.png,pugs,small,small,pred,pug,dogs2,congruent,filler,0,filler,pred
+workerid_0015,2,images/dog-parade-basic.png,chihuahuas,small,small,subj,chihuahua,dogs1,congruent,critical,0,critical,subj
+workerid_0015,3,images/dog-parade-basic_filler.png,dobermans,big,big,pred,doberman,dogs1,congruent,filler,0,filler,pred
+workerid_0015,4,images/dog-parade-basic2.png,Great Danes,big,big,subj,Great Dane,dogs2,congruent,critical,0,critical,subj
+workerid_0016,1,images/dog-parade-basic_filler.png,dobermans,big,big,subj,doberman,dogs1,congruent,filler,0,filler,subj
+workerid_0016,2,images/dog-parade-basic.png,dogs,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+workerid_0016,3,images/flower-parade-basic_filler.png,flowers,small,small,subj,dandelion,flowers,congruent,filler,1,filler,subj
+workerid_0016,4,images/flower-parade-basic.png,flowers,big,big,pred,sunflower,flowers,congruent,critical,1,critical,pred
+workerid_0016,1,images/dog-parade-basic2_filler.png,dogs,big,big,pred,Great Dane,dogs2,congruent,filler,1,filler,pred
+workerid_0016,2,images/bird-parade-basic_filler.png,birds,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+workerid_0016,3,images/dog-parade-basic2.png,prize-winners,small,small,subj,pug,dogs2,congruent,critical,1,critical,subj
+workerid_0016,4,images/bird-parade-basic.png,eagles,big,big,subj,eagle,birds,congruent,critical,0,critical,subj
+workerid_0017,1,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+workerid_0017,2,images/dog-parade-basic2_filler.png,dogs,small,small,subj,pug,dogs2,congruent,filler,1,filler,subj
+workerid_0017,3,images/flower-parade-basic.png,prize flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+workerid_0017,4,images/dog-parade-basic2.png,prize dogs,big,big,pred,Great Dane,dogs2,congruent,critical,1,critical,pred
+workerid_0017,1,images/bird-parade-basic_filler.png,birds,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+workerid_0017,2,images/dog-parade-basic.png,service-animals,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+workerid_0017,3,images/bird-parade-basic.png,birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+workerid_0017,4,images/dog-parade-basic_filler.png,dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+workerid_0018,1,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+workerid_0018,2,images/tree-parade-basic.png,trees,big,big,pred,redwood,trees,congruent,critical,1,critical,pred
+workerid_0018,3,images/dog-parade-basic.png,dogs,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+workerid_0018,4,images/tree-parade-basic_filler.png,trees,small,small,subj,bonsai,trees,congruent,filler,1,filler,subj
+workerid_0018,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+workerid_0018,2,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+workerid_0018,3,images/bird-parade-basic.png,birds,small,small,subj,hummingbird,birds,congruent,critical,1,critical,subj
+workerid_0018,4,images/flower-parade-basic.png,flowers,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+workerid_0019,1,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+workerid_0019,2,images/dog-parade-basic.png,dobermans,big,big,pred,doberman,dogs1,congruent,critical,0,critical,pred
+workerid_0019,3,images/bird-parade-basic_filler.png,eagles,big,big,subj,eagle,birds,congruent,filler,0,filler,subj
+workerid_0019,4,images/bird-parade-basic.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,critical,0,critical,pred
+workerid_0019,1,images/tree-parade-basic_filler.png,redwoods,big,big,pred,redwood,trees,congruent,filler,0,filler,pred
+workerid_0019,2,images/flower-parade-basic_filler.png,dandelions,small,small,pred,dandelion,flowers,congruent,filler,0,filler,pred
+workerid_0019,3,images/flower-parade-basic.png,sunflowers,big,big,subj,sunflower,flowers,congruent,critical,0,critical,subj
+workerid_0019,4,images/tree-parade-basic.png,bonsais,small,small,subj,bonsai,trees,congruent,critical,0,critical,subj
+workerid_0020,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+workerid_0020,2,images/bird-parade-basic.png,birds,small,small,subj,hummingbird,birds,congruent,critical,1,critical,subj
+workerid_0020,3,images/dog-parade-basic.png,service dogs,big,big,pred,doberman,dogs1,congruent,critical,1,critical,pred
+workerid_0020,4,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+workerid_0020,1,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0020,2,images/flower-parade-basic_filler.png,flowers,small,small,pred,dandelion,flowers,congruent,filler,1,filler,pred
+workerid_0020,3,images/flower-parade-basic.png,floral gifts,big,big,subj,sunflower,flowers,congruent,critical,1,critical,subj
+workerid_0020,4,images/dog-parade-basic2.png,prize winning dogs,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+workerid_0021,1,images/bird-parade-basic_filler.png,birds,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+workerid_0021,2,images/bird-parade-basic.png,rescue birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+workerid_0021,3,images/dog-parade-basic2_filler.png,dogs,big,big,pred,Great Dane,dogs2,congruent,filler,1,filler,pred
+workerid_0021,4,images/dog-parade-basic2.png,dogs,small,small,subj,pug,dogs2,congruent,critical,1,critical,subj
+workerid_0021,1,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+workerid_0021,2,images/flower-parade-basic.png,flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+workerid_0021,3,images/dog-parade-basic.png,dogs,big,big,pred,doberman,dogs1,congruent,critical,1,critical,pred
+workerid_0021,4,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+workerid_0022,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+workerid_0022,2,images/bird-parade-basic.png,hummingbirds,small,small,subj,hummingbird,birds,congruent,critical,0,critical,subj
+workerid_0022,3,images/flower-parade-basic.png,sunflowers,big,big,pred,sunflower,flowers,congruent,critical,0,critical,pred
+workerid_0022,4,images/flower-parade-basic_filler.png,flowers,small,small,subj,dandelion,flowers,congruent,filler,1,filler,subj
+workerid_0022,1,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0022,2,images/dog-parade-basic_filler.png,chihuahuas,small,small,pred,chihuahua,dogs1,congruent,filler,0,filler,pred
+workerid_0022,3,images/dog-parade-basic2.png,pugs,small,small,pred,pug,dogs2,congruent,critical,0,critical,pred
+workerid_0022,4,images/dog-parade-basic.png,service animals,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+workerid_0023,1,images/dog-parade-basic_filler.png,chihuahuas,small,small,pred,chihuahua,dogs1,congruent,filler,0,filler,pred
+workerid_0023,2,images/flower-parade-basic_filler.png,dandelions,small,small,subj,dandelion,flowers,congruent,filler,0,filler,subj
+workerid_0023,3,images/flower-parade-basic.png,sunflowers,big,big,pred,sunflower,flowers,congruent,critical,0,critical,pred
+workerid_0023,4,images/dog-parade-basic.png,service animals,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+workerid_0023,1,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0023,2,images/tree-parade-basic.png,other landmarks,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+workerid_0023,3,images/dog-parade-basic2.png,prize winners,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+workerid_0023,4,images/tree-parade-basic_filler.png,redwoods,big,big,pred,redwood,trees,congruent,filler,0,filler,pred
+workerid_0024,1,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+workerid_0024,2,images/dog-parade-basic.png,dogs,big,big,pred,doberman,dogs1,congruent,critical,1,critical,pred
+workerid_0024,3,images/tree-parade-basic.png,trees,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+workerid_0024,4,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+workerid_0024,1,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0024,2,images/dog-parade-basic2.png,dogs,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+workerid_0024,3,images/bird-parade-basic.png,birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+workerid_0024,4,images/bird-parade-basic_filler.png,birds,small,small,pred,hummingbird,birds,congruent,filler,1,filler,pred
+workerid_0025,1,images/dog-parade-basic2_filler.png,Great Danes,big,big,pred,Great Dane,dogs2,congruent,filler,0,filler,pred
+workerid_0025,2,images/bird-parade-basic.png,birds,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+workerid_0025,3,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0025,4,images/dog-parade-basic2.png,dogs,small,small,subj,pug,dogs2,congruent,critical,1,critical,subj
+workerid_0025,1,images/flower-parade-basic_filler.png,sunflowers,big,big,subj,sunflower,flowers,congruent,filler,0,filler,subj
+workerid_0025,2,images/dog-parade-basic_filler.png,chihuahuas,small,small,pred,chihuahua,dogs1,congruent,filler,0,filler,pred
+workerid_0025,3,images/dog-parade-basic.png,dogs,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+workerid_0025,4,images/flower-parade-basic.png,flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+workerid_0026,1,images/tree-parade-basic_filler.png,trees,small,small,pred,bonsai,trees,congruent,filler,1,filler,pred
+workerid_0026,2,images/dog-parade-basic2_filler.png,dogs,big,big,pred,Great Dane,dogs2,congruent,filler,1,filler,pred
+workerid_0026,3,images/tree-parade-basic.png,landmarks,big,big,subj,redwood,trees,congruent,critical,0,critical,subj
+workerid_0026,4,images/dog-parade-basic2.png,prize-winners,small,small,subj,pug,dogs2,congruent,critical,1,critical,subj
+workerid_0026,1,images/dog-parade-basic_filler.png,dogs,big,big,subj,doberman,dogs1,congruent,filler,1,filler,subj
+workerid_0026,2,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0026,3,images/dog-parade-basic.png,service-animals,small,small,pred,chihuahua,dogs1,congruent,critical,1,critical,pred
+workerid_0026,4,images/bird-parade-basic.png,rescues,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+workerid_0027,1,images/bird-parade-basic_filler.png,birds,big,big,pred,eagle,birds,congruent,filler,1,filler,pred
+workerid_0027,2,images/dog-parade-basic_filler.png,dogs,small,small,subj,chihuahua,dogs1,congruent,filler,1,filler,subj
+workerid_0027,3,images/dog-parade-basic.png,dobermans,big,big,pred,doberman,dogs1,congruent,critical,0,critical,pred
+workerid_0027,4,images/bird-parade-basic.png,birds,small,small,subj,hummingbird,birds,congruent,critical,1,critical,subj
+workerid_0027,1,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+workerid_0027,2,images/dog-parade-basic2_filler.png,pugs,small,small,pred,pug,dogs2,congruent,filler,0,filler,pred
+workerid_0027,3,images/flower-parade-basic.png,flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred
+workerid_0027,4,images/dog-parade-basic2.png,dogs,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+workerid_0028,1,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0028,2,images/tree-parade-basic.png,trees,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+workerid_0028,3,images/bird-parade-basic.png,birds,big,big,pred,eagle,birds,congruent,critical,1,critical,pred
+workerid_0028,4,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+workerid_0028,1,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0028,2,images/dog-parade-basic.png,dogs,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+workerid_0028,3,images/dog-parade-basic2.png,dogs,small,small,pred,pug,dogs2,congruent,critical,1,critical,pred
+workerid_0028,4,images/dog-parade-basic_filler.png,dogs,small,small,pred,chihuahua,dogs1,congruent,filler,1,filler,pred
+workerid_0029,1,images/tree-parade-basic_filler.png,trees,small,small,subj,bonsai,trees,congruent,filler,1,filler,subj
+workerid_0029,2,images/tree-parade-basic.png,redwoods,big,big,pred,redwood,trees,congruent,critical,0,critical,pred
+workerid_0029,3,images/dog-parade-basic2.png,prize winners,big,big,subj,Great Dane,dogs2,congruent,critical,1,critical,subj
+workerid_0029,4,images/dog-parade-basic2_filler.png,dogs,small,small,pred,pug,dogs2,congruent,filler,1,filler,pred
+workerid_0029,1,images/dog-parade-basic_filler.png,dogs,big,big,pred,doberman,dogs1,congruent,filler,1,filler,pred
+workerid_0029,2,images/bird-parade-basic_filler.png,birds,big,big,subj,eagle,birds,congruent,filler,1,filler,subj
+workerid_0029,3,images/bird-parade-basic.png,rescues,small,small,pred,hummingbird,birds,congruent,critical,1,critical,pred
+workerid_0029,4,images/dog-parade-basic.png,service animals,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+workerid_0030,1,images/dog-parade-basic2_filler.png,pugs,small,small,pred,pug,dogs2,congruent,filler,0,filler,pred
+workerid_0030,2,images/bird-parade-basic_filler.png,eagles,big,big,pred,eagle,birds,congruent,filler,0,filler,pred
+workerid_0030,3,images/bird-parade-basic.png,hummingbirds,small,small,subj,hummingbird,birds,congruent,critical,0,critical,subj
+workerid_0030,4,images/dog-parade-basic2.png,great danes,big,big,subj,Great Dane,dogs2,congruent,critical,0,critical,subj
+workerid_0030,1,images/flower-parade-basic_filler.png,dandelions,small,small,subj,dandelion,flowers,congruent,filler,0,filler,subj
+workerid_0030,2,images/tree-parade-basic.png,bonsai,small,small,pred,bonsai,trees,congruent,critical,0,critical,pred
+workerid_0030,3,images/tree-parade-basic_filler.png,redwoods,big,big,subj,redwood,trees,congruent,filler,0,filler,subj
+workerid_0030,4,images/flower-parade-basic.png,sunflowers,big,big,pred,sunflower,flowers,congruent,critical,0,critical,pred
+workerid_0032,1,images/flower-parade-basic_filler.png,flowers,big,big,pred,sunflower,flowers,congruent,filler,1,filler,pred
+workerid_0032,2,images/dog-parade-basic_filler.png,dogs,small,small,pred,chihuahua,dogs1,congruent,filler,1,filler,pred
+workerid_0032,3,images/flower-parade-basic.png,flowers,small,small,subj,dandelion,flowers,congruent,critical,1,critical,subj
+workerid_0032,4,images/dog-parade-basic.png,dogs,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+workerid_0032,1,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0032,2,images/dog-parade-basic2_filler.png,dogs,big,big,subj,Great Dane,dogs2,congruent,filler,1,filler,subj
+workerid_0032,3,images/bird-parade-basic.png,eagles,big,big,pred,eagle,birds,congruent,critical,0,critical,pred
+workerid_0032,4,images/dog-parade-basic2.png,pugs,small,small,pred,pug,dogs2,congruent,critical,0,critical,pred
+workerid_0033,1,images/bird-parade-basic_filler.png,birds,big,big,subj,eagle,birds,congruent,filler,1,filler,subj
+workerid_0033,2,images/bird-parade-basic.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,critical,0,critical,pred
+workerid_0033,3,images/dog-parade-basic_filler.png,dobermans,big,big,pred,doberman,dogs1,congruent,filler,0,filler,pred
+workerid_0033,4,images/dog-parade-basic.png,dogs,small,small,subj,chihuahua,dogs1,congruent,critical,1,critical,subj
+workerid_0033,1,images/dog-parade-basic2_filler.png,pugs,small,small,subj,pug,dogs2,congruent,filler,0,filler,subj
+workerid_0033,2,images/dog-parade-basic2.png,grat danes,big,big,pred,Great Dane,dogs2,congruent,critical,0,critical,pred
+workerid_0033,3,images/tree-parade-basic_filler.png,bonsai,small,small,pred,bonsai,trees,congruent,filler,0,filler,pred
+workerid_0033,4,images/tree-parade-basic.png,trees,big,big,subj,redwood,trees,congruent,critical,1,critical,subj
+workerid_0034,1,images/bird-parade-basic_filler.png,hummingbirds,small,small,pred,hummingbird,birds,congruent,filler,0,filler,pred
+workerid_0034,2,images/dog-parade-basic2.png,dogs,small,small,subj,pug,dogs2,congruent,critical,1,critical,subj
+workerid_0034,3,images/bird-parade-basic.png,birds,big,big,subj,eagle,birds,congruent,critical,1,critical,subj
+workerid_0034,4,images/dog-parade-basic2_filler.png,great danes,big,big,pred,Great Dane,dogs2,congruent,filler,0,filler,pred
+workerid_0034,1,images/tree-parade-basic_filler.png,trees,big,big,subj,redwood,trees,congruent,filler,1,filler,subj
+workerid_0034,2,images/flower-parade-basic.png,sunflowers,big,big,pred,sunflower,flowers,congruent,critical,0,critical,pred
+workerid_0034,3,images/tree-parade-basic.png,trees,small,small,pred,bonsai,trees,congruent,critical,1,critical,pred
+workerid_0034,4,images/flower-parade-basic_filler.png,dandelions,small,small,subj,dandelion,flowers,congruent,filler,0,filler,subj
+workerid_0035,1,images/bird-parade-basic_filler.png,birds,small,small,subj,hummingbird,birds,congruent,filler,1,filler,subj
+workerid_0035,2,images/dog-parade-basic.png,dogs,big,big,subj,doberman,dogs1,congruent,critical,1,critical,subj
+workerid_0035,3,images/bird-parade-basic.png,eagles,big,big,pred,eagle,birds,congruent,critical,0,critical,pred
+workerid_0035,4,images/dog-parade-basic_filler.png,dogs,small,small,pred,chihuahua,dogs1,congruent,filler,1,filler,pred
+workerid_0035,1,images/flower-parade-basic_filler.png,flowers,big,big,subj,sunflower,flowers,congruent,filler,1,filler,subj
+workerid_0035,2,images/tree-parade-basic_filler.png,trees,big,big,pred,redwood,trees,congruent,filler,1,filler,pred
+workerid_0035,3,images/tree-parade-basic.png,trees,small,small,subj,bonsai,trees,congruent,critical,1,critical,subj
+workerid_0035,4,images/flower-parade-basic.png,flowers,small,small,pred,dandelion,flowers,congruent,critical,1,critical,pred

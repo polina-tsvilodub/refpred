@@ -31,6 +31,8 @@ pilot5 <- read_csv("../../data/direct-modification/results_35_modXrefUt_pilot1_n
           ) %>% select(-NP_match)
 pilot6 <- read_csv("../../data/direct-modification/results_35_double-modXrefUt-pilot2_tidy.csv")
 pilot_data <- rbind(pilot5, pilot6)
+
+#pilot_data %>% write_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv")
 ```
 
 First, the seed model is computed on pilot data. Main effects are deviation-coded. 
@@ -101,10 +103,10 @@ predicted_fit <- brm(
   + (1 + syntax_dev*trial_dev | target),
   data = predicted_data,
   family = "bernoulli",
-  chains = 4,
+  chains = 3,
   iter = 3000, 
   cores = 4,
-  control = list(adapt_delta = 0.94)
+  control = list(adapt_delta = 0.97)
 )
 
 # extract contrasts of interest
@@ -258,21 +260,20 @@ sim3 %>%
             lower = quantile(check_syntax, probs = 0.025),
             upper = quantile(check_syntax, probs = 0.975))
 ```
-``` {r. results = "hide"}
+``` {r, results = "hide"}
 # helper function iterating over seeds (=iterations of the simulation)
 sim.power <- function(n.subj, n.sim) {
   sim <- tibble( seed = 1:n.sim) %>%
     mutate(
-      tidy = map(seed, sim_data_fit, n.subj) %>%
-        unnest(tidy)
-    )
-  print(n.sim)
+      tidy = map(seed, sim_data_fit, N = n.subj)
+    ) %>%
+    unnest(tidy)
 }
 
 # iterate over different subject numbers (total of 97 - 297, in steps of 20)
-analyse_power <- tibble(n.subj = seq(50, 250, 20)) %>%
+analyse_power <- tibble(n.subj = seq(50, 51, by=1)) %>%
   mutate(
-    tidy = map(n.subj, sim.power, n.sim = 100)
+    tidy = map(n.subj, sim.power, n.sim = 1)
   ) %>%
   unnest(tidy)
 ```
@@ -282,8 +283,98 @@ analyse_power <- tibble(n.subj = seq(50, 250, 20)) %>%
 analyse_power %>%
   filter(key == "syntax_critical") %>%
   mutate(check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)) %>%
-  group_by(n.subj)
+  group_by(n.subj) %>%
   summarise(power_syntax = mean(check_syntax),
-            lower = quantile(check_syntax, probs = 0.025),
-            upper = quantile(check_syntax, probs = 0.975))
+            `95lower` = quantile(check_syntax, probs = 0.025),
+            `95upper` = quantile(check_syntax, probs = 0.975)) -> analyse_power_summary
+
+```
+
+``` {r, results = "hide"}
+sim100 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 53)) %>% 
+  unnest(tidy)
+
+sim120 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 73)) %>% 
+  unnest(tidy)
+
+sim140 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 93)) %>% 
+  unnest(tidy)
+
+sim160 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 113)) %>% 
+  unnest(tidy)
+
+sim300 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 253)) %>% 
+  unnest(tidy)
+```
+
+
+``` {r, results = "hide"}
+sim180 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 133)) %>% 
+  unnest(tidy)
+
+sim200 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 153)) %>% 
+  unnest(tidy)
+
+sim220 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 173)) %>% 
+  unnest(tidy)
+
+sim240 <- tibble(seed = 1:100) %>% 
+  mutate(tidy = map(seed, sim_data_fit, 193)) %>% 
+  unnest(tidy)
+```
+
+``` {r}
+rbind(
+  sim100 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 100,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim120 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 120,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim140 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 140,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim160 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 160,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim180 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 180,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim200 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 200,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim220 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 220,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim240 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 240,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)),
+  sim300 %>%
+  filter(key == "syntax_critical") %>%
+  mutate(n.subj = 300,
+         check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0))
+  ) %>%
+  group_by(n.subj) %>%
+  summarise(power_syntax = mean(check_syntax)) -> power_summary
+
+#power_summary %>% write_csv("../../data/direct-modification/power_analysis_100iter.csv")
+        #    lower = quantile(check_syntax, probs = 0.025),
+         #   upper = quantile(check_syntax, probs = 0.975))  
+
 ```
