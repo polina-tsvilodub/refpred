@@ -1,0 +1,164 @@
+---
+title: "Direct Modification Experiment"
+author: "Polina Tsvilodub"
+date: "7/24/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lmerTest)
+library(brms)
+library(tidyboot)
+library(jsonlite)
+```
+
+
+```{r, message=F, warning=F}
+data <- read_csv("../../data/direct-modification/results_35_double-modXrefUt-pilot2.csv")
+```
+
+```{r clean}
+# exclude participants who report glitches
+data %>% select(workerid, comments, problems) %>% distinct() %>% View()
+d_modRef_woGlitches <- data 
+
+# exclude non-native English speakers
+d_modRef_woGlitches %>% distinct(languages) %>% View()
+
+d_modRef_Native <- d_modRef_woGlitches %>% 
+  filter(grepl("en", languages, ignore.case = T)) 
+
+# cleaning warm-up trials
+# comparison class paraphrase trial
+d_failed_cc_warmup <- d_modRef_Native %>% 
+  filter( trial_name == "comp_class_warmup") %>%
+  group_by(workerid) %>% count() %>%
+  filter( n > 4 )
+d_failed_label_warmup <- d_modRef_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(workerid) %>%
+  filter(attempts > 4)
+d_label_warmup_more1 <- d_modRef_Native %>%
+  filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
+  group_by(workerid) %>%
+  filter(attempts > 1) %>% ungroup() %>% 
+  select(workerid, picture1, response1, picture2, response2, attempts)
+
+d_modRef_filter <- anti_join(d_modRef_Native, d_failed_cc_warmup, by = c("workerid"))
+d_modRef_filter <- anti_join(d_modRef_filter, d_failed_label_warmup, by = c("workerid"))
+```
+
+```{r count}
+d_modRef_filter %>% count(trial_type, syntax, target_size)
+```
+
+### Response Classification
+``` {r classify}
+d_modRef_main <- d_modRef_filter %>% filter((trial_name == "custom_main_text1") |
+                                (trial_name == "custom_main_text2")) %>%
+  select(workerid, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type )
+
+d_modRef_main %>% distinct(response) %>% View()
+
+d_modRef_valid <- d_modRef_main %>% 
+  subset(., !(tolower(response) %in% c("height", "size", "height and weight", "distance", "wings", "width")))
+
+d_modRef_main_responseCat <- d_modRef_valid %>% 
+  mutate(response_cat = ifelse(
+    tolower(response) %in% 
+      c("flowers", "flower", "trees", "tree", "birds", "bird",  "dogs", "dog", "plants", "other trees", "animal", "other tree", "other birds", "nearby trees.", "animals", "gift flowers", "prize flowers", "prize dogs", "prize winning dogs", "rescue birds", "landmark", "gift", "prize winner", "rescues", "gifts", "prize-winners", "service-animals", "service dogs", "floral gifts", "service animals", "other landmarks", "prize winners"), 
+    "nonmatch", "match"
+  ),
+  response_num = ifelse(response_cat == "nonmatch", 1, 0)
+  )
+
+# detailed analysis of non-matching responses, distinguishing between basic and N2 comparison classes
+d_modRef_main_responseCat_nonmatch <- d_modRef_main_responseCat %>%
+  mutate(
+    response_cat = ifelse(
+      tolower(response) %in% 
+        c("flowers", "flower", "trees", "tree", "birds", "bird",  "dogs", "dog", "plants", "other trees", "animal", "other tree", "other birds", "nearby trees.", "animals", "gift flowers", "prize flowers", "prize dogs", "prize winning dogs", "rescue birds", "service dogs"
+          
+        ), "basic",
+      ifelse( tolower(response) %in% c("landmark", "gift", "prize winner", "rescues", "gifts", "prize-winners", "service-animals", "floral gifts", "service animals", "other landmarks", "prize winners"), "N2", "subordinate")
+    )
+  )
+```
+
+### Proportion of responses not matching critical N by-syntax and by-trial type
+```{r plot, echo=FALSE}
+bar.width = 0.8
+d_modRef_main_responseCat %>%  
+  group_by(syntax, trial_type) %>%
+  tidyboot_mean(column = response_num) -> d_modRef_main_responseCat.bs
+
+d_modRef_main_responseCat.bs %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper, fill=syntax)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width,
+           alpha = 0.5, color="black", size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = c(0, 0.5, 1))+
+  ylab("Proportion of non-matching responses") +
+  #theme_bw() +
+  facet_grid(~trial_type)
+```
+
+
+```{r plot2, echo = F}
+# more fine-grained comparison class types within critical trials
+d_modRef_main_responseCat_nonmatch %>%
+  filter(trial_type == "critical") %>%
+  ggplot(., aes(x = response_cat, fill = response_cat)) +
+  geom_bar(alpha = 0.8) +
+  facet_grid(~syntax) +
+  ggtitle("Response category counts in critical trials")
+```
+
+### Stats
+```{r stats}
+d_modRef_main_responseCat %>% 
+  mutate(syntax_dev = factor(syntax, levels = c("subj", "pred")),
+         trial_number_dev = factor(trial_type, levels = c( "filler", "critical"))) -> d_modRef_main_responseCat
+
+contrasts(d_modRef_main_responseCat$syntax_dev) <- contr.sum(2)
+contrasts(d_modRef_main_responseCat$trial_type_dev) <- contr.sum(2)
+
+model <- brm(
+  response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | workerid) + 
+    (1 + syntax_dev * trial_type_dev | target),
+  data = d_modRef_main_responseCat,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4, 
+  control = list(adapt_delta = 0.9)
+) 
+
+summary(model)
+```
+
+``` {r contrasts}
+# get effect of syntax by trial type 
+model_draws <- model %>%
+  spread_draws(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_type_dev1 - `b_syntax_dev1:trial_type_dev1`,
+         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_type_dev1 + `b_syntax_dev1:trial_type_dev1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_type_dev1 + `b_syntax_dev1:trial_type_dev1`,
+         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_type_dev1 - `b_syntax_dev1:trial_type_dev1`,
+         syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate
+  select(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+  summarise(
+    mean = mean(val),
+    lower = quantile(val, probs = 0.025),
+    upper = quantile(val, probs = 0.975)
+  )
+  
+```
