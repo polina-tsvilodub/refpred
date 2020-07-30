@@ -179,4 +179,5 @@ analyse_power %>%
             `95lower` = quantile(check_syntax, probs = 0.025),
             `95upper` = quantile(check_syntax, probs = 0.975)) -> analyse_power_summary
 
-analyse_power_summary %>% write_csv("power_analysis_1000iter.csv")
+analyse_power %>% write_csv("direct_mod_power_analysis_1000iter.csv")
+analyse_power_summary %>% write_csv("direct_mod_power_analysis_1000iter_summary.csv")
