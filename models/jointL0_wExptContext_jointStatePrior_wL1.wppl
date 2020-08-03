@@ -97,7 +97,7 @@ var sizePrior = function(cc) {
 // this allows to compute how informative an N is in order to refer to a target in the given context
 // their sizes are sampled from a distribution set by the comparison class
 // communicated either via the N in predicate position or as sampled by L1
-var statePrior = function(cc, context, target) {
+var statePriorL0 = function(cc, context, target) {
   Infer({
     model: function() {
     var ref = _.union(context, [target])
@@ -178,7 +178,7 @@ var jointL0 = function(utt, context, target, cc, threshold, subordinate) {
       var c = explicitCC == "dog" ?  "super" :
                explicitCC == "sub" ? subordinate : explicitCC // take the subordinate category of the referent L1 sees
       // sample a state
-      var state = sample(statePrior(c, context, target))
+      var state = sample(statePriorL0(c, context, target))
       // get the meaning of the utterance for sampled state
       var m = jointMeaning(utt, state, threshold, splitPred[0])
       condition(m )
@@ -197,7 +197,7 @@ var speakerContext = function(state, context, form, threshold, cc, subordinate){
       // sample noun position
       var Npos = sample(Nposition())
       var utt = utterance(form, Npos) // sample an utterance
-      var c = cc == 'sub' ? subordinate : "super"; // convert sub comparison class to appropriate category
+      var c = cc == 'sub' ? state.referent : "super"; // convert sub comparison class to appropriate category
       var jL0 = jointL0(utt, context, state, cc, threshold, subordinate)
       // get the utility
       var ut = jL0.score({referent: state.referent, property: state.property, c: c})
@@ -235,12 +235,12 @@ var pragmaticListener = function(utterance, form, cont, referent) {
     var c = uniformDraw(['sub', 'super', cont])
     var currentContext = context[cont]
     // get subordinate category of the referent which is assumed to be known to L1
-    var subordinate = referent.sub;
+    var subordinate = referent.referent;
     // L1 doesn't know the exact size of the referent -- but has prior knowledge
     // about sizes of the respective subordinate category
     var size = sample(sizePrior(subordinate))
     // construct state
-    var target = {referent: referent.sub, property: size}
+    var target = {referent: subordinate, property: size}
     // get prior distribution over sizes in this subordinate category
     // the same happens in statePrior, but just the properties which are needed for the threshold computation are harder to get
     var currentStatePrior = sizePrior(subordinate)
@@ -259,23 +259,23 @@ var pragmaticListener = function(utterance, form, cont, referent) {
 // the inferred size distribution corresponds to the inferred comparison classes (it shifts more extremely for predicate-N)
 // the cc inferred from subject-N sentences is biases corresponding to the context
 
-display("The referent is a dog1, in basic context")
-display("L1 hears: That dog1 is big.")
-viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "super", {sub: "dog1"}))
-display("L1 hears: That's a big dog1.")
-viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super", {sub: "dog1"}))
-display("L1 hears: That dog is big.")
-viz.marginals(pragmaticListener({subject: "dog", predicate: "big"}, "positive", "super", {sub: "dog1"}))
-display("L1 hears: That's a big dog.")
-viz.marginals(pragmaticListener({subject: "that", predicate: "big dog"}, "positive", "super", {sub: "dog1"}))
+// display("The referent is a dog1, in basic context")
+// display("L1 hears: That dog1 is big.")
+// viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "super", {referent: "dog1"}))
+// display("L1 hears: That's a big dog1.")
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super", {referent: "dog1"}))
+// display("L1 hears: That dog is big.")
+// viz.marginals(pragmaticListener({subject: "dog", predicate: "big"}, "positive", "super", {referent: "dog1"}))
+// display("L1 hears: That's a big dog.")
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog"}, "positive", "super", {referent: "dog1"}))
 
 
 // display("The referent is a dog1 in subordinate context")
 // display("L1 hears: That dog1 is big.")
-// viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "sub", {sub: "dog1"}))
+// viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "sub", {referent: "dog1"}))
 // display("L1 hears: That's a big dog1.")
-// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "sub", {sub: "dog1"}))
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "sub", {referent: "dog1"}))
 
 // display("The referent is a dog3 (small) in basic context")
-// viz.marginals(pragmaticListener({subject: "dog3", predicate: "small"}, "negative", "super", {sub: "dog3", name: "C"}))
-// viz.marginals(pragmaticListener({subject: "that", predicate: "small dog3"}, "negative", "super", {sub: "dog3", name: "C"}))
+viz.marginals(pragmaticListener({subject: "dog3", predicate: "small"}, "negative", "super", {referent: "dog3"}))
+viz.marginals(pragmaticListener({subject: "that", predicate: "small dog3"}, "negative", "super", {referent: "dog3"}))
