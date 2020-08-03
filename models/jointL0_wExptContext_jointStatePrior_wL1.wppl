@@ -93,26 +93,27 @@ var sizePrior = function(cc) {
   })
 };
 
+// L0 and L1 have different priors because they have different sources for the comparison class
+
 // joint state prior: the referent is sampled from the union of the context & the target
 // this allows to compute how informative an N is in order to refer to a target in the given context
-// their sizes are sampled from a distribution set by the comparison class
-// communicated either via the N in predicate position or as sampled by L1
+// the property is fully determined by the comparison class passed to L0
 var statePriorL0 = function(cc, context, target) {
   Infer({
     model: function() {
-    var ref = _.union(context, [target])
+    var cont = _.union(context, [target])
+    var ref = categorical({vs: cont, ps: [1,1,1,1,1,1,1]})["referent"];
+    var size = categorical({vs: stateVals, ps: stateProbs(cc)})
     return {
-      referent: categorical({vs: ref, ps: [1,1,1,1,1,1,1]})["referent"],
+      referent: ref,
       // an assumption made here is that all sizes come from either the basic category
       // or the subordinate category of the target referent (as passed from L1 and known to L0)
-      property: categorical({vs: stateVals, ps: stateProbs(cc)})
+      property: size
     }
    }
   })
 };
 
-// viz.marginals(statePrior("super", context["super"], {referent: "dog1", property: 1}) )
-// viz.marginals(statePrior("dog1", context["super"], {referent: "dog1", property: 1}) )
 
 var context = {
   // basic-level context, with a 2 members from three different subordinate categories
@@ -131,6 +132,11 @@ var context = {
          {referent: "dog1", property: 1}
   ]
 }
+
+
+// viz.marginals(statePriorL1(context["super"], {referent: "dog1", property: 1}) )
+// viz.marginals(statePriorL0("dog1", context["super"], {referent: "dog1", property: 1}) )
+
 
 // prior N position distribution (uniform)
 var Nposition = function() {
@@ -169,14 +175,15 @@ var jointMeaning = function(utt, state, threshold, adj) {
 // context, the target, the comparison class, threshold and the subordinate category of the target
 var jointL0 = function(utt, context, target, cc, threshold, subordinate) {
   Infer({
+    method: "enumerate",
     model: function() {
       // assume subject contributes to reference, predicate to predication
       // check if predicate contains the comparison class
       var splitPred = utt['predicate'].split(" ");
       var explicitCC = splitPred.length == 1 ? cc : splitPred[1];
       // get the category of the CC
-      var c = explicitCC == "dog" ?  "super" :
-               explicitCC == "sub" ? subordinate : explicitCC // take the subordinate category of the referent L1 sees
+      var c = explicitCC == "sub" ? utt['subject'] == "dog" ? "super" : utt['subject']:
+              explicitCC == "dog" ?  "super" : explicitCC
       // sample a state
       var state = sample(statePriorL0(c, context, target))
       // get the meaning of the utterance for sampled state
@@ -187,12 +194,15 @@ var jointL0 = function(utt, context, target, cc, threshold, subordinate) {
   })
 }
 
-// viz.marginals(jointL0({subject: "that", predicate: "big dog"}, context["super"], {referent: "dog1", property: 1}, "super", 0, "dog1"))
+// viz.marginals(jointL0({subject: "that", predicate: "big dog1"}, context["super"], {referent: "dog1", property: 1}, "super", 0, "dog1"))
+// viz.marginals(jointL0({subject: "dog1", predicate: "big"}, context["super"], {referent: "dog1", property: 1}, "super", 0, "dog1"))
+
 
 // the speaker has a state in mind, a context, knpws the subordinate category of the state referent,
 // knows the form of the adjective she wants to use, a threshold, has a CC in mind (for subject-N cases)
 var speakerContext = function(state, context, form, threshold, cc, subordinate){
   Infer({
+    method: "enumerate",
     model: function() {
       // sample noun position
       var Npos = sample(Nposition())
@@ -229,7 +239,9 @@ var speakerContext = function(state, context, form, threshold, cc, subordinate){
 // and the specific comparison class
 
 var pragmaticListener = function(utterance, form, cont, referent) {
-  Infer({model: function(){
+  Infer({
+    method: "enumerate",
+    model: function(){
     // uncertainty over the comparison class
     // add the context as potential comparison class, since it is a plausibly salient available comparison class
     var c = uniformDraw(['sub', 'super', cont])
@@ -237,7 +249,7 @@ var pragmaticListener = function(utterance, form, cont, referent) {
     // get subordinate category of the referent which is assumed to be known to L1
     var subordinate = referent.referent;
     // L1 doesn't know the exact size of the referent -- but has prior knowledge
-    // about sizes of the respective subordinate category
+    // about sizes of the respective subordinate category and knows the category of the referent
     var size = sample(sizePrior(subordinate))
     // construct state
     var target = {referent: subordinate, property: size}
@@ -250,7 +262,7 @@ var pragmaticListener = function(utterance, form, cont, referent) {
     var S1 = speakerContext(target, currentContext, form, threshold, c, subordinate);
     // condition on the utterance
     observe(S1, utterance);
-    return { comparisonClass: c, state: size}
+    return { comparisonClass: c, property: target.property}//state: size}
   }})
 }
 
