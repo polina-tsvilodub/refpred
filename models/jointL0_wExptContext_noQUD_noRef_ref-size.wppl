@@ -123,17 +123,6 @@ var context = {
   ]
 }
 
-// qud prior for L1
-var qudPrior = Infer({
-  model: function(){return uniformDraw(["ref", "pred", "both"])}
-});
-
-// following Kao et al.
-var qudFns = {
-  ref: function(state) {return {referent: state.referent}},
-  pred: function(state) {return {property: state.property}},
-  refpred: function(state) {return {referent: state.referent, property: state.property}}
-}
 
 // prior N position distribution (uniform)
 var Nposition = function() {
@@ -179,10 +168,6 @@ var jointL0 = function(utt, context, target, cc, threshold) {
               explicitCC == "dog" ?  "super" : explicitCC // take the category mentioned in the sentence if N is in subject position if cc = sub
       // sample a state
       var state = sample(statePriorL0(c, context, target))
-      // get qud-function
-//       var qudFn = qudFns[qud]
-      // following Kao et al. hyperbole-model
-//       var qudAnswer = qudFn(state)
       // get the meaning of the utterance for sampled state
       var m = jointMeaning(utt, state, threshold, splitPred[0])
       condition(m)
@@ -190,11 +175,9 @@ var jointL0 = function(utt, context, target, cc, threshold) {
     }
   })
 }
-// display("QUD: ref")
+
 // viz.marginals(jointL0({subject: "that", predicate: "big dog1"}, context["super"], {referent: "dog1", property: 1}, "sub", 0.5))
-// display("QUD: pred")
 // viz.marginals(jointL0({subject: "dog1", predicate: "big"}, context["super"], {referent: "dog1", property: 1}, "sub", 0.5))
-// display("QUD:refpred")
 // viz.marginals(jointL0({subject: "that", predicate: "big dog1"}, context["sub"], {referent: "dog1", property: 1}, "sub", 0.5))
 // viz.marginals(jointL0({subject: "dog1", predicate: "big"}, context["sub"], {referent: "dog1", property: 1}, "sub", 0.5))
 
@@ -210,9 +193,6 @@ var speakerContext = function(state, context, form, threshold, cc){
       var Npos = sample(Nposition()) // sample the position of the N
       var utt = utterance(form, Npos) // sample an utterance
 //       print(utt)
-      // from Kao et al. model
-//       var qudFn = qudFns[qud]
-//       var qudAnswer = qudFn(state)
       var ccCompare = cc == "sub" ? state.referent : "super"
       var jL0 = jointL0(utt, context, state, cc, threshold)
 //       print(jL0)
@@ -224,11 +204,8 @@ var speakerContext = function(state, context, form, threshold, cc){
   })
 }
 
-// display("QUD: ref")
 // viz(speakerContext({referent: 'dog1', property: 1}, context['super'], "positive", 0.5, "super") )
-// // display("QUD: pred")
 // viz(speakerContext({referent: 'dog1', property: 1}, context['sub'], "positive", 0.5, "super") )
-// // display("QUD: refpred")
 // viz(speakerContext({referent: 'dog1', property: 1}, context['super'], "positive", 0.5, "sub") )
 // viz(speakerContext({referent: 'dog1', property: 1}, context['sub'], "positive", 0.5, "sub") )
 
@@ -252,10 +229,6 @@ var pragmaticListener = function(utterance, form, cont, target) {
 //     print(currentContext)
     // L1 doesn't know the referent and its size
     var state = sample(statePriorL1(currentContext, target))
-//     print(state)
-// sample QUD
-//     var qud = sample(qudPrior)
-//     print(qud)
     var currentStatePrior = sizePrior(state.referent)
 //     print(currentStatePrior)
     var threshold = sample(thresholdPrior(form, currentStatePrior.support() ))
