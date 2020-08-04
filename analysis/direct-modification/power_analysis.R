@@ -159,6 +159,7 @@ sim_data_fit <- function(seed, N) {
 
 # helper function iterating over seeds (=iterations of the simulation)
 sim.power <- function(n.subj, n.sim) {
+  print(n.subj)
   sim <- tibble( seed = 1:n.sim) %>%
     mutate(
       tidy = map(seed, sim_data_fit, N = n.subj)
