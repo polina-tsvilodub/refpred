@@ -1,13 +1,15 @@
 library(tidyverse)
-library(lmerTest)
 library(brms)
-library(tidyboot)
-library(jsonlite)
+#library(tidyr)
+#library(dplyr)
 library(tidybayes)
 library(broom)
 
 # add appropriate path
 pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv")
+
+n_iter = 2000
+n_sim = 2
 
 # sum coding of main effects
 pilot_data <- pilot_data %>% 
@@ -23,7 +25,7 @@ pilot_model <- brm(
   data = pilot_data,
   family = "bernoulli",
   chains = 4,
-  iter = 2000, 
+  iter = n_iter, 
   cores = 4,
   control = list(adapt_delta = 0.95)
 )
@@ -63,8 +65,8 @@ predicted_fit <- brm(
   + (1 + syntax_dev*trial_dev | target),
   data = predicted_data,
   family = "bernoulli",
-  chains = 3,
-  iter = 3000, 
+  chains = 4,
+  iter = n_iter, 
   cores = 4,
   control = list(adapt_delta = 0.97)
 )
@@ -165,9 +167,9 @@ sim.power <- function(n.subj, n.sim) {
 }
 
 # iterate over different subject numbers (total of 100 - 300, in steps of 20)
-analyse_power <- tibble(n.subj = seq(53, 253, by=20)) %>%
+analyse_power <- tibble(n.subj = seq(53, 253, by= 150)) %>%
   mutate(
-    tidy = map(n.subj, sim.power, n.sim = 1000)
+    tidy = map(n.subj, sim.power, n.sim = n_sim)
   ) %>%
   unnest(tidy)
 
@@ -179,5 +181,5 @@ analyse_power %>%
             `95lower` = quantile(check_syntax, probs = 0.025),
             `95upper` = quantile(check_syntax, probs = 0.975)) -> analyse_power_summary
 
-analyse_power %>% write_csv("direct_mod_power_analysis_1000iter.csv")
-analyse_power_summary %>% write_csv("direct_mod_power_analysis_1000iter_summary.csv")
+analyse_power %>% write_csv("results/direct_mod_power_analysis_"+n_iter+"iter_"+n_sim+"sim.csv")
+analyse_power_summary %>% write_csv("results/direct_mod_power_analysis_"+n_iter+"iter_"+n_sim+"sim_summary.csv")
