@@ -145,13 +145,16 @@ var jointMeaning = function(utt, state, threshold, adj) {
 
 
 // only 1 N can occur in the utterance, its position Npos is randomly sampled by S1
-var utterance = function(form, Npos) {
-  var subject = Npos == "subj" ? uniformDraw(["dog1", "dog2", "dog3",  "dog"]) : "that";
-  var predicate = Npos == "pred" ? form == "positive" ? uniformDraw(["big dog1", "big dog2", "big dog3", "big dog"]) :
-                                       uniformDraw(["small dog1", "small dog2", "small dog3", "small dog"]):
+var utterance = function(form, Npos, referent) {
+  var subject = Npos == "subj" ? uniformDraw([referent, "dog"]) : "that";
+  var predicate = Npos == "pred" ?
+      form == "positive" ?
+      uniformDraw(["big "+ referent, "big dog"]) :
+  uniformDraw(["small "+ referent, "small dog"]):
                                   form == "positive" ? "big" : "small";
   return {subject, predicate}
 }
+
 
 // one joint L0, who computes the literal meaning of an utterance given a specific QUD,
 // and a context, a target, a CC and a threshold
@@ -171,7 +174,7 @@ var jointL0 = function(utt, context, target, cc, threshold) {
       // get the meaning of the utterance for sampled state
       var m = jointMeaning(utt, state, threshold, splitPred[0])
       condition(m)
-      return {referent: state.referent, state: state, cc: c}
+      return {referent: state.referent, state: state}//, cc: c}
     }
   })
 }
@@ -196,7 +199,7 @@ var speakerContext = function(state, context, form, threshold, cc){
       var ccCompare = cc == "sub" ? state.referent : "super"
       var jL0 = jointL0(utt, context, state, cc, threshold)
 //       print(jL0)
-      var ut = jL0.score({referent: state.referent, state: state, cc: ccCompare})
+      var ut = jL0.score({referent: state.referent, state: state})//, cc: ccCompare})
 //       print(ut)
       factor(3*ut)
       return utt
