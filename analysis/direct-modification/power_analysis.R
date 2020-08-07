@@ -9,7 +9,7 @@ library(broom)
 pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv")
 
 n_iter = 3000
-n_sim = 2
+n_sim = 5
 
 # sum coding of main effects
 pilot_data <- pilot_data %>%
@@ -168,7 +168,8 @@ sim.power <- function(n.subj, n.sim) {
 }
 
 # iterate over different subject numbers (total of 100 - 300, in steps of 20)
-analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
+#analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
+analyse_power <- tibble(n.subj = 100000) %>%
   mutate(
     tidy = map(n.subj, sim.power, n.sim = n_sim)
   ) %>%
@@ -182,5 +183,5 @@ analyse_power %>%
             `95lower` = quantile(check_syntax, probs = 0.025),
             `95upper` = quantile(check_syntax, probs = 0.975)) -> analyse_power_summary
 
-analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
-analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
+analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_100000subj_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
+analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_1000subj_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
