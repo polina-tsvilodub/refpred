@@ -1,0 +1,281 @@
+// ///fold:
+
+
+// // helper function
+var exp = function(x){return Math.exp(x)}
+
+// // helper function
+var marginalize = function(dist, key){
+  return Infer({model: function(){sample(dist)[key]}})
+}
+
+// // for discretization
+
+var binParam = 5;
+
+var round = function(x){
+  return Math.round(x*10)/10
+}
+
+// introduce parameters for three possible subordinate and a basic category
+var stateParams = {
+  dog1: {mu: 1, sigma: 0.5},
+  dog2: {mu: 0, sigma: 0.5},
+  dog3: {mu: -1, sigma: 0.5},
+  super: {mu: 0, sigma: 1}
+};
+
+// rangle of possible sizes
+var stateVals = map(
+  round,
+  _.range(stateParams.super.mu - 2 * stateParams.super.sigma,
+          stateParams.super.mu + 2 * stateParams.super.sigma + stateParams.super.sigma/binParam,
+          stateParams.super.sigma/binParam)
+);
+
+// probabilitites of possible sizes depending on cc
+var stateProbs = function(cc) {
+  return map(function(s){
+    Math.exp(Gaussian(stateParams[cc]).score(s))+
+    Number.EPSILON
+  }, stateVals)
+};
+
+// generate the uniform threshold prior
+// generate the uniform threshold prior
+var thresholdBins = function(form, stateSupport){
+  return map(function(x){
+    return form == "positive" ? x - (1/(binParam*2)) : x + (1/(binParam*2));
+  }, sort(stateSupport))
+}
+
+var thresholdPrior = function(form, stateSupport){
+  return Infer({
+    model: function() { return uniformDraw(thresholdBins(form, stateSupport)) }
+  });
+};
+
+
+var statePrior = function(cc) {
+  Infer({
+//    method: 'MCMC',
+    model: function() {
+    return categorical({vs: stateVals, ps: stateProbs(cc)})
+
+   }
+  })
+};
+
+
+var context = {
+  // basic-level context, with a 2 members from three different subordinate categories
+  super: [ {referent: "dog1", property: 1},
+         {referent: "dog1", property: 1.6},
+         {referent: "dog2", property: 0},
+         {referent: "dog2", property: 0.2},
+         {referent: "dog3", property: -1},
+         {referent: "dog3", property: -1}
+  ],
+  sub: [ {referent: "dog1", property: 1},
+         {referent: "dog1", property: 1},
+         {referent: "dog1", property: 1},
+         {referent: "dog1", property: 1},
+         {referent: "dog1", property: 1},
+         {referent: "dog1", property: 1}
+  ]
+}
+
+// possible statePrior parameters are adjusted to represent three different subordinate categories (above)
+
+// additionally to the context representation, there is a variable whether the target referent
+// is already accommodated or not, i.e. if reference is established or not
+
+/////////////////////////////
+// functions for the L1
+
+// the L1 is going to infer if reference is established or not;
+// however this might be not entirely plausible given our experimental setup
+
+// referent prior given (known) context
+var targetPrior = function(context){ // gets the respective list, for L1
+  Infer({
+    model: function(){return uniformDraw(context)}
+  });
+}
+
+// assume a uniform prior over comparison classes
+var classPrior = Infer({
+  model: function(){return uniformDraw(["sub", "super"])}
+});
+/////////////////////////
+
+
+// prior N position distribution (uniform)
+var Nposition = function(){
+  Infer({ // think if Infer is necessary here
+    model: function(){return uniformDraw(['subj', 'pred'])}
+  })
+}
+
+var betaPrior = function() {
+  return uniformDraw(_.range(0.05, 0.95, 0.05))
+}
+
+var meaningContext = function(utterance, state, establishRef) { // assume utterance is subject only
+  var truthVal = utterance == 'that' ? true : utterance == "dog" ? true : utterance == state.referent ? flip(0.999) : flip(0.001)
+  return truthVal
+}
+
+// standard adjective meaning
+/////////////////////////////
+// the flips() were added akin to the original comparison classes model, otherwise L1 crashes when a wrong threshold is sampled
+////////////////////////////
+var meaningPred = function(utterance, threshold, state){ // assume utterance is adjective only
+  var truthVal = utterance == "big" ? state.property > threshold ? flip(0.999) : flip(0.001) :
+                                      state.property < threshold ? flip(0.999) : flip(0.001) //: true
+  return truthVal
+}
+
+// only 1 N can occur in the utterance, its position Npos is randomly sampled by S1
+var utterance = function(form, Npos, referent) {
+  var subject = Npos == "subj" ? uniformDraw([referent, "dog"]) : "that";
+  var predicate = Npos == "pred" ?
+      form == "positive" ?
+      uniformDraw(["big "+ referent, "big dog"]) :
+  uniformDraw(["small "+ referent, "small dog"]):
+                                  form == "positive" ? "big" : "small";
+  return {subject, predicate}
+}
+// L0 accomplishing reference
+var literalListenerRefInContext = cache(function(utterance, context ){
+  Infer({
+    method: "enumerate",
+    model: function(){
+      // under this representation, the context and reference influence
+      // the representation of the (possible) states:
+      // having established a referent constrains the set of possible states,
+      // whereas no reference is formalised via the context which provides the possible states
+      // (constraining the general world knowledge to specific individuals)
+      var state = uniformDraw(context);
+      // alternatively: var state = uniformDraw(context);
+      // get the meaning
+      var m = meaningContext(utterance, state)
+      // the context representation includes names of the single individuals
+      // otherwise, the given basic level context is treated as consisting of 3 individuals
+      // having the individual names does not really influence qualitative behaviour,
+      // but makes L0s performance kind of 'conceptually complete'
+      condition(m)
+      return {referent: state.referent}
+    }
+  })
+}, 10000)
+// viz(literalListenerRefInContext('dog', context['super'], true, {referent: 'dog1', property: 0.6}))
+// viz(literalListenerRefInContext('dog2', context['super'], true, {referent: 'dog1', property: 0.6}))
+// viz(literalListenerRefInContext('that', context['super'], true, {referent: 'dog1', property: 0.6}))
+
+
+// L0 accomplishing predication
+// NB: I could also put the two L0s into one and add a QUD variable (like in the previous model version),
+// but if separating them is legitimate this way it's clearer and the meaning function doesn't
+// depend on the QUD (MH's comment)
+
+var literalListenerPredInContext = cache(function(utterance, cc, threshold, subordinate){
+  Infer({
+    method: "enumerate",
+    model: function(){
+  // as before, the CC influences sampling the state from prior knowledge
+      // i think this assumption is reasonable as long as we stipulate conceptual comparison classes,
+      // (not sth like 'big dog' said of a pug surrounded by toy dogs) which we indeed do experimentally
+      var splitPred = utterance.split(" ");
+      var explicitCC = splitPred.length == 1 ? cc : splitPred[1];
+   // get the category of the CC
+      var cc = explicitCC == "dog" ?  "super" :
+               explicitCC == "sub" ? subordinate : explicitCC
+      // this sub is the subordinate category of the state sampled by L1...
+      //not sure how much sense this makes, but also for the disjoined L0s there is
+      //not really another way to represent this
+      var state = {
+        property: sample(statePrior(cc))
+        }
+      var m = meaningPred(splitPred[0], threshold, state)
+      condition(m)
+      // by returning the cc here and conditioning on it in S1, we make sure that only correct comparison classes can be used to talk about a referent
+      return {property: state.property}//, c: cc}
+      }
+  })
+}, 10000)
+// viz.marginals(literalListenerPredInContext('big', context['super'], false, {referent: 'dog1', property: 0.6}, "dog1", 0, "dog1"))
+// viz.marginals(literalListenerPredInContext('big dog', context['super'], false, {referent: 'dog1', property: 0.6}, "super", 0, "dog1"))
+// viz.marginals(literalListenerPredInContext('big dog', context['super'], false, {referent: 'dog1', property: 0.6}, "dog3", 0, "dog1"))
+// viz.marginals(literalListenerPredInContext('big', context['super'], false, {referent: 'dog1', property: 0.6}, "sub", 0, "dog1"))
+// viz.marginals(literalListenerPredInContext('big dog1', context['super'], false, {referent: 'dog1', property: 0.6}, "super", 0))
+
+// the speaker has a state in mind, a context, knows whether reference was established,
+// knows the form of the adjective he wants to use, a threshold and has a CC in mind (for subject-N cases)
+var speakerContext = cache(function(state, context, form, threshold, cc, subordinate, beta){
+  Infer({
+    method: "enumerate",
+    model: function() {
+      var Npos = sample(Nposition()) // sample the position of the N
+      var utt = utterance(form, Npos, state.referent) // sample an utterance
+      var subject = utt.subject
+      var predicate = utt.predicate
+      // get reference
+      var L0ref = literalListenerRefInContext(subject, context)
+      // get predication
+      var L0pred = literalListenerPredInContext(predicate, cc, threshold, subordinate)
+      var c = cc == 'sub' ? subordinate : "super";
+      // compute the two utilities
+      // again, I assume subject accomplishes reference, predicate accomplishes predication
+      var refUt = L0ref.score({referent: state.referent})
+      // conditioning on cc here makes L1's comparison class predictions go in the correct direction
+      var predUt = L0pred.score({property: state.property})//, c: c})
+      // maximize sum utility (alpha arbitrarily set to 3)
+      factor(3*(beta*refUt + (1-beta)*predUt))
+      return utt
+    }
+  })
+}, 10000)
+
+
+display("Basic context, referential speaker")
+viz(speakerContext({referent: 'dog1', property: 1.6}, context['super'], "positive", 0, "super", "dog1", 0.99) )
+display("Basic context, beta = 0.5")
+viz(speakerContext({referent: 'dog1', property: 1.6}, context['super'], "positive", 0, "super", "dog1", 0.5) )
+display("Basic context, predicative speaker")
+viz(speakerContext({referent: 'dog1', property: 1.6}, context['super'], "positive", 0, "super", "dog1", 0.01) )
+
+
+var pragmaticListener = function(utterance, form, cont) {
+  Infer({
+    method: "enumerate",
+    model: function(){
+    // uncertainty about the comparison class (super vs. sub)
+    var c = sample(classPrior)
+    var currentContext = context[cont]
+    // sample target
+    var target = sample(targetPrior(currentContext))
+    var subordinate = target.referent
+    var beta = betaPrior()
+    var currentStatePrior = statePrior(subordinate)
+    var state = {referent: target.referent, property: sample(currentStatePrior)}
+    // sample threshold
+    var threshold = sample(thresholdPrior(form, currentStatePrior.support() ))
+    var S1 = speakerContext(state, currentContext, form, threshold, c, subordinate, beta);
+    observe(S1, {subject: utterance.subject, predicate : utterance.predicate});
+    return { comparisonClass: c, referent: state.referent, property: state.property, beta: beta}
+  }})
+}
+
+// marginals are easier to parse
+// display("Subject vs predicate sub N in basic context")
+viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "super"))
+viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super"))
+
+// display("Sub N in predicate condition in basic vs sub context")
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super"))
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "sub"))
+
+// display("Basic N in predicate vs subject position in basic context")
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog"}, "positive", "super"))
+// viz.marginals(pragmaticListener({subject: "dog", predicate: "big"}, "positive", "super"))
