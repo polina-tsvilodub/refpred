@@ -6,7 +6,8 @@ library(tidybayes)
 library(broom)
 
 # add appropriate path
-pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv")
+pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>% 
+  filter(!(workerid %in% c(2243, 2245))) # exclude workers where not all trials are included, resulting in 45 unique workers
 
 n_iter = 3000
 n_sim = 5
@@ -91,25 +92,16 @@ predicted_fit_draws <- predicted_fit %>%
 
 # helper function to get posterior predictive draws for a subset of participants of size N
 # d is the a dataframe with posterior predictive draws for 47 participants based on the pilot data set
-get_new_data <- function(d, N) {
-  if(N == 0) {
-    data <- d
-  } else if (N > 47) {
-    data <- add_predicted_draws(model=pilot_model,
-                                newdata = pilot_data %>%
-                                  filter(workerid %in% sample(unique(pilot_data$workerid), N, replace = T)),
-                                n = 1) %>%
-      mutate(workerid = paste(workerid, letters[1], sep = "_")) %>%
-      rbind(., d)
-  } else {
-    data <- add_predicted_draws(model=pilot_model,
-                                newdata = pilot_data %>%
-                                  filter(workerid %in% sample(unique(pilot_data$workerid), N, replace = F)),
-                                n = 1) %>%
-      mutate(workerid = paste(workerid, letters[1], sep = "_")) %>%
-      rbind(., d)
-  }
-
+get_new_data <- function(N, pilot_model, pilot_data) {
+  new.data <- tibble()
+  workers <- sample(unique(pilot_data$workerid), N, replace = N > 45)
+  for(i in 1:N) { new.data <- rbind(new.data, pilot_data %>% filter(workerid == workers[i])) }
+  data <- add_predicted_draws(model=pilot_model,
+                              newdata = new.data,
+                              n = 1) 
+  worker_nums <- rep(1:N, each = 8) # 8 is nr of trials per participant
+  data[["workerid"]] <- worker_nums
+  return(data)
 }
 
 # simulate data and updat
@@ -121,12 +113,11 @@ sim_data_fit <- function(seed, N) {
   # predictions are based on pilot data, i.e. grouped by original pilot input rows
   # corresponds to brms::redict.brmsfit()
 
-  # the new draws are added in the column .prediction
-  # simulates 47 participants, as in the original dataset
-  d <- add_predicted_draws(model=pilot_model, newdata = pilot_data, n = 1)
-
-  # possibly add more participants
-  data <- get_new_data(d, N)
+  # simulate data from original pilot data
+  # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
+  # predictions are based on pilot data, i.e. grouped by original pilot input rows
+  # corresponds to brms::redict.brmsfit()
+  data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data)
 
   # deviation code main effects
   contrasts(data$trial_dev) <- contr.sum(2)
@@ -168,8 +159,7 @@ sim.power <- function(n.subj, n.sim) {
 }
 
 # iterate over different subject numbers (total of 100 - 300, in steps of 20)
-#analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
-analyse_power <- tibble(n.subj = 100000) %>%
+analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
   mutate(
     tidy = map(n.subj, sim.power, n.sim = n_sim)
   ) %>%
@@ -183,5 +173,5 @@ analyse_power %>%
             `95lower` = quantile(check_syntax, probs = 0.025),
             `95upper` = quantile(check_syntax, probs = 0.975)) -> analyse_power_summary
 
-analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_100000subj_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
-analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_1000subj_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
+analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
+analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
