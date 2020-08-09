@@ -1,17 +1,10 @@
 ///fold:
-
-
 // // helper function
 var exp = function(x){return Math.exp(x)}
 
-// // helper function
-var marginalize = function(dist, key){
-  return Infer({model: function(){sample(dist)[key]}})
-}
-
 // // for discretization
 
-var binParam = 5;
+var binParam = 3;
 
 var round = function(x){
   return Math.round(x*10)/10
@@ -19,50 +12,52 @@ var round = function(x){
 
 // introduce parameters for three possible subordinate and a basic category
 var stateParams = {
-  dog1: {mu: 1, sigma: 0.5},
-  dog2: {mu: 0, sigma: 0.5},
-  dog3: {mu: -1, sigma: 0.5},
-  super: {mu: 0, sigma: 1}
+  greatdane: {mu: 1, sigma: 0.5},
+  labrador: {mu: 0, sigma: 0.5},
+  chihuahua: {mu: -1, sigma: 0.5},
+  dog: {mu: 0, sigma: 1}
 };
 
 // rangle of possible sizes
-var stateVals = map(
-  round,
-  _.range(stateParams.super.mu - 2 * stateParams.super.sigma,
-          stateParams.super.mu + 2 * stateParams.super.sigma + stateParams.super.sigma/binParam,
-          stateParams.super.sigma/binParam)
-);
+var stateVals = [-2,-1.7,-1.3,-1,-0.7,-0.3,0,0.3,0.7,1,1.3,1.7,2]
+
+
+//     map(
+//   round,
+//   _.range(stateParams.dog.mu - 3 * stateParams.dog.sigma,
+//           stateParams.dog.mu + 3 * stateParams.dog.sigma + stateParams.dog.sigma/binParam,
+//           stateParams.dog.sigma/binParam)
+// );
 
 // probabilitites of possible sizes depending on cc
-var stateProbs = cache( function(cc) {
+var stateProbs = cache(function(cc) {
   return map(function(s){
-    Math.exp(Gaussian(stateParams[cc]).score(s))+
+    exp(Gaussian(stateParams[cc]).score(s))+
     Number.EPSILON
   }, stateVals)
 });
 
 
 // generate the uniform threshold prior
-var thresholdBins = function(form, stateSupport){
-  return map(function(x){
-    return form == "positive" ? x - (1/(binParam*2)) : x + (1/(binParam*2));
-  }, sort(stateSupport))
-}
-
-var thresholdPrior = function(form, stateSupport){
-  return Infer({
-    model: function() { return uniformDraw(thresholdBins(form, stateSupport)) }
-  });
+var thresholdBins ={
+  positive: map(function(x){
+    return  x - (1/(binParam*2));
+  }, sort(stateVals)),
+  negative: map(function(x){
+    return  x + (1/(binParam*2));
+  }, sort(stateVals))
 };
+
+var thresholdPrior = cache(function(form){
+  return Infer({
+    model: function() { return uniformDraw(thresholdBins[form]) }
+  });
+});
 
 // a size prior for L1 for easier threshold generation
 var sizePrior = function(cc) {
-  Infer({
-    model: function() {
-      return categorical({vs: stateVals, ps: stateProbs(cc)})
-   }
-  })
-};
+  Categorical({vs: stateVals, ps: stateProbs(cc)})
+}
 ///
 
 // joint state prior: the referent is sampled from the union of the context & the target
@@ -104,28 +99,37 @@ var statePriorL0 = function(cc, context, target) {
   })
 };
 
+// var stateVals = [-2,-1.7,-1.3,-1,-0.7,-0.3,0,0.3,0.7,1,1.3,1.7,2]
 
 var context = {
   // basic-level context, with a 2 members from three different subordinate categories
-  super: [ {referent: "dog1", property: 1},
-         {referent: "dog1", property: 1.6},
-         {referent: "dog2", property: 0},
-         {referent: "dog2", property: 0.2},
-         {referent: "dog3", property: -1},
-         {referent: "dog3", property: -1}
+  dog: [
+    {referent: "greatdane", property: 1},
+   {referent: "greatdane", property: 1.7},
+   {referent: "labrador", property: 0},
+   {referent: "labrador", property: 0.3},
+   {referent: "chihuahua", property: -1},
+   {referent: "chihuahua", property: -0.7}
   ],
-  sub: [ {referent: "dog1", property: 1},
-         {referent: "dog1", property: 1},
-         {referent: "dog1", property: 1},
-         {referent: "dog1", property: 1},
-         {referent: "dog1", property: 1},
-         {referent: "dog1", property: 1}
+  greatdane: [
+    {referent: "greatdane", property: 1},
+     {referent: "greatdane", property: 1.7},
+     {referent: "greatdane", property: 0.7},
+     {referent: "greatdane", property: 1.3},
+     {referent: "greatdane", property: 0.7},
+     {referent: "greatdane", property: 1}
   ]
 }
 
 // qud prior for L1
-var qudPrior = Infer({
-  model: function(){return uniformDraw(["ref", "pred", "refpred"])}
+var QUDPrior = Infer({
+  model: function(){
+    return uniformDraw([
+      "ref",
+      "pred",
+      "refpred"
+    ])
+  }
 });
 
 // following Kao et al.
@@ -135,126 +139,144 @@ var qudFns = {
   refpred: function(state) {return {referent: state.referent, property: state.property}}
 }
 
-// prior N position distribution (uniform)
-var Nposition = function() {
-  Infer({
-    model: function(){
-      return uniformDraw(['subj', 'pred'])
-    }
-  })
+
+var meaning_reference = function(referring_expression, referent){
+  return referring_expression == 'that' ? true :
+  referring_expression == "dog" ? true :
+  referring_expression == referent
 }
 
+var meaning_predication = function(adj, property_val, threshold){
+//   display(adj)
+//   display(property_val + " " + threshold)
+  return adj == "big" ? property_val > threshold :
+  adj == "small" ? property_val < threshold :
+  true
+}
 
-var jointMeaning = function(utt, state, threshold, adj) {
+var meaningFn = function(utt, state, threshold, adj) {
+//   display(JSON.stringify(utt))
+//   display(JSON.stringify(state))
+//   display(threshold)
+//   display(adj)
   // assume subject contributes to reference, predicate to predication
-//   var RefTruthVal = utt.subject == 'that' ? true : utt.subject == "dog" ? true : utt.subject == state.referent ? flip(0.999) : flip(0.001);
-  var RefTruthVal = utt.subject == 'that' ? true : utt.subject == "dog" ? true : utt.subject == state.referent; // ? flip(0.999) : flip(0.001);
-  // I could not get rid of the flips() above because of the subordinate context: there, it otherwise happens that for 2 of 4 nouns there is no applicable referent
-//  var PredTruthVal = adj == "big" ? state.property > threshold ? flip(0.999) : flip(0.001):
- ///                                     state.property < threshold ? flip(0.999) : flip(0.001);
-    var PredTruthVal = adj == "big" ? state.property > threshold :
-                                      state.property < threshold
+  var RefTruthVal = meaning_reference(utt.subject, state.referent)
+  var PredTruthVal = meaning_predication(adj, state.property, threshold)
   return RefTruthVal && PredTruthVal
 }
 
+var UtterancePrior = cache(function(form, subordinate_label){
+  Infer({model: function(){
+//     var adj = uniformDraw([form == "positive" ? "big" : "small", "silence"])
+    var adj = form == "positive" ? "big" : "small"
 
-// only 1 N can occur in the utterance, its position Npos is randomly sampled by S1
-var utterance = function(form, Npos, referent) {
-//   var subject = Npos == "subj" ? uniformDraw(["dog1", "dog2", "dog3",  "dog"]) : "that";
-  var subject = Npos == "subj" ? uniformDraw([referent, "dog"]) : "that";
-  var predicate = Npos == "pred" ?
-      form == "positive" ?
-      uniformDraw(["big "+ referent, "big dog"]) :
-  uniformDraw(["small "+ referent, "small dog"]):
-                                  form == "positive" ? "big" : "small";
-//       uniformDraw(["big dog1", "big dog2", "big dog3", "big dog"]) :
-//   uniformDraw(["small dog1", "small dog2", "small dog3", "small dog"]):
-//                                   form == "positive" ? "big" : "small";
-  return {subject, predicate}
-}
+    var noun_position = uniformDraw(['subject', 'predicate'])
+    var noun_label = uniformDraw([subordinate_label, "dog"])
+
+    var subject = noun_position == "subject" ? noun_label : "that"
+    var predicate = noun_position == "subject" ? adj : adj + " " + noun_label
+
+    return {subject, predicate}
+  }})
+})
+
 
 // one joint L0, who computes the literal meaning of an utterance given a specific QUD,
 // and a context, a target, a CC and a threshold
-var jointL0 = function(utt, context, target, cc, threshold, qud) {
+var listener0 = function(utt, context, target, cc, threshold, qud) {
   Infer({
     method: "enumerate",
     model: function() {
       // assume subject contributes to reference, predicate to predication
       // check if predicate contains the comparison class
       var splitPred = utt['predicate'].split(" ");
-      var explicitCC = splitPred.length == 1 ? cc : splitPred[1];
-      // get the category of the CC
-      var c = explicitCC == "sub" ? utt['subject'] == "dog" ? "super" : utt['subject']:
-              explicitCC == "dog" ?  "super" : explicitCC // take the category mentioned in the sentence if N is in subject position if cc = sub
-      // sample a state
-      var state = sample(statePriorL0(c, context, target))
+      var npInPredicate = splitPred.length > 1;
+      var comparisonClass = npInPredicate ? splitPred[1] : cc
+      var state = sample(statePriorL0(comparisonClass, context, target))
       // get qud-function
       var qudFn = qudFns[qud]
       // following Kao et al. hyperbole-model
-      var qudAnswer = qudFn(state)
+      var qudVal = qudFn(state)
       // get the meaning of the utterance for sampled state
-      var m = jointMeaning(utt, state, threshold, splitPred[0])
+      var m = meaningFn(utt, state, threshold, splitPred[0])
       condition(m)
 //       return {referent: state.referent, qudAnswer: qudAnswer, cc: c} //
-      return {qudAnswer: qudAnswer}//, cc: c} //
+      return {qudVal: qudVal}//, cc: c} //
     }
   })
 }
-// display("QUD: ref")
-// viz.table(jointL0({subject: "dog1", predicate: "big"}, context["super"], {referent: "dog1", property: 1}, "super", 0.5,  "ref"))
-// display("QUD: pred")
-// viz.table(jointL0({subject: "dog1", predicate: "big"}, context["super"], {referent: "dog1", property: 1}, "super", 0.5,  "pred"))
-// display("QUD:refpred")
-// viz.table(jointL0({subject: "dog1", predicate: "big"}, context["super"], {referent: "dog1", property: 1}, "super", 0.5,  "refpred"))
 
-// the speaker has a state in mind, a context, a QUD he wants to address,
-// knows the form of the adjective he wants to use, a threshold and has a CC in mind (for subject-N cases)
-var speakerContext = function(state, context, qud, form, threshold, cc, priorOnly){
+// display("QUD: ref")
+// viz.table(listener0(
+//   {subject: "greatdane", predicate: "big"},
+//   context["dog"],
+//   {referent: "greatdane", property: 1},
+//   "dog", 0.5,  "ref"
+// ))
+
+// display("QUD: pred")
+// viz.table(listener0(
+//   {subject: "greatdane", predicate: "big"},
+//   context["dog"],
+//   {referent: "greatdane", property: 1},
+//   "dog", 0.5,  "pred"
+// ))
+// display("QUD:refpred")
+
+// viz.table(listener0(
+//   {subject: "greatdane", predicate: "big"},
+//   context["dog"],
+//   {referent: "greatdane", property: 1},
+//   "dog", 0.5,  "refpred"
+// ))
+
+var speaker1 = function(state, context, qud, form, threshold, cc, priorOnly){
   Infer({
     method: "enumerate",
     model: function() {
-      var Npos = sample(Nposition()) // sample the position of the N
-      var utt = utterance(form, Npos, state.referent) // sample an utterance
-//       print(utt)
-      // from Kao et al. model
       var qudFn = qudFns[qud]
-      var qudAnswer = qudFn(state)
-      var jL0 = jointL0(utt, context, state, cc, threshold, qud)
-//       print(jL0)
-      var ccCompare = cc == "sub" ? state.referent : "super"
+      var qudVal = qudFn(state)
+      var utterance = sample(UtterancePrior(form, state.referent))
+      // from Kao et al. model
+//       display(JSON.stringify(utterance))
+//       display(JSON.stringify(qudVal))
+      var jL0 = listener0(utterance, context, state, cc, threshold, qud)
+//       display('after L0')
+//       display(JSON.stringify(jL0))
       var ut = jL0.score({
 //         referent: state.referent,
-        qudAnswer: qudAnswer//,
+        qudVal: qudVal//,
 //         cc: ccCompare
       }) //
 //       print(ut)
-      factor(priorOnly == "yes" ? 0 : 3*ut)
-      return utt
+      factor(priorOnly == "runPriorOnly" ? 0 : 3*ut)
+      return utterance
     }
   })
 }
 
-display("speaker prior")
-viz.table(speakerContext({referent: 'dog1', property: 1},
-                         context['super'], "ref", "positive", 0.5,
-                         "sub", "yes") )
+// display("speaker prior")
+// viz.table(speaker1({referent: 'greatdane', property: 1},
+//                          context['dog'], "ref", "positive", 0.5,
+//                          "greatdane", "runPriorOnly") )
 
 
-display("QUD: ref")
-viz.table(speakerContext({referent: 'dog1', property: 1},
-                         context['super'], "ref", "positive", 0.5,
-                         "sub") )
+// display("QUD: ref")
+// viz.table(speaker1({referent: 'greatdane', property: 1.7},
+//                          context['dog'], "ref", "positive", 0.5,
+//                          "greatdane") )
 
-display("QUD: pred")
-viz.table(speakerContext({referent: 'dog1', property: 1}, context['super'], "pred", "positive", 0.5, "sub") )
-display("QUD: refpred")
-viz.table(speakerContext({referent: 'dog1', property: 1}, context['super'], "refpred", "positive", 0.5, "sub") )
+// display("QUD: pred")
+// viz.table(speaker1({referent: "greatdane", property: 1.7},
+//                    context['dog'], "pred", "positive", 0.5, "greatdane") )
+
+
 // display("QUD: refpred")
-// viz.table(speakerContext({referent: 'dog1', property: 1}, context['super'], "refpred", "positive", 0.5, "sub") )
+// viz.table(speaker1({referent: 'greatdane', property: 1.7},
+//                    context['dog'], "refpred", "positive", 0.5, "greatdane") )
 
 
-// L1 has access to the context and hears an utterance
-// she infers the QUD, the comparison class, and the referent with its size
+
 
 var pragmaticListener = function(utterance, form, cont, target) {
   // target is the referent in the expt, just for easier representation
@@ -263,27 +285,34 @@ var pragmaticListener = function(utterance, form, cont, target) {
 //     method: "enumerate",
     model: function(){
     // uncertainty about the comparison class (super vs. sub)
-    // add the context as potential comparison class
-    var c = uniformDraw(['sub', 'super', cont])
-//     print(c)
+    var c = uniformDraw([target.referent, "dog"])
     var currentContext = context[cont]
-//     print(currentContext)
     // L1 doesn't know the referent and its size
     var state = sample(statePriorL1(currentContext, target))
-//     print(state)
-// sample QUD
-    var qud = sample(qudPrior)
-//     print(qud)
-    var currentStatePrior = sizePrior(state.referent)
-    var threshold = sample(thresholdPrior(form, currentStatePrior.support() ))
-//     print(threshold)
-    var S1 = speakerContext(state, currentContext, qud, form, threshold, c);
+    var qud = sample(QUDPrior)
+
+    // sample from subordinate category sizes
+    // var SubordinateSizePrior = SizePrior(state.referent)
+
+    var threshold = sample(thresholdPrior("positive"))
+
+//     display(threshold)
+//       display(JSON.stringify(state))
+//       display(JSON.stringify(currentContext))
+//       display(JSON.stringify(qud))
+//       display(JSON.stringify(form))
+//       display(JSON.stringify(c))
+
+    var S1 = speaker1(state, currentContext, qud, form, threshold, c);
 //     print(S1)
 //     display(S1.score(utterance))
     observe(S1, utterance);
-    return { comparisonClass: c, referent: state.referent, property: state.property, QUD: qud}
+    return { comparisonClass: c, referent: state.referent, property: state.property}
   }})
 }
 
-// viz.marginals(pragmaticListener({subject: "dog1", predicate: "big"}, "positive", "super", {referent: "dog1"}))
-// viz.marginals(pragmaticListener({subject: "that", predicate: "big dog1"}, "positive", "super", {referent: "dog1"}))
+// viz.marginals(pragmaticListener(
+//   {subject: "greatdane", predicate: "big"}, "positive", "dog", {referent: "greatdane"}))
+// viz.marginals(pragmaticListener({subject: "that", predicate: "big greatdane"}, "positive", "dog", {referent: "greatdane"}))
+
+// stateVals
