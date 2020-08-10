@@ -406,7 +406,9 @@ pilot_model <- brm(
   chains = 4,
   iter = n_iter,
   cores = 4,
-  control = list(adapt_delta = 0.95)
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
 )
 
 predicted_draws <- pilot_model %>%
@@ -447,7 +449,9 @@ predicted_fit <- brm(
   chains = 4,
   iter = n_iter,
   cores = 4,
-  control = list(adapt_delta = 0.97)
+  control = list(adapt_delta = 0.98),
+  silent = T, 
+  refresh = 0
 )
 
 # extract contrasts of interest
@@ -498,11 +502,12 @@ get_new_df <- function(N, pilot_model, pilot_data) {
   return(data)
 }
 
+# create file path for streaming output
+stream_out <- paste("results/direct_mod_power_analysis_stream_", n_iter,  "iter_", n_sim, "sim.csv", sep="")
 # simulate data and update
-# n is number of participants to be added to the pilot baseline of 47, cannot exceed 47
 sim_data_fit <- function(seed, N) {
   set.seed(seed)
-
+  print(paste("iteration:", seed, " , subjects:", N, sep=""))
   # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
   # predictions are based on pilot data, i.e. grouped by original pilot input rows
   # corresponds to brms::redict.brmsfit()
@@ -521,6 +526,7 @@ sim_data_fit <- function(seed, N) {
          newdata = data,
          seed = seed,
          cores = 4, 
+         silent = T,
          refresh = 0) %>%
     # extract posterior draws
     spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
@@ -539,7 +545,14 @@ sim_data_fit <- function(seed, N) {
       mean = mean(val),
       lower = quantile(val, probs = 0.025),
       upper = quantile(val, probs = 0.975)
-    )
+    ) %>%
+    mutate(
+      n.subj = N,
+      seed = seed
+    ) %>%
+    # write out results for each subject N and each seed
+    # appending the column names doesn't work though
+    write_csv(., stream_out, append = !(file.exists(stream_out)), col_names = T) %>% select(-n.subj, -seed)
 
 }
 
@@ -550,16 +563,16 @@ sim.power <- function(n.subj, n.sim) {
     mutate(
       tidy = map(seed, sim_data_fit, N = n.subj)
     ) %>%
-    unnest(tidy)
+    unnest(tidy) 
 }
 
 # iterate over different subject numbers (total of 100 - 300, in steps of 20)
 #analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
-analyse_power <- tibble(n.subj = 500) %>%
+analyse_power <- tibble(n.subj = 10) %>%
   mutate(
     tidy = map(n.subj, sim.power, n.sim = n_sim)
   ) %>%
-  unnest(tidy)
+  unnest(tidy) 
 
 analyse_power %>%
   filter(key == "syntax_critical") %>%
@@ -567,8 +580,36 @@ analyse_power %>%
   group_by(n.subj) %>%
   summarise(power_syntax = mean(check_syntax)) -> analyse_power_summary
 
-analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_1000subj_3_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
-analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_1000subj_3_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
+analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_stream_final_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
+analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
+```
 
+``` {r}
 
+library(foreach)
+library(doParallel)
+
+registerDoParallel(cores = 4) # number of workers, specify 4 cores 
+
+getDoParWorkers() # check how many workers foreach is going to use
+
+analyse.power <- foreach(n.subj = seq(10, 300, by= 20), .combine = rbind) %dopar% {
+  tibble(n.subj = n.subj) %>%
+    mutate(
+      tidy = map(n.subj, sim.power, n.sim = n_sim)
+    ) %>%
+    unnest(tidy) %>%
+    # write out results of simulation for each subject N
+    write_csv(paste("results/direct_mod_power_analysis_stream_subj_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T)
+}
+
+write_csv(analyse.power, paste("results/direct_mod_power_analysis_final_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T)
+
+analyse.power %>%
+  filter(key == "syntax_critical") %>%
+  mutate(check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)) %>%
+  group_by(n.subj) %>%
+  summarise(power_syntax = mean(check_syntax)) -> analyse.power.summary
+
+analyse.power.summary %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
 ```
