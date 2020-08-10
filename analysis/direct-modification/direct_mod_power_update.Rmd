@@ -388,7 +388,7 @@ library(broom)
 pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>% filter(!(workerid %in% c(2243, 2245))) # exclude workers where not all trials are included, resulting in 45 unique workers
 
 n_iter = 3000
-n_sim = 5
+n_sim = 1
 
 # sum coding of main effects
 pilot_data <- pilot_data %>%
@@ -525,7 +525,7 @@ sim_data_fit <- function(seed, N) {
   update(predicted_fit,
          newdata = data,
          seed = seed,
-         cores = 4, 
+      #   cores = 4, # cannot be included if %dopar% is used 
          silent = T,
          refresh = 0) %>%
     # extract posterior draws
@@ -546,22 +546,22 @@ sim_data_fit <- function(seed, N) {
       lower = quantile(val, probs = 0.025),
       upper = quantile(val, probs = 0.975)
     ) %>%
+    tibble() %>%
     mutate(
       n.subj = N,
       seed = seed
     ) %>%
     # write out results for each subject N and each seed
     # appending the column names doesn't work though
-    write_csv(., stream_out, append = !(file.exists(stream_out)), col_names = T) %>% select(-n.subj, -seed)
-
+    write_csv(., stream_out, append = T, col_names = !(file.exists(stream_out))) %>% select(-n.subj, -seed)
 }
 
 # helper function iterating over seeds (=iterations of the simulation)
 sim.power <- function(n.subj, n.sim) {
-  print(n.subj)
   sim <- tibble( seed = 1:n.sim) %>%
     mutate(
-      tidy = map(seed, sim_data_fit, N = n.subj)
+      tidy = map(seed, sim_data_fit, N = n.subj),
+      n.subj = n.subj
     ) %>%
     unnest(tidy) 
 }
@@ -589,21 +589,19 @@ analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", 
 library(foreach)
 library(doParallel)
 
-registerDoParallel(cores = 4) # number of workers, specify 4 cores 
+registerDoParallel(cores = 2) # number of workers, specify 4 cores 
 
-getDoParWorkers() # check how many workers foreach is going to use
+getDoParWorkers() # check how many workers foreach is going to use after setting desired number
 
-analyse.power <- foreach(n.subj = seq(10, 300, by= 20), .combine = rbind) %dopar% {
-  tibble(n.subj = n.subj) %>%
-    mutate(
-      tidy = map(n.subj, sim.power, n.sim = n_sim)
-    ) %>%
-    unnest(tidy) %>%
-    # write out results of simulation for each subject N
-    write_csv(paste("results/direct_mod_power_analysis_stream_subj_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T)
-}
+analyse.power <- foreach(n.subj = seq(10, 20, by= 10), .combine = rbind, .multicombine = T) %dopar% {
+ 
+  tidy <- sim.power(n.subj = n.subj, n.sim = n_sim) 
+  
+  tidy 
+ # w columnk names
+} 
 
-write_csv(analyse.power, paste("results/direct_mod_power_analysis_final_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T)
+write_csv(analyse.power, paste("results/direct_mod_power_analysis_final_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T, col_names = T)
 
 analyse.power %>%
   filter(key == "syntax_critical") %>%
