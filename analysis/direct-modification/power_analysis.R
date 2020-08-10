@@ -135,8 +135,8 @@ sim_data_fit <- function(seed, N) {
   # predictions are based on pilot data, i.e. grouped by original pilot input rows
   # corresponds to brms::redict.brmsfit()
   data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data) %>%
-    mutate(trial_dev = factor(trial_type, levels = c("filler", "critical")),
-           syntax_dev = factor(syntax, levels = c("subj", "pred")))
+    mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
+           syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
 
   # deviation code main effects
   contrasts(data$trial_dev) <- contr.sum(2)
