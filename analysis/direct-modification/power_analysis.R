@@ -134,7 +134,9 @@ sim_data_fit <- function(seed, N) {
   # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
   # predictions are based on pilot data, i.e. grouped by original pilot input rows
   # corresponds to brms::redict.brmsfit()
-  data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data)
+  data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data) %>%
+    mutate(trial_dev = factor(trial_type, levels = c("filler", "critical")),
+           syntax_dev = factor(syntax, levels = c("subj", "pred")))
 
   # deviation code main effects
   contrasts(data$trial_dev) <- contr.sum(2)
@@ -203,7 +205,9 @@ registerDoParallel(cores = 4) # number of workers, specify 4 cores
 
 getDoParWorkers() # check how many workers foreach is going to use after setting desired number
 
-analyse_power <- foreach(n.subj = seq(10, 20, by= 10), .combine = rbind, .multicombine = T) %dopar% {
+# simulate subject Ns of 60 to 300, with steps of 20
+#analyse_power <- foreach(n.subj = seq(60, 300, by= 20), .combine = rbind, .multicombine = T) %dopar% {
+analyse_power <- foreach(n.subj = seq(60, 70, by= 10), .combine = rbind, .multicombine = T) %dopar% {
   tidy <- sim.power(n.subj = n.subj, n.sim = n_sim) 
   tidy 
 } 
