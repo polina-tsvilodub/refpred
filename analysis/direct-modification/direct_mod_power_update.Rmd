@@ -381,8 +381,6 @@ rbind(
 ```{r}
 library(tidyverse)
 library(brms)
-#library(tidyr)
-#library(dplyr)
 library(tidybayes)
 library(broom)
 
@@ -470,22 +468,33 @@ predicted_fit_draws <- predicted_fit %>%
     upper = quantile(val, probs = 0.975)
   )
 
-# helper
-get_unique_id <- function(id, N) {
-  workerid <- paste(id, N, sep="_")
+# helper function to get 4 out of 5 possible target pairs per participant 
+get_targets <- function(N){
+ targets <- sample(c("sunflower_dandelion", "redwood_bonsai", "doberman_chihuahua", "Great Dane_pug", "eagle_hummingbird"), 4, replace = F)
+ unlist(str_split(targets, pattern="_"))
 }
 
 # helper function to get posterior predictive draws for a subset of participants of size N
-# d is the a dataframe with posterior predictive draws for 47 participants based on the pilot data set
-get_new_data <- function(N, pilot_model, pilot_data) {
-  new.data <- tibble()
+get_new_df <- function(N, pilot_model, pilot_data) {
+  
   workers <- sample(unique(pilot_data$workerid), N, replace = N > 45)
-  for(i in 1:N) { new.data <- rbind(new.data, pilot_data %>% filter(workerid == workers[i])) }
+  trials <- rep(c("critical", "filler"), each = 4)
+  syntax <- rep(c("subj", "subj", "pred", "pred"), times = 2)
+  
+  new.data <- tibble(
+    workerid = workers,
+    target = map(N, get_targets)
+  ) %>%
+    unnest(cols = target) %>%
+    mutate(
+      trial_dev = as.factor(rep(trials, times = N)),
+      syntax_dev = as.factor(rep(syntax, times = N))
+    )
+  
   data <- add_predicted_draws(model=pilot_model,
                               newdata = new.data,
-                                n = 1) 
-  worker_nums <- rep(1:N, each = 8) # 8 is nr of trials per particiapnt
-  data[["workerid"]] <- worker_nums
+                              n = 1)
+  data[["workerid"]] <- rep(1:N, each = 8)
   return(data)
 }
 
@@ -499,11 +508,9 @@ sim_data_fit <- function(seed, N) {
   # corresponds to brms::redict.brmsfit()
 
   # the new draws are added in the column .prediction
-  # simulates 47 participants, as in the original dataset
-  #d <- add_predicted_draws(model=pilot_model, newdata = pilot_data, n = 1)
+  # simulates N participants
 
-  # possibly add more participants
-  data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data)
+  data <- get_new_df(N, pilot_model = pilot_model, pilot_data = pilot_data)
 
   # deviation code main effects
   contrasts(data$trial_dev) <- contr.sum(2)
@@ -512,7 +519,9 @@ sim_data_fit <- function(seed, N) {
   # update model fit with new data
   update(predicted_fit,
          newdata = data,
-         seed = seed) %>%
+         seed = seed,
+         cores = 4, 
+         refresh = 0) %>%
     # extract posterior draws
     spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
     # extract contrasts of interest, especially effect of syntax by-trial
@@ -546,7 +555,7 @@ sim.power <- function(n.subj, n.sim) {
 
 # iterate over different subject numbers (total of 100 - 300, in steps of 20)
 #analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
-analyse_power <- tibble(n.subj = 100000) %>%
+analyse_power <- tibble(n.subj = 500) %>%
   mutate(
     tidy = map(n.subj, sim.power, n.sim = n_sim)
   ) %>%
@@ -558,8 +567,8 @@ analyse_power %>%
   group_by(n.subj) %>%
   summarise(power_syntax = mean(check_syntax)) -> analyse_power_summary
 
-analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_100000subj_2_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
-analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_100000subj_2_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
+analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_1000subj_3_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
+analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_1000subj_3_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
 
 
 ```

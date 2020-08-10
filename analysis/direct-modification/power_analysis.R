@@ -1,7 +1,5 @@
 library(tidyverse)
 library(brms)
-#library(tidyr)
-#library(dplyr)
 library(tidybayes)
 library(broom)
 
@@ -53,7 +51,7 @@ predicted_draws <- pilot_model %>%
 # corresponds to brms::redict.brmsfit()
 
 # the new draws are added in the column .prediction
-# simulates 47 participants, as in the original dataset
+# simulates 45 participants, as in the original dataset
 predicted_data <- add_predicted_draws(model=pilot_model, newdata = pilot_data, n = 1) %>%
   mutate(workerid = paste(workerid, letters[1], sep = "_")) # mutate the workerid to simulate adding more participants
 
