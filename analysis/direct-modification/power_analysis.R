@@ -6,7 +6,6 @@ library(broom)
 
 # list of subject-Ns; argument passed is the index accessing the respective N
 subjN_list <- c(80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300)
-#subjN_list <- c(1000)
 
 # get the argument passed (assuming the index is the first one after --args)
 arg <- commandArgs(trailingOnly = T)[1]
@@ -31,14 +30,16 @@ contrasts(pilot_data$syntax_dev) <- contr.sum(2)
 
 # fit full desired model on pilot data
 pilot_model <- brm(
-  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid)
-  + (1 + syntax_dev*trial_dev | target),
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || workerid)
+  + (1 + syntax_dev*trial_dev || target),
   data = pilot_data,
   family = "bernoulli",
   chains = 4,
   iter = n_iter,
   cores = 4,
-  control = list(adapt_delta = 0.95)
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
 )
 
 # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
@@ -62,7 +63,9 @@ predicted_fit <- brm(
   chains = 4,
   iter = n_iter,
   cores = 4,
-  control = list(adapt_delta = 0.95)
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
 )
 
 
@@ -72,8 +75,7 @@ get_targets <- function(N){
   unlist(str_split(targets, pattern="_"))
 }
 
-# helper function to get posterior predictive draws for a subset of participants of size N
-
+# helper function to get posterior predictive draws for participant number N
 get_new_data <- function(N, pilot_model, pilot_data) {
   
   trials <- rep(c("critical", "filler"), each = 4)
@@ -91,8 +93,8 @@ get_new_data <- function(N, pilot_model, pilot_data) {
   
   data <- add_predicted_draws(model=pilot_model,
                               newdata = new.data,
-                              allow_new_levels = T, 
-                              sample_new_levels = "gaussian",
+                              allow_new_levels = T, # allow sampling new workerids
+                              sample_new_levels = "gaussian", # sample new REs based on estimated REs
                               n = 1)
   return(data)
 }
@@ -100,15 +102,13 @@ get_new_data <- function(N, pilot_model, pilot_data) {
 # create file path for streaming output
 stream_out <- paste("results/direct_mod_power_analysis_stream_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep="")
 
-# simulate data and updat
-# n is number of participants to be added to the pilot baseline of 47, cannot exceed 47
+# simulate data and update model fit
 sim_data_fit <- function(seed, N) {
   set.seed(seed)
   print(paste("iteration:", seed, " , subjects:", N, sep=""))
-  # simulate data from original pilot data
-  # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
+  
   # predictions are based on pilot data, i.e. grouped by original pilot input rows
-  # corresponds to brms::redict.brmsfit()
+  # corresponds to brms::predict.brmsfit()
   data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data) %>%
     mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
            syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
@@ -122,8 +122,8 @@ sim_data_fit <- function(seed, N) {
          newdata = data,
          seed = seed,
          cores = 4,
-         silent = T#,
-        # refresh = 0
+         silent = T,
+         refresh = 0
          ) %>%
     # extract posterior draws
     spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
