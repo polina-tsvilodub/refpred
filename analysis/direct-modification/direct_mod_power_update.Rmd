@@ -386,29 +386,32 @@ full_pilot_data <- bind_rows(
   read_csv("./../../data/direct-modification/results_32_modification_manipulation_pilot1_tidy.csv") %>%
     mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
            trial_dev = "critical",
-           submission_id = as.character(submission_id)),
+           submission_id = as.character(submission_id)) %>%
+    rename(workerid = submission_id),
   read_csv("./../../data/direct-modification/results_32_modification_manipulation_pilot2_tidy.csv")%>%
     mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
            trial_dev = "critical",
-           submission_id = as.character(submission_id)),
+           submission_id = as.character(submission_id))%>%
+    rename(workerid = submission_id),
   read_csv("./../../data/direct-modification/results_32_modification_manipulation_pilot3_tidy.csv")%>%
     mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
            trial_dev = "critical",
-           submission_id = as.character(submission_id)),
+           submission_id = as.character(submission_id)) %>%
+    rename(workerid = submission_id),
   read_csv("./../../data/direct-modification/results_34_modXcongr_pilot1_tidy.csv") %>%
     filter(adj_cond == "congruent") %>% # ignore incongruent condition not occurring in pilots 5-6
     mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
            trial_dev = "critical",
            pilot_nr = 4,
-           submission_id = as.character(submission_id)),
+           submission_id = as.character(submission_id)) %>%
+    rename(workerid = submission_id),
   read_csv("./../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>%
-    mutate(pilot_nr = 5.6) %>%
-    rename(submission_id = workerid)
+    mutate(pilot_nr = 5.6) 
 )  %>%
     mutate(target = tolower(target),
            pilot_nr = as.factor(pilot_nr))
 
-#write_csv(full_pilot_data, "../../data/direct-modification/results_all_pilots_tidy.csv")
+write_csv(full_pilot_data, "../../data/direct-modification/results_all_pilots_tidy.csv")
 ```
 
 ```{r}

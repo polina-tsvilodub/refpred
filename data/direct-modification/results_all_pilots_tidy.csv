@@ -1,4 +1,4 @@
-submission_id,trial_number,target,item,response,syntax,adj,response_cat,response_num,response_label,pilot_nr,syntax_dev,trial_dev,context_picture,target_size,adj_cond,trial_type
+workerid,trial_number,target,item,response,syntax,adj,response_cat,response_num,response_label,pilot_nr,syntax_dev,trial_dev,context_picture,target_size,adj_cond,trial_type
 2062,1,sunflower,flowers,other flowers,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
 2062,2,chihuahua,dogs1,other dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
 2062,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
