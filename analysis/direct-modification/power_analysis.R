@@ -15,16 +15,17 @@ currentSubj.N <- subjN_list[arg]
 print(currentSubj.N)
 
 # add appropriate path
-pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>% 
-  filter(!(workerid %in% c(2243, 2245))) # exclude workers where not all trials are included, resulting in 45 unique workers
+pilot_data <- read_csv("../../data/direct-modification/results_all_pilots_tidy.csv")
+  #read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>% 
+ # filter(!(workerid %in% c(2243, 2245))) # exclude workers where not all trials are included, resulting in 45 unique workers
 
 n_iter = 3000
 n_sim = 5
 
 # sum coding of main effects
 pilot_data <- pilot_data %>%
-  mutate(trial_dev = factor(trial_type, levels = c("filler", "critical")),
-         syntax_dev = factor(syntax, levels = c("subj", "pred")))
+  mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
+         syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
 contrasts(pilot_data$trial_dev) <- contr.sum(2)
 contrasts(pilot_data$syntax_dev) <- contr.sum(2)
 
@@ -100,7 +101,7 @@ get_new_data <- function(N, pilot_model, pilot_data) {
 }
 
 # create file path for streaming output
-stream_out <- paste("results/direct_mod_power_analysis_stream_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep="")
+stream_out <- paste("results/direct_mod_power_analysis_fullData_stream_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep="")
 
 # simulate data and update model fit
 sim_data_fit <- function(seed, N) {
@@ -169,7 +170,7 @@ analyse_power <- tibble(n.subj = currentSubj.N) %>%
   ) %>%
   unnest(tidy)
 
-write_csv(analyse_power, paste("results/direct_mod_power_analysis_final_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T, col_names = T)
+write_csv(analyse_power, paste("results/direct_mod_power_analysis_fullData_final_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T, col_names = T)
 
 analyse_power %>%
   filter(key == "syntax_critical") %>%
@@ -177,4 +178,4 @@ analyse_power %>%
   group_by(n.subj) %>%
   summarise(power_syntax = mean(check_syntax)) -> analyse_power_summary
 
-analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", currentSubj.N, "subj_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
+analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_fullData_", currentSubj.N, "subj_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))

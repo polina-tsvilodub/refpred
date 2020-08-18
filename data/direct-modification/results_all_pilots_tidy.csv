@@ -1,0 +1,919 @@
+workerid,trial_number,target,item,response,syntax,adj,response_cat,response_num,response_label,pilot_nr,syntax_dev,trial_dev,context_picture,target_size,adj_cond,trial_type
+2062,1,sunflower,flowers,other flowers,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2062,2,chihuahua,dogs1,other dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2062,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2062,1,hummingbird,birds,birds,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2062,2,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2061,1,eagle,birds,eagle,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2061,2,doberman,dogs1,dog,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2059,1,eagle,birds,eagles,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2059,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2059,3,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2059,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2059,2,dandelion,flowers,dandelion,subject,small,subordinate,0,basic,1,subj,critical,NA,NA,NA,NA
+2058,1,redwood,trees,trees,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2058,2,great dane,dogs2,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2058,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2058,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2058,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2057,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2057,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2057,3,sunflower,flowers,sunflowers,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2057,1,redwood,trees,redwoods,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2057,2,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2056,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2056,2,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2056,3,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2056,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2056,2,pug,dogs2,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2055,1,great dane,dogs2,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2055,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2055,3,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2055,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2055,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2054,2,pug,dogs2,pug,subject,small,subordinate,0,basic,1,subj,critical,NA,NA,NA,NA
+2054,2,dandelion,flowers,plant,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2053,1,doberman,dogs1,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2053,2,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2053,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2053,1,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2053,2,dandelion,flowers,flowers,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2052,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2052,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2052,3,great dane,dogs2,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2052,1,eagle,birds,birds,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2052,2,doberman,dogs1,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2050,3,sunflower,flowers,sunflower,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2050,1,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2050,2,chihuahua,dogs1,dog,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2049,1,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2049,2,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2049,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2049,1,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2049,2,dandelion,flowers,flowers,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2046,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2046,2,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2046,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2046,1,hummingbird,birds,birds,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2046,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2045,1,eagle,birds,eagles,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2045,2,doberman,dogs1,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2045,3,bonsai,trees,trees,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2045,1,dandelion,flowers,flowers,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2045,2,pug,dogs2,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2044,1,chihuahua,dogs1,DOG,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2044,2,dandelion,flowers,FLOWER,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2043,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2043,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2043,3,hummingbird,birds,birds,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2043,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2043,2,bonsai,trees,trees,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2042,1,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2042,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2042,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2042,1,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2042,2,dandelion,flowers,plants,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2041,1,great dane,dogs2,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2041,2,doberman,dogs1,animals,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2041,3,bonsai,trees,trees,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2041,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2041,2,eagle,birds,birds,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2040,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2040,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2040,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2040,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2040,2,great dane,dogs2,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2039,1,redwood,trees,trees,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2039,2,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2039,3,dandelion,flowers,flowers,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2039,1,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2039,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2037,1,bonsai,trees,trees,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2037,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2037,3,eagle,birds,eagles,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2037,1,doberman,dogs1,dobermans,predicate,big,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2037,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2036,1,dandelion,flowers,flowers,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2036,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2036,3,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2036,1,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2036,2,great dane,dogs2,animals,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2035,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2035,2,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2035,3,dandelion,flowers,flowers,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2035,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2035,2,pug,dogs2,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2034,1,sunflower,flowers,flowers in the garden,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2034,2,redwood,trees,all the other trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2034,3,hummingbird,birds,the other birds in the animal shelter,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2034,1,chihuahua,dogs1,all the other dogs at the dog park,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2034,2,great dane,dogs2,dogs at the dog show,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2033,1,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2033,2,great dane,dogs2,dogs,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2033,3,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2033,1,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2033,2,eagle,birds,birds,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2032,1,hummingbird,birds,hummingbirds,predicate,small,subordinate,0,basic,1,pred,critical,NA,NA,NA,NA
+2032,2,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2032,3,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2032,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2032,2,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2030,1,redwood,trees,trees,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2030,2,hummingbird,birds,birds,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2030,3,pug,dogs2,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2030,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2030,2,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2029,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2029,2,sunflower,flowers,flowers,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2029,3,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2029,1,hummingbird,birds,birds,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2029,2,bonsai,trees,trees,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2028,1,eagle,birds,birds,subject,big,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2028,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2028,3,bonsai,trees,trees,subject,small,basic,1,basic,1,subj,critical,NA,NA,NA,NA
+2028,1,pug,dogs2,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2028,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,1,pred,critical,NA,NA,NA,NA
+2099,1,bonsai,trees,trees,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2099,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2099,3,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2099,1,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2099,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2098,1,redwood,trees,trees,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2098,2,chihuahua,dogs1,chihuahuas,subject,small,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2098,1,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2098,2,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2097,1,pug,dogs2,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2097,2,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2097,3,eagle,birds,birds,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2097,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2097,2,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2095,1,pug,dogs2,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2095,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2095,3,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2095,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2094,1,pug,dogs2,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2094,2,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2094,3,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2094,1,hummingbird,birds,hummingbirds,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2094,2,redwood,trees,trees,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2093,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2093,2,redwood,trees,trees,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2093,3,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2093,1,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2093,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2091,1,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2091,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2091,3,chihuahua,dogs1,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2091,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2091,2,bonsai,trees,trees,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2090,1,pug,dogs2,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2090,2,eagle,birds,birds,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2090,3,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2090,1,redwood,trees,trees,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2090,2,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2089,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2089,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2089,3,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2089,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2089,2,sunflower,flowers,flowers,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2087,1,redwood,trees,trees,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2087,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2087,3,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2087,1,pug,dogs2,big dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2087,2,sunflower,flowers,flowers,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2086,1,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2086,2,eagle,birds,birds,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2086,3,pug,dogs2,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2086,1,redwood,trees,trees,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2086,2,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2084,1,doberman,dogs1,other dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2084,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2084,3,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2084,1,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2084,2,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2083,1,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2083,2,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2083,3,redwood,trees,trees,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2083,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2083,2,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2082,1,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2082,2,eagle,birds,birds,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2082,3,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2082,1,doberman,dogs1,animals,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2082,2,pug,dogs2,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2081,1,redwood,trees,trees,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2081,2,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2081,3,pug,dogs2,pugs,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2081,1,chihuahua,dogs1,chihuahuas,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2081,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2080,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2080,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2080,3,eagle,birds,birds,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2080,1,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2080,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2079,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2079,2,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2079,3,dandelion,flowers,plants,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2079,1,pug,dogs2,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2079,2,eagle,birds,birds,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2078,1,bonsai,trees,trees,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2078,2,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2078,3,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2078,1,pug,dogs2,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2078,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2077,1,eagle,birds,birds,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2077,2,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2077,3,dandelion,flowers,flowerrs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2077,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2077,2,bonsai,trees,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2075,1,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2075,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2075,3,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2075,1,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2075,2,redwood,trees,trees,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2074,1,pug,dogs2,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2074,2,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2074,3,bonsai,trees,bonsais,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2074,1,eagle,birds,eagles,predicate,big,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2074,2,dandelion,flowers,dandelions,subject,small,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2073,1,sunflower,flowers,flowers,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2073,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2073,3,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2073,1,redwood,trees,tres,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2073,2,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2072,1,chihuahua,dogs1,chihuahua,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2072,2,great dane,dogs2,great danes,subject,big,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2072,3,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2072,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2072,2,redwood,trees,redwoods,subject,big,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2071,1,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2071,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2071,3,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2071,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2071,2,bonsai,trees,trees,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2070,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2070,2,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2070,3,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2070,1,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2070,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2069,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2069,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2069,3,redwood,trees,trees,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2069,1,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2069,2,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2068,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2068,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2068,3,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2068,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2068,2,eagle,birds,birds,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2067,1,doberman,dogs1,dobermans,predicate,big,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2067,2,sunflower,flowers,sunflowers,subject,big,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2067,3,great dane,dogs2,great danes,subject,big,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2067,1,hummingbird,birds,hummingbirds,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2067,2,bonsai,trees,bonsai,predicate,small,subordinate,0,basic,2,pred,critical,NA,NA,NA,NA
+2066,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2066,2,hummingbird,birds,birds,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2066,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2066,1,bonsai,trees,trees,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2066,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2065,1,great dane,dogs2,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2065,2,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2065,3,bonsai,trees,trees,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2065,1,doberman,dogs1,dogs,subject,big,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2065,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2064,1,dandelion,flowers,flowers,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2064,2,hummingbird,birds,birds,subject,small,basic,1,basic,2,subj,critical,NA,NA,NA,NA
+2064,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,2,pred,critical,NA,NA,NA,NA
+2064,1,redwood,trees,redwoods,subject,big,subordinate,0,basic,2,subj,critical,NA,NA,NA,NA
+2135,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2135,2,hummingbird,birds,birds,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2135,3,redwood,trees,trees,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2135,1,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2135,2,pug,dogs2,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2134,1,hummingbird,birds,birds,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2134,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2134,3,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2134,1,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2134,2,bonsai,trees,trees,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2133,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2133,2,hummingbird,birds,birds,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2133,3,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2133,1,pug,dogs2,pugs,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2133,2,redwood,trees,trees,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2132,1,redwood,trees,tree,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2132,2,doberman,dogs1,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2132,3,eagle,birds,birds,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2132,1,pug,dogs2,dog,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2132,2,dandelion,flowers,flower,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2131,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2131,2,redwood,trees,trees,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2131,3,pug,dogs2,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2131,1,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2131,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2130,1,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2130,2,chihuahua,dogs1,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2130,3,sunflower,flowers,flowers,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2130,1,redwood,trees,trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2130,2,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2128,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2128,2,eagle,birds,eagles,subject,big,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2128,3,bonsai,trees,bonsai,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2128,1,sunflower,flowers,sunflowers,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2128,2,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2127,1,doberman,dogs1,doberman,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2127,2,hummingbird,birds,hummingbirds,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2127,3,great dane,dogs2,great danes,subject,big,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2127,1,dandelion,flowers,flowers,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2127,2,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2126,1,pug,dogs2,pug,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2126,2,bonsai,trees,bonsai,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2126,3,eagle,birds,eagle,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2126,1,sunflower,flowers,sunflower,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2126,2,chihuahua,dogs1,chihuahua,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2125,1,chihuahua,dogs1,chihuahuas,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2125,2,redwood,trees,redwoods,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2125,3,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2125,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2125,2,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2124,1,redwood,trees,tree,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2124,2,hummingbird,birds,bird,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2124,3,sunflower,flowers,flower,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2124,1,pug,dogs2,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2124,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2123,1,sunflower,flowers,sunflowers,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2123,2,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2123,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2123,1,hummingbird,birds,birds,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2123,2,doberman,dogs1,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2121,1,chihuahua,dogs1,chihuahuas,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2121,2,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2121,3,sunflower,flowers,sunflowers,subject,big,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2121,1,great dane,dogs2,great danes,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2121,2,bonsai,trees,bonsais,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2120,1,redwood,trees,Trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2120,2,chihuahua,dogs1,Dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2120,3,eagle,birds,Birds,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2120,1,pug,dogs2,Dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2120,2,sunflower,flowers,Flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2119,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2119,2,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2119,3,pug,dogs2,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2119,1,redwood,trees,trees,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2119,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2118,1,hummingbird,birds,birds,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2118,2,doberman,dogs1,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2118,3,redwood,trees,trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2118,1,dandelion,flowers,flowers,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2118,2,pug,dogs2,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2117,1,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2117,2,hummingbird,birds,birds,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2117,3,doberman,dogs1,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2117,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2117,2,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2116,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2116,2,hummingbird,birds,hummingbirds,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2116,3,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2116,1,redwood,trees,trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2116,2,sunflower,flowers,sunflowers,subject,big,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2115,1,redwood,trees,trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2115,2,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2115,3,chihuahua,dogs1,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2115,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2115,2,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2114,1,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2114,2,dandelion,flowers,plants,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2114,3,bonsai,trees,trees,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2114,1,doberman,dogs1,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2114,2,eagle,birds,birds,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2113,1,bonsai,trees,trees,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2113,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2113,3,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2113,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2113,2,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2112,1,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2112,2,eagle,birds,birds,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2112,3,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2112,1,sunflower,flowers,sunflowers,subject,big,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2112,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2111,1,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2111,2,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2111,3,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2111,1,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2111,2,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2110,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2110,2,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2110,3,eagle,birds,birds,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2110,1,pug,dogs2,pugs,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2110,2,dandelion,flowers,dandelion,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2109,1,bonsai,trees,bonsai,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2109,2,doberman,dogs1,dobermans,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2109,3,hummingbird,birds,hummingbirds,subject,small,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2109,1,dandelion,flowers,dandelions,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2109,2,great dane,dogs2,great danes,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2108,1,chihuahua,dogs1,animals,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2108,2,dandelion,flowers,flowers,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2108,3,eagle,birds,birds,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2108,1,pug,dogs2,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2108,2,redwood,trees,trees,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2107,1,eagle,birds,birds,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2107,2,redwood,trees,trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2107,3,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2107,1,dandelion,flowers,flowers,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2107,2,pug,dogs2,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2106,1,pug,dogs2,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2106,2,bonsai,trees,trees,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2106,3,doberman,dogs1,doberman,predicate,big,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2106,1,eagle,birds,birds,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2106,2,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2105,1,doberman,dogs1,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2105,2,pug,dogs2,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2105,3,redwood,trees,trees,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2105,1,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2105,2,sunflower,flowers,flowers,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2104,1,great dane,dogs2,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2104,2,sunflower,flowers,flowers,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2104,3,hummingbird,birds,birds,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2104,1,chihuahua,dogs1,dogs,subject,small,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2104,2,bonsai,trees,trees,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2101,1,hummingbird,birds,hummingbirds,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2101,2,sunflower,flowers,plants,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2101,3,bonsai,trees,bonsai,predicate,small,subordinate,0,basic,3,pred,critical,NA,NA,NA,NA
+2101,1,great dane,dogs2,dogs,predicate,big,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2101,2,doberman,dogs1,dogs,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2100,1,dandelion,flowers,flowers,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2100,2,eagle,birds,eagles,subject,big,subordinate,0,basic,3,subj,critical,NA,NA,NA,NA
+2100,3,redwood,trees,trees,subject,big,basic,1,basic,3,subj,critical,NA,NA,NA,NA
+2100,1,pug,dogs2,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2100,2,chihuahua,dogs1,dogs,predicate,small,basic,1,basic,3,pred,critical,NA,NA,NA,NA
+2237,1,hummingbird,birds,birds,pred,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2237,1,redwood,trees,trees,subj,big,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2237,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2236,1,great dane,dogs2,dogs,subj,big,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2236,3,eagle,birds,eagles,subj,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2236,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2235,1,chihuahua,dogs1,chihuahua,pred,small,subordinate,0,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2235,2,eagle,birds,Hummingbird,subj,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2235,3,sunflower,flowers,flower,subj,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2234,1,hummingbird,birds,birds,subj,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2234,1,sunflower,flowers,flowers,pred,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2233,2,pug,dogs2,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2233,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2232,1,bonsai,trees,trees,pred,small,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2232,3,pug,dogs2,pets,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2231,2,great dane,dogs2,dogs,pred,big,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2231,1,bonsai,trees,trees,subj,small,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2230,2,chihuahua,dogs1,chihuahua,pred,small,subordinate,0,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2230,3,bonsai,trees,bonsai,pred,small,subordinate,0,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2229,2,bonsai,trees,trees,pred,small,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2229,3,eagle,birds,birds,subj,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2229,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2228,1,dandelion,flowers,plants,subj,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2228,3,pug,dogs2,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2228,1,doberman,dogs1,dogs,pred,big,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,big,congruent,NA
+2227,1,bonsai,trees,tall tree,pred,small,subordinate,0,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2225,2,eagle,birds,birds,pred,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2225,3,great dane,dogs2,canines,pred,big,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2225,1,chihuahua,dogs1,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2223,1,pug,dogs2,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2223,2,eagle,birds,birds,pred,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2223,1,dandelion,flowers,flowers,pred,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2222,2,redwood,trees,trees,pred,big,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2222,3,eagle,birds,eagles,subj,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2222,1,dandelion,flowers,flowers,pred,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2221,1,redwood,trees,trees,pred,big,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2221,3,dandelion,flowers,plants,subj,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2220,3,hummingbird,birds,birds,pred,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2220,1,sunflower,flowers,flowers,subj,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2219,2,bonsai,trees,trees,pred,small,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2219,3,hummingbird,birds,birds,subj,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2219,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2216,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2216,3,eagle,birds,eagles,subj,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2215,3,eagle,birds,eagles,subj,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2215,1,bonsai,trees,bonsais,pred,small,subordinate,0,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2214,1,chihuahua,dogs1,chihuahuas,pred,small,subordinate,0,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2214,2,great dane,dogs2,dogs,subj,big,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2214,3,hummingbird,birds,hummingbirds,pred,small,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2212,2,hummingbird,birds,birds,subj,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2212,3,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2211,1,eagle,birds,eagles,subj,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2211,2,sunflower,flowers,flowers,pred,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2211,3,pug,dogs2,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2210,2,bonsai,trees,tree,subj,small,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2209,1,great dane,dogs2,great danes,pred,big,subordinate,0,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2209,2,chihuahua,dogs1,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2209,3,sunflower,flowers,flowers,subj,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2208,3,eagle,birds,eagles,pred,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2208,2,bonsai,trees,bonsais,subj,small,subordinate,0,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2207,2,chihuahua,dogs1,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2207,3,hummingbird,birds,birds,subj,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2206,2,sunflower,flowers,flowers,subj,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2206,1,hummingbird,birds,birds,pred,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2205,2,pug,dogs2,pugs,subj,small,subordinate,0,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2205,2,eagle,birds,eagles,pred,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2204,2,chihuahua,dogs1,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2204,1,dandelion,flowers,flowers,pred,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2203,1,doberman,dogs1,dogs,pred,big,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,big,congruent,NA
+2203,2,eagle,birds,birds,subj,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2202,1,bonsai,trees,redwood,subj,small,subordinate,0,NA,4,pred,critical,images/tree-parade-basic.png,small,congruent,NA
+2202,3,great dane,dogs2,pug,subj,big,subordinate,0,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2202,1,eagle,birds,bird,pred,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2201,1,pug,dogs2,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2201,2,dandelion,flowers,flowers,pred,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2201,2,eagle,birds,eagles,pred,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2200,1,redwood,trees,trees,subj,big,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2200,3,pug,dogs2,pugs,pred,small,subordinate,0,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2200,2,eagle,birds,birds,subj,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2199,1,redwood,trees,redwoods,subj,big,subordinate,0,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2199,2,dandelion,flowers,flowers,pred,small,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2198,1,sunflower,flowers,sunflowers,subj,big,subordinate,0,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2198,2,eagle,birds,eagles,pred,big,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2198,2,pug,dogs2,pugs,pred,small,subordinate,0,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2197,1,redwood,trees,trees,pred,big,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2197,2,sunflower,flowers,sunflowers,subj,big,subordinate,0,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2197,2,hummingbird,birds,hummingbirds,pred,small,subordinate,0,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2196,2,chihuahua,dogs1,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,small,congruent,NA
+2196,3,eagle,birds,birds,subj,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2196,2,pug,dogs2,dogs,pred,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2195,1,redwood,trees,trees,subj,big,basic,1,NA,4,pred,critical,images/tree-parade-basic.png,big,congruent,NA
+2195,2,great dane,dogs2,great danes,pred,big,subordinate,0,NA,4,pred,critical,images/dog-parade-basic2.png,big,congruent,NA
+2195,1,dandelion,flowers,dandelions,subj,small,subordinate,0,NA,4,pred,critical,images/flower-parade-basic.png,small,congruent,NA
+2194,1,doberman,dogs1,dogs,pred,big,basic,1,NA,4,pred,critical,images/dog-parade-basic.png,big,congruent,NA
+2194,3,pug,dogs2,dogs,subj,small,basic,1,NA,4,pred,critical,images/dog-parade-basic2.png,small,congruent,NA
+2193,1,hummingbird,birds,birds,pred,small,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,small,congruent,NA
+2193,2,sunflower,flowers,plants,subj,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2192,1,sunflower,flowers,flowers,subj,big,basic,1,NA,4,pred,critical,images/flower-parade-basic.png,big,congruent,NA
+2192,2,eagle,birds,birds,pred,big,basic,1,NA,4,pred,critical,images/bird-parade-basic.png,big,congruent,NA
+2255,1,sunflower,flowers,sunflowers,subj,big,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+2255,2,redwood,trees,redwoods,subj,big,NA,0,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+2255,3,bonsai,trees,bonsais,subj,small,NA,0,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+2255,4,dandelion,flowers,dandelions,pred,small,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+2255,1,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+2255,2,doberman,dogs1,dobermans,pred,big,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2255,3,chihuahua,dogs1,chihuahuas,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+2255,4,eagle,birds,eagles,subj,big,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+2254,1,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2254,2,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+2254,3,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2254,4,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+2254,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+2254,2,dandelion,flowers,dandelions,pred,small,NA,0,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2254,3,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+2254,4,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+2253,1,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2253,2,sunflower,flowers,gifts,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+2253,3,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+2253,4,pug,dogs2,pugs,subj,small,NA,0,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2253,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+2253,2,hummingbird,birds,rescues,pred,small,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+2253,3,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2253,4,chihuahua,dogs1,chihuahuas,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+2252,1,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+2252,2,bonsai,trees,bonsai,pred,small,NA,0,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+2252,3,eagle,birds,rescues,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+2252,4,redwood,trees,landmarks,subj,big,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+2252,1,great dane,dogs2,Great danes,subj,big,NA,0,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+2252,2,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+2252,3,chihuahua,dogs1,chihuahuas,subj,small,NA,0,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+2252,4,doberman,dogs1,dobermans,subj,big,NA,0,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2251,1,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2251,2,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2251,3,bonsai,trees,landmarks,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+2251,4,great dane,dogs2,prizewinners,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+2251,1,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2251,2,sunflower,flowers,gifts,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+2251,3,chihuahua,dogs1,service animals,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+2251,4,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2250,1,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2250,2,bonsai,trees,landmarks,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+2250,3,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2250,4,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+2250,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+2250,2,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+2250,3,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+2250,4,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+2249,1,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+2249,2,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+2249,3,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2249,4,bonsai,trees,landmarks,pred,small,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+2249,1,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2249,2,great dane,dogs2,prize winnders,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+2249,3,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+2249,4,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2248,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2248,2,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+2248,3,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+2248,4,bonsai,trees,landmarks,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+2248,1,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2248,2,chihuahua,dogs1,service animals,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+2248,3,sunflower,flowers,gifts,pred,big,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+2248,4,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2247,1,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+2247,2,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+2247,3,bonsai,trees,landmarks,pred,small,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+2247,4,redwood,trees,landmarks,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2247,1,doberman,dogs1,service dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2247,2,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+2247,3,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+2247,4,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2246,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2246,2,dandelion,flowers,plants,subj,small,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,small,congruent,critical
+2246,3,sunflower,flowers,flowers,pred,big,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+2246,4,bonsai,trees,trees,pred,small,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+2246,1,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+2246,2,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+2246,3,eagle,birds,rescues,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+2246,4,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+2245,3,chihuahua,dogs1,pug,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+2245,4,pug,dogs2,chichu,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+2245,1,dandelion,flowers,dandelion,pred,small,NA,0,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2245,2,hummingbird,birds,egale,subj,small,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+2245,3,sunflower,flowers,flower,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+2245,4,eagle,birds,eagle,pred,big,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+2244,1,eagle,birds,eagle,pred,big,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+2244,2,pug,dogs2,great dane,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2244,3,hummingbird,birds,himmingbird,pred,small,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+2244,4,great dane,dogs2,pug,subj,big,NA,0,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+2244,1,chihuahua,dogs1,doberman,subj,small,NA,0,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+2244,2,sunflower,flowers,dandelion,subj,big,NA,0,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+2244,3,doberman,dogs1,chihuahua,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+2244,4,dandelion,flowers,sunflower,subj,small,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2243,1,bonsai,trees,other trees,pred,small,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+2243,2,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+2243,4,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+2243,1,hummingbird,birds,bird,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+2243,2,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+2243,3,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+2243,4,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+2242,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2242,2,doberman,dogs1,service dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+2242,3,bonsai,trees,landmarks,pred,small,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+2242,4,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+2242,1,pug,dogs2,prize winners,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2242,2,great dane,dogs2,prize winners,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+2242,3,dandelion,flowers,gifts,subj,small,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2242,4,sunflower,flowers,gifts,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+2240,1,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+2240,2,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+2240,3,sunflower,flowers,flowers,pred,big,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+2240,4,dandelion,flowers,flowers,subj,small,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+2240,1,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+2240,2,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2240,3,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+2240,4,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+2239,1,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+2239,2,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+2239,3,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+2239,4,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+2239,1,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+2239,2,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+2239,3,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+2239,4,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0001,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0001,2,dandelion,flowers,flowers,subj,small,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0001,3,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0001,4,bonsai,trees,landmarks,pred,small,NA,0,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0001,1,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0001,2,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0001,3,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0001,4,eagle,birds,eagles,subj,big,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0002,1,eagle,birds,eagles,pred,big,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0002,2,great dane,dogs2,great dane,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0002,3,hummingbird,birds,hummingbirds,subj,small,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0002,4,pug,dogs2,pugs,subj,small,NA,0,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0002,1,bonsai,trees,bonsai,pred,small,NA,0,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0002,2,sunflower,flowers,sunflower,subj,big,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0002,3,redwood,trees,landmark,subj,big,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0002,4,dandelion,flowers,gift,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0003,1,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0003,2,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0003,3,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0003,4,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0003,1,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0003,2,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0003,3,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0003,4,dandelion,flowers,dandelions,pred,small,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0004,1,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0004,2,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0004,3,sunflower,flowers,sunflowers,subj,big,NA,0,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0004,4,bonsai,trees,bonsais,subj,small,NA,0,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0004,1,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0004,2,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0004,3,eagle,birds,eagles,pred,big,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0004,4,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0006,1,pug,dogs2,ANIMAL,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0006,2,redwood,trees,OTHER TREE,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0006,3,great dane,dogs2,PRIZE WINNER,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0006,4,bonsai,trees,LANDMARK,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0006,1,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0006,2,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0006,3,doberman,dogs1,doberman,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0006,4,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0008,1,hummingbird,birds,other birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0008,2,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0008,3,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0008,4,bonsai,trees,nearby trees.,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0008,1,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0008,2,great dane,dogs2,animals,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0008,3,sunflower,flowers,gift flowers,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0008,4,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0009,1,eagle,birds,thats a big eagle,pred,big,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0009,2,bonsai,trees,bonsai,pred,small,NA,0,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0009,3,hummingbird,birds,hummingbird,subj,small,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0009,4,redwood,trees,redwood,subj,big,NA,0,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0009,1,chihuahua,dogs1,chihuahua,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0009,2,great dane,dogs2,big great dane,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0009,3,doberman,dogs1,doberman,subj,big,NA,0,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0009,4,pug,dogs2,pug,subj,small,NA,0,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0010,1,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0010,2,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0010,3,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0010,4,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0010,1,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0010,2,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0010,3,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0010,4,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0012,1,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0012,2,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0012,3,dandelion,flowers,dandelions,subj,small,NA,0,NA,5.6,subj,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0012,4,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0012,1,doberman,dogs1,dobermans,subj,big,NA,0,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0012,2,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0012,3,bonsai,trees,bonsai,pred,small,NA,0,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0012,4,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0013,1,dandelion,flowers,flowers,subj,small,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0013,2,sunflower,flowers,flowers,pred,big,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0013,3,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0013,4,hummingbird,birds,rescues,subj,small,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0013,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0013,2,bonsai,trees,trees,pred,small,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0013,3,great dane,dogs2,prize winner,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0013,4,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0014,1,hummingbird,birds,hummingbird,pred,small,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0014,2,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0014,3,eagle,birds,eagle,subj,big,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0014,4,great dane,dogs2,Great Dane,subj,big,NA,0,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0014,1,bonsai,trees,bonsai,subj,small,NA,0,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0014,2,sunflower,flowers,flowers,pred,big,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0014,3,dandelion,flowers,gifts,subj,small,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0014,4,redwood,trees,redwood,pred,big,NA,0,NA,5.6,pred,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0015,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0015,2,bonsai,trees,bonsais,pred,small,NA,0,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0015,3,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0015,4,eagle,birds,eagles,pred,big,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0015,1,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0015,2,chihuahua,dogs1,chihuahuas,subj,small,NA,0,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0015,3,doberman,dogs1,dobermans,pred,big,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0015,4,great dane,dogs2,Great Danes,subj,big,NA,0,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0016,1,doberman,dogs1,dobermans,subj,big,NA,0,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0016,2,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0016,3,dandelion,flowers,flowers,subj,small,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0016,4,sunflower,flowers,flowers,pred,big,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0016,1,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0016,2,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0016,3,pug,dogs2,prize-winners,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0016,4,eagle,birds,eagles,subj,big,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0017,1,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0017,2,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0017,3,dandelion,flowers,prize flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0017,4,great dane,dogs2,prize dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0017,1,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0017,2,chihuahua,dogs1,service-animals,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0017,3,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0017,4,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0018,1,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0018,2,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0018,3,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0018,4,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0018,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0018,2,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0018,3,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0018,4,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0019,1,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0019,2,doberman,dogs1,dobermans,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0019,3,eagle,birds,eagles,subj,big,NA,0,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0019,4,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0019,1,redwood,trees,redwoods,pred,big,NA,0,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0019,2,dandelion,flowers,dandelions,pred,small,NA,0,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0019,3,sunflower,flowers,sunflowers,subj,big,NA,0,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0019,4,bonsai,trees,bonsais,subj,small,NA,0,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0020,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0020,2,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0020,3,doberman,dogs1,service dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0020,4,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0020,1,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0020,2,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0020,3,sunflower,flowers,floral gifts,subj,big,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0020,4,pug,dogs2,prize winning dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0021,1,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0021,2,eagle,birds,rescue birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0021,3,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0021,4,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0021,1,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0021,2,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0021,3,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0021,4,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0022,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0022,2,hummingbird,birds,hummingbirds,subj,small,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0022,3,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0022,4,dandelion,flowers,flowers,subj,small,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0022,1,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0022,2,chihuahua,dogs1,chihuahuas,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0022,3,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0022,4,doberman,dogs1,service animals,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0023,1,chihuahua,dogs1,chihuahuas,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0023,2,dandelion,flowers,dandelions,subj,small,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0023,3,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0023,4,doberman,dogs1,service animals,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0023,1,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0023,2,bonsai,trees,other landmarks,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0023,3,pug,dogs2,prize winners,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0023,4,redwood,trees,redwoods,pred,big,NA,0,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0024,1,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0024,2,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0024,3,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0024,4,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0024,1,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0024,2,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0024,3,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0024,4,hummingbird,birds,birds,pred,small,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0025,1,great dane,dogs2,Great Danes,pred,big,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0025,2,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0025,3,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0025,4,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0025,1,sunflower,flowers,sunflowers,subj,big,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0025,2,chihuahua,dogs1,chihuahuas,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0025,3,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0025,4,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0026,1,bonsai,trees,trees,pred,small,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0026,2,great dane,dogs2,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0026,3,redwood,trees,landmarks,subj,big,NA,0,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0026,4,pug,dogs2,prize-winners,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0026,1,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0026,2,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0026,3,chihuahua,dogs1,service-animals,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0026,4,eagle,birds,rescues,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0027,1,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0027,2,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0027,3,doberman,dogs1,dobermans,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0027,4,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0027,1,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0027,2,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0027,3,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0027,4,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0028,1,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0028,2,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0028,3,eagle,birds,birds,pred,big,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0028,4,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0028,1,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0028,2,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0028,3,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0028,4,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0029,1,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0029,2,redwood,trees,redwoods,pred,big,NA,0,NA,5.6,pred,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0029,3,great dane,dogs2,prize winners,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0029,4,pug,dogs2,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0029,1,doberman,dogs1,dogs,pred,big,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0029,2,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0029,3,hummingbird,birds,rescues,pred,small,NA,1,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0029,4,chihuahua,dogs1,service animals,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0030,1,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0030,2,eagle,birds,eagles,pred,big,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0030,3,hummingbird,birds,hummingbirds,subj,small,NA,0,NA,5.6,subj,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0030,4,great dane,dogs2,great danes,subj,big,NA,0,NA,5.6,subj,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0030,1,dandelion,flowers,dandelions,subj,small,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0030,2,bonsai,trees,bonsai,pred,small,NA,0,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0030,3,redwood,trees,redwoods,subj,big,NA,0,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0030,4,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0032,1,sunflower,flowers,flowers,pred,big,NA,1,NA,5.6,pred,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0032,2,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0032,3,dandelion,flowers,flowers,subj,small,NA,1,NA,5.6,subj,critical,images/flower-parade-basic.png,small,congruent,critical
+workerid_0032,4,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0032,1,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0032,2,great dane,dogs2,dogs,subj,big,NA,1,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0032,3,eagle,birds,eagles,pred,big,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0032,4,pug,dogs2,pugs,pred,small,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0033,1,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,big,congruent,filler
+workerid_0033,2,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,small,congruent,critical
+workerid_0033,3,doberman,dogs1,dobermans,pred,big,NA,0,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,big,congruent,filler
+workerid_0033,4,chihuahua,dogs1,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,small,congruent,critical
+workerid_0033,1,pug,dogs2,pugs,subj,small,NA,0,NA,5.6,subj,filler,images/dog-parade-basic2_filler.png,small,congruent,filler
+workerid_0033,2,great dane,dogs2,grat danes,pred,big,NA,0,NA,5.6,pred,critical,images/dog-parade-basic2.png,big,congruent,critical
+workerid_0033,3,bonsai,trees,bonsai,pred,small,NA,0,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,small,congruent,filler
+workerid_0033,4,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,big,congruent,critical
+workerid_0034,1,hummingbird,birds,hummingbirds,pred,small,NA,0,NA,5.6,pred,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0034,2,pug,dogs2,dogs,subj,small,NA,1,NA,5.6,subj,critical,images/dog-parade-basic2.png,small,congruent,critical
+workerid_0034,3,eagle,birds,birds,subj,big,NA,1,NA,5.6,subj,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0034,4,great dane,dogs2,great danes,pred,big,NA,0,NA,5.6,pred,filler,images/dog-parade-basic2_filler.png,big,congruent,filler
+workerid_0034,1,redwood,trees,trees,subj,big,NA,1,NA,5.6,subj,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0034,2,sunflower,flowers,sunflowers,pred,big,NA,0,NA,5.6,pred,critical,images/flower-parade-basic.png,big,congruent,critical
+workerid_0034,3,bonsai,trees,trees,pred,small,NA,1,NA,5.6,pred,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0034,4,dandelion,flowers,dandelions,subj,small,NA,0,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,small,congruent,filler
+workerid_0035,1,hummingbird,birds,birds,subj,small,NA,1,NA,5.6,subj,filler,images/bird-parade-basic_filler.png,small,congruent,filler
+workerid_0035,2,doberman,dogs1,dogs,subj,big,NA,1,NA,5.6,subj,critical,images/dog-parade-basic.png,big,congruent,critical
+workerid_0035,3,eagle,birds,eagles,pred,big,NA,0,NA,5.6,pred,critical,images/bird-parade-basic.png,big,congruent,critical
+workerid_0035,4,chihuahua,dogs1,dogs,pred,small,NA,1,NA,5.6,pred,filler,images/dog-parade-basic_filler.png,small,congruent,filler
+workerid_0035,1,sunflower,flowers,flowers,subj,big,NA,1,NA,5.6,subj,filler,images/flower-parade-basic_filler.png,big,congruent,filler
+workerid_0035,2,redwood,trees,trees,pred,big,NA,1,NA,5.6,pred,filler,images/tree-parade-basic_filler.png,big,congruent,filler
+workerid_0035,3,bonsai,trees,trees,subj,small,NA,1,NA,5.6,subj,critical,images/tree-parade-basic.png,small,congruent,critical
+workerid_0035,4,dandelion,flowers,flowers,pred,small,NA,1,NA,5.6,pred,critical,images/flower-parade-basic.png,small,congruent,critical

@@ -378,17 +378,65 @@ rbind(
          #   upper = quantile(check_syntax, probs = 0.975))  
 
 ```
+
+``` {r, warnings=FALSE}
+# prep full dataset
+
+full_pilot_data <- bind_rows(
+  read_csv("./../../data/direct-modification/results_32_modification_manipulation_pilot1_tidy.csv") %>%
+    mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
+           trial_dev = "critical",
+           submission_id = as.character(submission_id)) %>%
+    rename(workerid = submission_id),
+  read_csv("./../../data/direct-modification/results_32_modification_manipulation_pilot2_tidy.csv")%>%
+    mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
+           trial_dev = "critical",
+           submission_id = as.character(submission_id))%>%
+    rename(workerid = submission_id),
+  read_csv("./../../data/direct-modification/results_32_modification_manipulation_pilot3_tidy.csv")%>%
+    mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
+           trial_dev = "critical",
+           submission_id = as.character(submission_id)) %>%
+    rename(workerid = submission_id),
+  read_csv("./../../data/direct-modification/results_34_modXcongr_pilot1_tidy.csv") %>%
+    filter(adj_cond == "congruent") %>% # ignore incongruent condition not occurring in pilots 5-6
+    mutate(syntax_dev = ifelse(syntax == "subject", "subj", "pred"),
+           trial_dev = "critical",
+           pilot_nr = 4,
+           submission_id = as.character(submission_id)) %>%
+    rename(workerid = submission_id),
+  read_csv("./../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>%
+    mutate(pilot_nr = 5.6) 
+)  %>%
+    mutate(target = tolower(target),
+           pilot_nr = as.factor(pilot_nr))
+
+write_csv(full_pilot_data, "../../data/direct-modification/results_all_pilots_tidy.csv")
+```
+
 ```{r}
 library(tidyverse)
 library(brms)
 library(tidybayes)
 library(broom)
 
+
+# list of subject-Ns; argument passed is the index accessing the respective N
+subjN_list <- c(80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300)
+
+# get the argument passed (assuming the index is the first one after --args)
+arg <- commandArgs(trailingOnly = T)[1]
+arg <- as.numeric(arg)
+# get the N subj at the position in list corresponding the passed index
+currentSubj.N <- subjN_list[arg]
+print(currentSubj.N)
+
 # add appropriate path
-pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>% filter(!(workerid %in% c(2243, 2245))) # exclude workers where not all trials are included, resulting in 45 unique workers
+pilot_data <- read_csv("../../data/direct-modification/results_double-modXrefUt-pilot1-2_tidy.csv") %>% 
+  filter(!(workerid %in% c(2243, 2245))) # exclude workers where not all trials are included, resulting in 45 unique workers
 
 n_iter = 3000
-n_sim = 1
+n_sim = 5
 
 # sum coding of main effects
 pilot_data <- pilot_data %>%
@@ -397,10 +445,16 @@ pilot_data <- pilot_data %>%
 contrasts(pilot_data$trial_dev) <- contr.sum(2)
 contrasts(pilot_data$syntax_dev) <- contr.sum(2)
 
+full_pilot_data <- full_pilot_data %>% 
+  mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
+         syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
+contrasts(full_pilot_data$trial_dev) <- contr.sum(2)
+contrasts(full_pilot_data$syntax_dev) <- contr.sum(2)
+
 # fit full desired model on pilot data
 pilot_model <- brm(
-  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid)
-  + (1 + syntax_dev*trial_dev | target),
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || workerid)
+  + (1 + syntax_dev*trial_dev || target),
   data = pilot_data,
   family = "bernoulli",
   chains = 4,
@@ -411,23 +465,31 @@ pilot_model <- brm(
   refresh = 0
 )
 
-predicted_draws <- pilot_model %>%
-  spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
-         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         syntax_critical = critical_subj - critical_pred,
-         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
-         syntax_filler = filler_subj - filler_pred) %>%
-  select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
-  gather(key, val) %>%
-  group_by(key) %>%
-  summarise(
-    mean = mean(val),
-    lower = quantile(val, probs = 0.025),
-    upper = quantile(val, probs = 0.975)
-  )
+pilot_model_full <- brm(
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || submission_id)
+  + (1 + syntax_dev*trial_dev || target),
+  data = full_pilot_data,
+  family = "bernoulli",
+  chains = 4,
+  iter = n_iter,
+  cores = 4,
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
+)
 
+pilot_model_full_expFE <- brm(
+  response_num ~ syntax_dev * trial_dev + pilot_nr + (1 + syntax_dev*trial_dev || submission_id)
+  + (1 + syntax_dev*trial_dev || target),
+  data = full_pilot_data,
+  family = "bernoulli",
+  chains = 4,
+  iter = n_iter,
+  cores = 4,
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
+)
 # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
 # predictions are based on pilot data, i.e. grouped by original pilot input rows
 # corresponds to brms::redict.brmsfit()
@@ -441,53 +503,56 @@ predicted_data <- add_predicted_draws(model=pilot_model, newdata = pilot_data, n
 contrasts(predicted_data$trial_dev) <- contr.sum(2)
 contrasts(predicted_data$syntax_dev) <- contr.sum(2)
 
+# predicted data for updating full data model
+full_predicted_data <- add_predicted_draws(pilot_model_full, newdata = full_pilot_data, n = 1) %>% 
+  mutate(response_num = `.prediction`)
+contrasts(full_predicted_data$trial_dev) <- contr.sum(2)
+contrasts(full_predicted_data$syntax_dev) <- contr.sum(2)
+pilot_model_full_update <- update(pilot_model_full, 
+                                  newdata = full_predicted_data,
+                                  cores=4,
+                                  chains=4,
+                                  iter=n_iter,
+                                  silent=T,
+                                  refresh=0)
+
+pilot_model_full_update2 <- update(pilot_model_full_update, 
+                                  newdata = full_predicted_data,
+                                  cores=4,
+                                  chains=4,
+                                  iter=n_iter,
+                                  silent=T,
+                                  refresh=0)
+
 predicted_fit <- brm(
-  `.prediction` ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid)
-  + (1 + syntax_dev*trial_dev | target),
+  `.prediction` ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || workerid)
+  + (1 + syntax_dev*trial_dev || target),
   data = predicted_data,
   family = "bernoulli",
   chains = 4,
   iter = n_iter,
   cores = 4,
-  control = list(adapt_delta = 0.98),
-  silent = T, 
+  control = list(adapt_delta = 0.95),
+  silent = T,
   refresh = 0
 )
 
-# extract contrasts of interest
-predicted_fit_draws <- predicted_fit %>%
-  spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
-         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         syntax_critical = critical_subj - critical_pred, # subject vs predicate
-         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
-         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
-         syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate
-  select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
-  gather(key, val) %>%
-  group_by(key) %>%
-  summarise(
-    mean = mean(val),
-    lower = quantile(val, probs = 0.025),
-    upper = quantile(val, probs = 0.975)
-  )
 
 # helper function to get 4 out of 5 possible target pairs per participant 
 get_targets <- function(N){
- targets <- sample(c("sunflower_dandelion", "redwood_bonsai", "doberman_chihuahua", "Great Dane_pug", "eagle_hummingbird"), 4, replace = F)
- unlist(str_split(targets, pattern="_"))
+  targets <- sample(c("sunflower_dandelion", "redwood_bonsai", "doberman_chihuahua", "Great Dane_pug", "eagle_hummingbird"), 4, replace = F)
+  unlist(str_split(targets, pattern="_"))
 }
 
-# helper function to get posterior predictive draws for a subset of participants of size N
-get_new_df <- function(N, pilot_model, pilot_data) {
+# helper function to get posterior predictive draws for participant number N
+get_new_data <- function(N, pilot_model, pilot_data) {
   
-  workers <- sample(unique(pilot_data$workerid), N, replace = N > 45)
   trials <- rep(c("critical", "filler"), each = 4)
   syntax <- rep(c("subj", "subj", "pred", "pred"), times = 2)
   
   new.data <- tibble(
-    workerid = workers,
-    target = map(N, get_targets)
+    workerid = 1:N,
+    target = map(workerid, get_targets)
   ) %>%
     unnest(cols = target) %>%
     mutate(
@@ -497,25 +562,25 @@ get_new_df <- function(N, pilot_model, pilot_data) {
   
   data <- add_predicted_draws(model=pilot_model,
                               newdata = new.data,
+                              allow_new_levels = T, # allow sampling new workerids
+                              sample_new_levels = "gaussian", # sample new REs based on estimated REs
                               n = 1)
-  data[["workerid"]] <- rep(1:N, each = 8)
   return(data)
 }
 
 # create file path for streaming output
-stream_out <- paste("results/direct_mod_power_analysis_stream_", n_iter,  "iter_", n_sim, "sim.csv", sep="")
-# simulate data and update
+stream_out <- paste("results/direct_mod_power_analysis_stream_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep="")
+
+# simulate data and update model fit
 sim_data_fit <- function(seed, N) {
   set.seed(seed)
   print(paste("iteration:", seed, " , subjects:", N, sep=""))
-  # add draws from the posterior predictive distribution, getting one sample per fit (n = 1)
+  
   # predictions are based on pilot data, i.e. grouped by original pilot input rows
-  # corresponds to brms::redict.brmsfit()
-
-  # the new draws are added in the column .prediction
-  # simulates N participants
-
-  data <- get_new_df(N, pilot_model = pilot_model, pilot_data = pilot_data)
+  # corresponds to brms::predict.brmsfit()
+  data <- get_new_data(N, pilot_model = pilot_model, pilot_data = pilot_data) %>%
+    mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
+           syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
 
   # deviation code main effects
   contrasts(data$trial_dev) <- contr.sum(2)
@@ -525,9 +590,10 @@ sim_data_fit <- function(seed, N) {
   update(predicted_fit,
          newdata = data,
          seed = seed,
-      #   cores = 4, # cannot be included if %dopar% is used 
+         cores = 4,
          silent = T,
-         refresh = 0) %>%
+         refresh = 0
+         ) %>%
     # extract posterior draws
     spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
     # extract contrasts of interest, especially effect of syntax by-trial
@@ -552,27 +618,27 @@ sim_data_fit <- function(seed, N) {
       seed = seed
     ) %>%
     # write out results for each subject N and each seed
-    # appending the column names doesn't work though
-    write_csv(., stream_out, append = T, col_names = !(file.exists(stream_out))) %>% select(-n.subj, -seed)
+    write_csv(., stream_out, append = T, col_names = (seed == 1)) %>% select(-n.subj, -seed)
 }
 
 # helper function iterating over seeds (=iterations of the simulation)
 sim.power <- function(n.subj, n.sim) {
+  print(n.subj)
   sim <- tibble( seed = 1:n.sim) %>%
     mutate(
-      tidy = map(seed, sim_data_fit, N = n.subj),
-      n.subj = n.subj
+      tidy = map(seed, sim_data_fit, N = n.subj)
     ) %>%
-    unnest(tidy) 
+    unnest(tidy)
 }
 
-# iterate over different subject numbers (total of 100 - 300, in steps of 20)
-#analyse_power <- tibble(n.subj = seq(10, 300, by= 20)) %>%
-analyse_power <- tibble(n.subj = 10) %>%
+# iterate over subject number passed to script 
+analyse_power <- tibble(n.subj = currentSubj.N) %>%
   mutate(
     tidy = map(n.subj, sim.power, n.sim = n_sim)
   ) %>%
-  unnest(tidy) 
+  unnest(tidy)
+
+write_csv(analyse_power, paste("results/direct_mod_power_analysis_final_", currentSubj.N, "subj_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T, col_names = T)
 
 analyse_power %>%
   filter(key == "syntax_critical") %>%
@@ -580,34 +646,6 @@ analyse_power %>%
   group_by(n.subj) %>%
   summarise(power_syntax = mean(check_syntax)) -> analyse_power_summary
 
-analyse_power %>% write_csv(paste("results/direct_mod_power_analysis_stream_final_", n_iter, "iter_", n_sim, "sim.csv", sep = ""))
-analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
-```
+analyse_power_summary %>% write_csv(paste("results/direct_mod_power_analysis_", currentSubj.N, "subj_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
 
-``` {r}
-
-library(foreach)
-library(doParallel)
-
-registerDoParallel(cores = 2) # number of workers, specify 4 cores 
-
-getDoParWorkers() # check how many workers foreach is going to use after setting desired number
-
-analyse.power <- foreach(n.subj = seq(10, 20, by= 10), .combine = rbind, .multicombine = T) %dopar% {
- 
-  tidy <- sim.power(n.subj = n.subj, n.sim = n_sim) 
-  
-  tidy 
- # w columnk names
-} 
-
-write_csv(analyse.power, paste("results/direct_mod_power_analysis_final_", n_iter,  "iter_", n_sim, "sim.csv", sep=""), append = T, col_names = T)
-
-analyse.power %>%
-  filter(key == "syntax_critical") %>%
-  mutate(check_syntax = ifelse((lower > 0) | (upper < 0 ), 1, 0)) %>%
-  group_by(n.subj) %>%
-  summarise(power_syntax = mean(check_syntax)) -> analyse.power.summary
-
-analyse.power.summary %>% write_csv(paste("results/direct_mod_power_analysis_", n_iter, "iter_", n_sim, "sim_summary.csv", sep = ""))
 ```
