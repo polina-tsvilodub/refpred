@@ -41,6 +41,8 @@ get_intermediate_power = function(N) {
 my_powers <- foreach(i = n.sims, .combine=rbind) %do% {get_intermediate_power(i)}  
 
 my_powers <- my_powers %>% mutate(n.subj = as.factor(n.subj))
+#write_csv(my_powers, "results/power_analysis_3000iter_running_power.csv")
+
 ggplot(my_powers, aes(x = n.sim, y = power_syntax, color = n.subj) ) +
   geom_point() +
   geom_line() +

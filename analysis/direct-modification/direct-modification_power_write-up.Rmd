@@ -1,0 +1,83 @@
+---
+title: "Direct Modification Power Analysis Write-Up"
+author: "Polina Tsvilodub"
+date: "8/18/2020"
+output: github_document
+---
+
+This write-up summarizes results of a Bayesian power analysis for the Direct Modification refpred experiment. In this experiment, we manipulate the syntactic position of the noun directly modified by the adjective ("big Great Dane" appearing in the subject or in the predicate) in order to disentangle effects of reasoning about informational goals  on comparison class inference from effects of syntactic modification. The experiment has a 2-by-2 within-subjects  design, manipulating the syntax (subject vs predicate N) and the trial-type (critical vs filer, where fillers are trials from our CogSci Experiment 3). 
+
+Smaller simulations based on data from last two direct modification pilots only (n = 45) which match the experimental design planned for the large-scale experiment revealed a high level of noise (large by-subject intercepts).
+Therefore, this power analysis is based on pilot data from *all 6* direct-modification pilots (n = 180). The pilots differ in details like warm-up trials, but all use the same critical experimental items and critical condition (subject-N vs. predicate-N sentences: "That big Great Dane is a prize-winner" vs. "That prize-winner is a big Great Dane"). A detailed write-up of pilot results can be found under `https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/modificationXrefUt-pilot2.md`
+
+Crucially, we are interested in a credible *effect of syntax in the critical condition*.
+We decided to build the power analysis assuming a maximal model including a main effects of syntax (subject vs predicate-N), trial type (critical vs. filler) and their *interaction* since this model is most appropriate given our experimental design, but we'll remain agnostic about the direction of the interaction estimate.
+
+The power analysis proceeds as follows: 
+
+1. The desired model to be used in final analyses is fit on pilot data (n = 180 subjects):
+
+response-category = syntax * trial-type + (1 + syntax * trial-type || subjectID) + (1 + syntax * trial-type || item)
+
+``` {r, include=FALSE}
+library(tidyverse)
+library(brms)
+library(tidybayes)
+library(broom)
+library(knitr)
+
+pilot_data <- read_csv("../../data/direct-modification/results_all_pilots_tidy.csv")
+n_iter = 3000
+pilot_data <- pilot_data %>%
+  mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
+         syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
+contrasts(pilot_data$trial_dev) <- contr.sum(2)
+contrasts(pilot_data$syntax_dev) <- contr.sum(2)
+
+# fit full desired model on pilot data
+pilot_model <- brm(
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || workerid)
+  + (1 + syntax_dev*trial_dev || target),
+  data = pilot_data,
+  family = "bernoulli",
+  chains = 4,
+  iter = n_iter,
+  cores = 4,
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
+)
+```
+
+``` {r}
+summary(pilot_model)
+```
+
+2. Then, posterior predictive samples are drawn from this fitted model, simulating a given number of subjects (increased iteratively from 50 to 600). 
+3. The model is re-computed on these posterior samples and the parameter of interest (i.e., the syntax coefficient in the critical condition) is extracted. The models were fit using 4 chains and 3000 iterations each. 
+4. This process is repeated *500 times* for each simulated subjects-number.
+5. The power for the given number of participants is calculated as the proportion of critical coefficients that were estimated in the predicted direction (i.e., the credible interval excludes 0) over all the simulations. 
+
+The power analysis script can be found under: `https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/power_analysis.R`
+
+The results of the simulations reveal the following power for subject-numbers between 50 and 600, increasing by 50 subjects:
+``` {r, echo=FALSE}
+power_summary <- read_csv("results/direct_mod_power_analysis_fullData_3000iter_500sim_summary.csv")
+power_summary
+```
+
+The power plotted as a function of number of simulations reveals oscillations of the power for less than 200 simulations:
+``` {r, echo=FALSE}
+read_csv("results/power_analysis_3000iter_running_power.csv") %>%
+  mutate(n.subj = as.factor(n.subj)) %>%
+  ggplot(., aes(x = n.sim, y = power_syntax, color = n.subj) ) +
+  geom_point() +
+  geom_line() +
+  ylab("Power") +
+  ylim(0.6, 1) +
+  xlab("Number of simulations") +
+  ggtitle("Power as a function of number of simulations")
+
+```
+
+Overall, we see that simulations of 400 subjects or more show a power > 0.8.  
