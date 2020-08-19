@@ -86,7 +86,7 @@ full_data_500 %>%
   geom_pointrange(fatten = 1/2) +
   labs(x = "simulation index",
        y = "critical syntax CrI") +
-  facet_wrap(~n.subj, ncol=1, )
+  facet_wrap(~n.subj, ncol=1, scales = "free")
 ```
 
 
