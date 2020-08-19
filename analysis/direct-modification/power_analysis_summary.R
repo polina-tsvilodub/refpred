@@ -14,7 +14,11 @@ full_data_400 <- list.files(
                        ) %>%
   map_df(~read_csv(.))
 
-full_data_500 <- rbind(full_data_100, full_data_400) 
+full_data_500 <- rbind(full_data_100, full_data_400) %>%
+  group_by(n.subj, key) %>%
+  mutate(
+  seed = 1:length(n.subj)
+)  %>% ungroup()
 
 full_data_500_summary <- full_data_500 %>%
   filter(key == "syntax_critical") %>%
@@ -25,7 +29,7 @@ full_data_500_summary <- full_data_500 %>%
 write_csv(full_data_500_summary, "../direct_mod_power_analysis_fullData_3000iter_500sim_summary.csv")
 
 # plot power as n iter increases
-n.sims = seq(50, 500, by=50) 
+n.sims = seq(50, 400, by=50) 
 
 get_intermediate_power = function(N) {
   summary <-  full_data_500 %>% 
@@ -40,8 +44,8 @@ get_intermediate_power = function(N) {
 
 my_powers <- foreach(i = n.sims, .combine=rbind) %do% {get_intermediate_power(i)}  
 
-my_powers <- my_powers %>% mutate(n.subj = as.factor(n.subj))
-#write_csv(my_powers, "results/power_analysis_3000iter_running_power.csv")
+#my_powers <- my_powers %>% mutate(n.subj = as.factor(n.subj))
+write_csv(my_powers, "results/power_analysis_3000iter_running_power.csv")
 
 ggplot(my_powers, aes(x = n.sim, y = power_syntax, color = n.subj) ) +
   geom_point() +

@@ -55,10 +55,40 @@ summary(pilot_model)
 
 2. Then, posterior predictive samples are drawn from this fitted model, simulating a given number of subjects (increased iteratively from 50 to 600). New potential by-subject effects for the respective number are sampled from a gaussian distribution specified by the estimated group-level standard deviations and correlations of pilot data.
 3. The model is re-computed on these posterior samples and the parameter of interest (i.e., the syntax coefficient in the critical condition) is extracted. The models were fit using 4 chains and 3000 iterations each. 
-4. This process is repeated *500 times* for each simulated subjects-number.
+4. This process is repeated *400 times* for each simulated subjects-number. (for n = 50, 100 we only did 100 simulations, for n = 600 only 300)
 5. The power for the given number of participants is calculated as the proportion of critical coefficients that were estimated in the predicted direction (i.e., the credible interval excludes 0) over all the simulations. 
 
 The power analysis script can be found under: [https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/power_analysis.R](https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/power_analysis.R)
+
+Here is the credible interval over the estimate for the effect of syntax in the critical condition over the progressing simulations, faceted by number of simulated subjects:
+```{r, echo=FALSE, fig.height=15, fig.width= 8, message=FALSE, warning=FALSE}
+setwd("results/sim_100")
+full_data_100 <- list.files(
+                    pattern = "direct_mod_power_analysis_fullData_final*"
+                   ) %>%
+  map_df(~read_csv(.))
+
+setwd("../sim_400")
+full_data_400 <- list.files(
+                       pattern = "direct_mod_power_analysis_fullData_final*"
+                       ) %>%
+  map_df(~read_csv(.))
+full_data_500 <- rbind(full_data_100, full_data_400) 
+
+full_data_500 %>%
+  filter(key == "syntax_critical") %>%
+  group_by(n.subj) %>%
+  mutate(seed = 1 : length(n.subj)) %>% 
+  ungroup() %>%
+  filter(seed %in% seq(1, 400, by = 5)) %>%
+  ggplot(aes(x = seed, y = mean, ymin = lower, ymax = upper)) +
+  geom_hline(yintercept = c(0), color = "white") +
+  geom_pointrange(fatten = 1/2) +
+  labs(x = "simulation index",
+       y = "critical syntax CrI") +
+  facet_wrap(~n.subj, ncol=1, )
+```
+
 
 The results of the simulations reveal the following power for subject-numbers between 50 and 600, increasing by 50 subjects:
 ``` {r, echo=FALSE}

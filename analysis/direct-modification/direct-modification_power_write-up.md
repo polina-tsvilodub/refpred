@@ -54,39 +54,39 @@ summary(pilot_model)
     ## Group-Level Effects: 
     ## ~target (Number of levels: 10) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.27      0.20     0.01     0.75 1.00     2421
-    ## sd(syntax_dev1)                0.21      0.17     0.01     0.65 1.00     3319
-    ## sd(trial_dev1)                 0.47      0.26     0.06     1.08 1.00     1863
-    ## sd(syntax_dev1:trial_dev1)     0.25      0.19     0.01     0.73 1.00     2397
+    ## sd(Intercept)                  0.26      0.20     0.01     0.74 1.00     2168
+    ## sd(syntax_dev1)                0.21      0.17     0.01     0.64 1.00     2426
+    ## sd(trial_dev1)                 0.45      0.25     0.03     1.06 1.00     1615
+    ## sd(syntax_dev1:trial_dev1)     0.25      0.19     0.01     0.72 1.00     2418
     ##                            Tail_ESS
-    ## sd(Intercept)                  3355
-    ## sd(syntax_dev1)                3732
-    ## sd(trial_dev1)                 2031
-    ## sd(syntax_dev1:trial_dev1)     2588
+    ## sd(Intercept)                  2752
+    ## sd(syntax_dev1)                2561
+    ## sd(trial_dev1)                 1566
+    ## sd(syntax_dev1:trial_dev1)     3148
     ## 
     ## ~workerid (Number of levels: 180) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  3.10      0.42     2.39     4.00 1.00     1918
-    ## sd(syntax_dev1)                0.41      0.25     0.02     0.95 1.00     1218
-    ## sd(trial_dev1)                 0.75      0.31     0.12     1.35 1.01      839
-    ## sd(syntax_dev1:trial_dev1)     0.28      0.20     0.01     0.74 1.00     1819
+    ## sd(Intercept)                  3.08      0.40     2.37     3.95 1.00     1983
+    ## sd(syntax_dev1)                0.42      0.26     0.02     0.94 1.00     1166
+    ## sd(trial_dev1)                 0.74      0.32     0.10     1.37 1.00      899
+    ## sd(syntax_dev1:trial_dev1)     0.28      0.20     0.01     0.74 1.00     2000
     ##                            Tail_ESS
-    ## sd(Intercept)                  3456
-    ## sd(syntax_dev1)                2640
-    ## sd(trial_dev1)                 1376
-    ## sd(syntax_dev1:trial_dev1)     2195
+    ## sd(Intercept)                  3355
+    ## sd(syntax_dev1)                2368
+    ## sd(trial_dev1)                 1233
+    ## sd(syntax_dev1:trial_dev1)     3174
     ## 
     ## Population-Level Effects: 
     ##                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                  2.91      0.43     2.14     3.82 1.00     2026
-    ## syntax_dev1                0.66      0.20     0.29     1.06 1.00     5113
-    ## trial_dev1                -0.12      0.28    -0.66     0.42 1.00     3583
-    ## syntax_dev1:trial_dev1     0.08      0.19    -0.29     0.45 1.00     5166
+    ## Intercept                  2.90      0.43     2.11     3.80 1.00     2196
+    ## syntax_dev1                0.65      0.20     0.27     1.06 1.00     4936
+    ## trial_dev1                -0.12      0.27    -0.66     0.41 1.00     3992
+    ## syntax_dev1:trial_dev1     0.07      0.19    -0.30     0.45 1.00     4605
     ##                        Tail_ESS
-    ## Intercept                  3776
-    ## syntax_dev1                4199
-    ## trial_dev1                 4049
-    ## syntax_dev1:trial_dev1     4606
+    ## Intercept                  3499
+    ## syntax_dev1                4014
+    ## trial_dev1                 3952
+    ## syntax_dev1:trial_dev1     4250
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -101,8 +101,9 @@ summary(pilot_model)
     parameter of interest (i.e., the syntax coefficient in the critical
     condition) is extracted. The models were fit using 4 chains and 3000
     iterations each.
-4.  This process is repeated *500 times* for each simulated
-    subjects-number.
+4.  This process is repeated *400 times* for each simulated
+    subjects-number. (for n = 50, 100 we only did 100 simulations, for n
+    = 600 only 300)
 5.  The power for the given number of participants is calculated as the
     proportion of critical coefficients that were estimated in the
     predicted direction (i.e., the credible interval excludes 0) over
@@ -110,6 +111,11 @@ summary(pilot_model)
 
 The power analysis script can be found under:
 <https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/power_analysis.R>
+
+Here is the credible interval over the estimate for the effect of syntax
+in the critical condition over the progressing simulations, faceted by
+number of simulated subjects:
+![](direct-modification_power_write-up_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 The results of the simulations reveal the following power for
 subject-numbers between 50 and 600, increasing by 50 subjects:
@@ -145,7 +151,7 @@ oscillations of the power for less than 200 simulations:
     ##   n.sim = col_double()
     ## )
 
-![](direct-modification_power_write-up_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](direct-modification_power_write-up_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Overall, we see that simulations of around 250 subjects already achieve
 a power of 0.8 and 300 subjects around 0.85, but for 350 subjects the
