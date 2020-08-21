@@ -5,7 +5,7 @@ library(broom)
 
 
 # list of subject-Ns; argument passed is the index accessing the respective N
-subjN_list <- c(80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300)
+subjN_list <- c(100, 150, 200, 250, 300, 350, 400, 450, 500, 600)
 Nitems_list <- c(5, 6, 8, 10)
 
 # get the argument passed (assuming the index is the first one after --args)
