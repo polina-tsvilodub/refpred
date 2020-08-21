@@ -80,13 +80,14 @@ full_data_500 %>%
   group_by(n.subj) %>%
   mutate(seed = 1 : length(n.subj)) %>% 
   ungroup() %>%
-  filter(seed %in% seq(1, 400, by = 5)) %>%
+  filter(seed %in% seq(1, 400, by = 5), !(n.subj %in% c(50))) %>%
   ggplot(aes(x = seed, y = mean, ymin = lower, ymax = upper)) +
   geom_hline(yintercept = c(0), color = "white") +
   geom_pointrange(fatten = 1/2) +
   labs(x = "simulation index",
        y = "critical syntax CrI") +
-  facet_wrap(~n.subj, ncol=1, scales = "free")
+  ylim(-1, 4) +
+  facet_wrap(~n.subj, ncol=1)
 ```
 
 
