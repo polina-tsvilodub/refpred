@@ -18,7 +18,7 @@ library(lmerTest)
 
 ``` {r}
 
-d_infer1_1 <- read_csv('../data/results_32_modification_manipulation_pilot.csv')
+d_infer1_1 <- read_csv('../../data/direct-modification/results_32_modification_manipulation_pilot.csv')
 ```
 7 participants were excluded for failing the warm-up tasks (1 test comparison class inference trial and 5 labeling trials) or reporting a native language other than English.
 
@@ -102,8 +102,8 @@ d_infer_main_responseCat.bs1 %>%
   mutate(syntax = factor(syntax, levels = c( "subject", "predicate"),
                             labels = c(  "Subject NP\n(That big Great Dane\n is a prize-winner)", "Predicate NP\n(That prize-winner\n is a big Great Dane)"))) %>%
   ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper)) +
-  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black', fill = 'white',
-           alpha = 0.5, color = 'black', size = 0.5) +
+  geom_col(position = position_dodge(bar.width), width = bar.width, color= 'black', fill = 'gray',
+           alpha = 0.5, size = 0.5) +
   geom_linerange(position = position_dodge(bar.width), size = 0.5) +
   ggthemes::theme_few()+
   xlab("") +
@@ -114,7 +114,7 @@ d_infer_main_responseCat.bs1 %>%
   ylab("Proportion of basic-level responses") +
   ggtitle("Experiment 4 Pilot: Direct Modification")
  # facet_grid(~context)  +
-  ggsave("amlap_expt4_double_mod2.pdf", width = 4.5, height = 4.5)
+  ggsave("../../../amlap_expt4_double_mod_poster.pdf", width = 4.5, height = 4.5)
 ```
 ## By-item plot
 

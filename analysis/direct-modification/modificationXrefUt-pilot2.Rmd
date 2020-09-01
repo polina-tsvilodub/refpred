@@ -137,13 +137,15 @@ d_modRef_main_responseCat.bs %>%
                          labels = c("Subject NP", "Predicate NP"))) %>%
   ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper, fill=syntax)) +
   geom_col(position = position_dodge(bar.width), width = bar.width,
-           alpha = 0.5, color="black", size = 0.5) +
-  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+           alpha = 0.5, color="black", size = 1) +
+  geom_linerange(position = position_dodge(bar.width), size = 1) +
   scale_y_continuous(limits = c(0, 1),
                      breaks = c(0, 0.5, 1))+
   ylab("Proportion of non-matching responses") +
-  #theme_bw() +
+  ggthemes::theme_few()+
+  xlab("") +
   facet_grid(~trial_type)
+ggsave("../../../amlap_expt4_double_mod_poster_final2.pdf", width = 6, height = 3.5)
 ```
 
 ### Comparison class types within critical trials

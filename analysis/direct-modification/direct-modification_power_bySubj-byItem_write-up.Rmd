@@ -1,0 +1,105 @@
+---
+title: "Direct Modification Power Analysis Write-Up"
+author: "Polina Tsvilodub"
+date: "9/01/2020"
+output: github_document
+---
+
+This write-up summarizes results of the Bayesian power analysis for the Direct Modification refpred experiment including an iteration both over different numbers of subjects and over different numbers of experimental items. 
+For more details in the experiment and the power analysis procedure, see [https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/direct-modification_power_write-up.md](https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/direct-modification_power_write-up.md).
+
+Crucially, we are interested in a credible *effect of syntax in the critical condition*.
+We decided to build the power analysis assuming a maximal model including a main effects of syntax (subject vs predicate-N), trial type (critical vs. filler) and their *interaction* since this model is most appropriate given our experimental design, but we'll remain agnostic about the direction of the interaction estimate.
+
+The power analysis proceeds as follows: 
+
+1. The desired model to be used in final analyses is fit on pilot data (n = 180 subjects):
+
+response-category = syntax * trial-type + (1 + syntax * trial-type || subjectID) + (1 + syntax * trial-type || item)
+
+``` {r, include=FALSE}
+library(tidyverse)
+library(brms)
+library(tidybayes)
+library(broom)
+library(knitr)
+
+pilot_data <- read_csv("../../data/direct-modification/results_all_pilots_tidy.csv")
+n_iter = 4000
+pilot_data <- pilot_data %>%
+  mutate(trial_dev = factor(trial_dev, levels = c("filler", "critical")),
+         syntax_dev = factor(syntax_dev, levels = c("subj", "pred")))
+contrasts(pilot_data$trial_dev) <- contr.sum(2)
+contrasts(pilot_data$syntax_dev) <- contr.sum(2)
+
+# fit full desired model on pilot data
+pilot_model <- brm(
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || workerid)
+  + (1 + syntax_dev*trial_dev || target),
+  data = pilot_data,
+  family = "bernoulli",
+  chains = 4,
+  iter = n_iter,
+  cores = 4,
+  control = list(adapt_delta = 0.95),
+  silent = T,
+  refresh = 0
+)
+```
+
+``` {r}
+summary(pilot_model)
+```
+
+2. Then, posterior predictive samples are drawn from this fitted model, simulating a given number of subjects (increased iteratively from 150 to 600) and a given number of experimental items (iterating over 12, 16 or 20). New potential by-subject and by-item effects for the respective number are sampled from a gaussian distribution specified by the estimated group-level standard deviations and correlations of pilot data.
+3. The model is re-computed on these posterior samples and the parameter of interest (i.e., the syntax coefficient in the critical condition) is extracted. The models were fit using 4 chains and 4000 iterations each. 
+4. This process is repeated *200 times* for each simulated subjects-number and item-number. 
+5. The power for the given number of participants/items is calculated as the proportion of critical coefficients that were estimated in the predicted direction (i.e., the credible interval excludes 0) over all the simulations. 
+
+The power analysis script can be found under: [https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/power_analysis.R](https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/power_analysis.R)
+
+Here is the credible interval over the estimate for the effect of syntax in the critical condition over the progressing simulations, faceted by number of simulated subjects:
+
+```{r, echo=FALSE, fig.height=15, fig.width= 8, message=FALSE, warning=FALSE}
+setwd("results/sim_200_bySubj-byItem")
+full_data_200 <- list.files(
+                    pattern = "direct_mod_power_analysis_fullData_final*"
+                   ) %>%
+  map_df(~read_csv(.))
+
+full_data_200 %>%
+  mutate(n.item = as.factor(n.item)) %>%
+  filter(key == "syntax_critical") %>%
+  filter(seed %in% seq(1, 200, by = 5)) %>%
+  ggplot(aes(x = seed, y = mean, ymin = lower, ymax = upper, color = n.item)) +
+  geom_hline(yintercept = c(0), color = "white") +
+  geom_pointrange(fatten = 1/2) +
+  labs(x = "simulation index",
+       y = "critical syntax CrI") +
+#  ylim(-1, 4) +
+  facet_wrap(~n.subj, ncol=1)
+```
+
+
+The results of the simulations reveal the following power for subject-numbers between 150 and 600, increasing by 50 subjects and over 12, 16, 20 items can be found under [https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv](https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv).
+
+The power plotted as a function of number of simulations reveals oscillations of the power for less than 200 simulations:
+``` {r, echo=FALSE, fig.height=12, fig.width= 5, message=FALSE, warning=FALSE}
+read_csv("results/power_analysis_bySubj-byItem_4000iter_running_power.csv") %>%
+  mutate(n.subj = as.factor(n.subj),
+         n.item = as.factor(n.item)) %>%
+  ggplot(., aes(x = n.sim, y = power_syntax, color = n.item) ) +
+  geom_point() +
+  geom_line() +
+  ylab("Power") +
+  ylim(0.6, 1) +
+  facet_wrap(~n.subj, ncol = 1) +
+  xlab("Number of simulations") +
+  ggtitle("Power as a function of number of simulations")
+
+```
+
+Overall, we see that simulations of around 250 subjects already achieve a power of 0.8 and 300 subjects around 0.85, and the number of items does not seem to have a large effect for any number of subjects but  350.
+
+#### Attrition rates in the pilots
+Over the course of all 6 pilots, we recruited 207 participants and excluded 27 (13%), mostly due to failing the warm-up trials (i.e., taking more than 4 attempts to provide correct picture labels upon correction on labeling warm-up trials; 17 participants, 8%) or reporting a native language other than English. The rate of invalid responses post-exclusion (i.e., unclassifiable free-production responses) is around 1-3%. The participants were paid $1.00/participant. 
