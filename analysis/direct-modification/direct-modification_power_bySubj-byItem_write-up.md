@@ -39,39 +39,39 @@ summary(pilot_model)
     ## Group-Level Effects: 
     ## ~target (Number of levels: 10) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.27      0.20     0.01     0.76 1.00     2736
-    ## sd(syntax_dev1)                0.21      0.17     0.01     0.63 1.00     3614
-    ## sd(trial_dev1)                 0.46      0.26     0.03     1.04 1.00     1718
-    ## sd(syntax_dev1:trial_dev1)     0.25      0.19     0.01     0.72 1.00     2908
+    ## sd(Intercept)                  0.27      0.21     0.01     0.77 1.00     3560
+    ## sd(syntax_dev1)                0.21      0.17     0.01     0.64 1.00     3909
+    ## sd(trial_dev1)                 0.47      0.26     0.05     1.07 1.00     2499
+    ## sd(syntax_dev1:trial_dev1)     0.24      0.19     0.01     0.72 1.00     3667
     ##                            Tail_ESS
-    ## sd(Intercept)                  3379
-    ## sd(syntax_dev1)                3571
-    ## sd(trial_dev1)                 1642
-    ## sd(syntax_dev1:trial_dev1)     3488
+    ## sd(Intercept)                  4096
+    ## sd(syntax_dev1)                4288
+    ## sd(trial_dev1)                 2696
+    ## sd(syntax_dev1:trial_dev1)     4201
     ## 
     ## ~workerid (Number of levels: 180) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  3.07      0.41     2.37     3.99 1.00     2286
-    ## sd(syntax_dev1)                0.41      0.25     0.02     0.94 1.00     1328
-    ## sd(trial_dev1)                 0.73      0.31     0.11     1.36 1.00      953
-    ## sd(syntax_dev1:trial_dev1)     0.27      0.20     0.01     0.74 1.00     2279
+    ## sd(Intercept)                  3.09      0.42     2.37     3.99 1.00     2511
+    ## sd(syntax_dev1)                0.41      0.25     0.02     0.93 1.00     1701
+    ## sd(trial_dev1)                 0.73      0.31     0.12     1.34 1.00     1542
+    ## sd(syntax_dev1:trial_dev1)     0.29      0.21     0.01     0.76 1.00     2437
     ##                            Tail_ESS
-    ## sd(Intercept)                  3349
-    ## sd(syntax_dev1)                2433
-    ## sd(trial_dev1)                 1109
-    ## sd(syntax_dev1:trial_dev1)     3568
+    ## sd(Intercept)                  5260
+    ## sd(syntax_dev1)                2989
+    ## sd(trial_dev1)                 2474
+    ## sd(syntax_dev1:trial_dev1)     3920
     ## 
     ## Population-Level Effects: 
     ##                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                  2.90      0.44     2.13     3.83 1.00     2170
-    ## syntax_dev1                0.66      0.20     0.29     1.07 1.00     5180
-    ## trial_dev1                -0.12      0.27    -0.66     0.42 1.00     4387
-    ## syntax_dev1:trial_dev1     0.08      0.19    -0.29     0.45 1.00     5771
+    ## Intercept                  2.90      0.44     2.12     3.81 1.00     3005
+    ## syntax_dev1                0.66      0.19     0.29     1.05 1.00     7559
+    ## trial_dev1                -0.12      0.27    -0.65     0.43 1.00     6069
+    ## syntax_dev1:trial_dev1     0.07      0.19    -0.29     0.44 1.00     8208
     ##                        Tail_ESS
-    ## Intercept                  4084
-    ## syntax_dev1                4610
-    ## trial_dev1                 5133
-    ## syntax_dev1:trial_dev1     5524
+    ## Intercept                  4877
+    ## syntax_dev1                6022
+    ## trial_dev1                 5268
+    ## syntax_dev1:trial_dev1     6093
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -109,9 +109,14 @@ subject-numbers between 150 and 600, increasing by 50 subjects and over
 12, 16, 20 items can be found under
 <https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv>.
 
-The power plotted as a function of number of simulations reveals
-oscillations of the power for less than 200 simulations:
+The power plotted as a function of number of simulations, by subject
+number and items-number:
 ![](direct-modification_power_bySubj-byItem_write-up_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+This plot shows the power as a function of the number of subjects, by -
+item-number:
+
+![](direct-modification_power_bySubj-byItem_write-up_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Overall, we see that simulations of around 250 subjects already achieve
 a power of 0.8 and 300 subjects around 0.85 for 12 items or more. The

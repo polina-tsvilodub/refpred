@@ -83,7 +83,7 @@ full_data_200 %>%
 
 The results of the simulations reveal the following power for subject-numbers between 150 and 600, increasing by 50 subjects and over 12, 16, 20 items can be found under [https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv](https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv).
 
-The power plotted as a function of number of simulations reveals oscillations of the power for less than 200 simulations:
+The power plotted as a function of number of simulations, by subject number and items-number:
 ``` {r, echo=FALSE, fig.height=12, fig.width= 8, message=FALSE, warning=FALSE}
 running_power_5_10_items <- rbind(
   read_csv("results/power_analysis_bySubj-byItem_4000iter_running_power.csv"),
@@ -101,6 +101,26 @@ running_power_5_10_items %>%
   facet_wrap(~n.subj, ncol = 1) +
   xlab("Number of simulations") +
   ggtitle("Power as a function of number of simulations")
+
+```
+
+This plot shows the power as a function of the number of subjects, by - item-number: 
+
+``` {r, echo=FALSE, message=FALSE, warning=FALSE}
+power_by_subj_summary <- rbind(
+  read_csv("results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv"),
+  read_csv("results/direct_mod_power_analysis_fullData_3000iter_500sim_summary.csv") %>% mutate(n.item = 5) %>% filter((n.subj != 50), (n.subj != 100) )
+  )
+
+power_by_subj_summary %>%
+  mutate(n.item = as.factor(n.item)) %>%
+  ggplot(., aes(x = n.subj, y = power_syntax, color = n.item) ) +
+  geom_point() +
+  geom_line() +
+  ylab("Power") +
+  ylim(0.6, 1) +
+  xlab("Number of subjects") +
+  ggtitle("Power as a function of number of subjects")
 
 ```
 
