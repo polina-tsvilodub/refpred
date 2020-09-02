@@ -39,39 +39,39 @@ summary(pilot_model)
     ## Group-Level Effects: 
     ## ~target (Number of levels: 10) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.26      0.21     0.01     0.76 1.00     2434
-    ## sd(syntax_dev1)                0.21      0.17     0.01     0.63 1.00     3168
-    ## sd(trial_dev1)                 0.47      0.26     0.06     1.05 1.00     2107
-    ## sd(syntax_dev1:trial_dev1)     0.24      0.19     0.01     0.72 1.00     2666
+    ## sd(Intercept)                  0.27      0.20     0.01     0.76 1.00     2736
+    ## sd(syntax_dev1)                0.21      0.17     0.01     0.63 1.00     3614
+    ## sd(trial_dev1)                 0.46      0.26     0.03     1.04 1.00     1718
+    ## sd(syntax_dev1:trial_dev1)     0.25      0.19     0.01     0.72 1.00     2908
     ##                            Tail_ESS
-    ## sd(Intercept)                  2358
-    ## sd(syntax_dev1)                3340
-    ## sd(trial_dev1)                 2181
-    ## sd(syntax_dev1:trial_dev1)     3242
+    ## sd(Intercept)                  3379
+    ## sd(syntax_dev1)                3571
+    ## sd(trial_dev1)                 1642
+    ## sd(syntax_dev1:trial_dev1)     3488
     ## 
     ## ~workerid (Number of levels: 180) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  3.09      0.42     2.36     3.99 1.00     1756
-    ## sd(syntax_dev1)                0.41      0.25     0.02     0.95 1.00     1418
-    ## sd(trial_dev1)                 0.73      0.31     0.12     1.33 1.00     1056
-    ## sd(syntax_dev1:trial_dev1)     0.28      0.20     0.01     0.73 1.00     2108
+    ## sd(Intercept)                  3.07      0.41     2.37     3.99 1.00     2286
+    ## sd(syntax_dev1)                0.41      0.25     0.02     0.94 1.00     1328
+    ## sd(trial_dev1)                 0.73      0.31     0.11     1.36 1.00      953
+    ## sd(syntax_dev1:trial_dev1)     0.27      0.20     0.01     0.74 1.00     2279
     ##                            Tail_ESS
-    ## sd(Intercept)                  3331
-    ## sd(syntax_dev1)                2801
-    ## sd(trial_dev1)                 1269
-    ## sd(syntax_dev1:trial_dev1)     3281
+    ## sd(Intercept)                  3349
+    ## sd(syntax_dev1)                2433
+    ## sd(trial_dev1)                 1109
+    ## sd(syntax_dev1:trial_dev1)     3568
     ## 
     ## Population-Level Effects: 
     ##                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                  2.89      0.44     2.12     3.82 1.00     1822
-    ## syntax_dev1                0.65      0.19     0.29     1.05 1.00     4037
-    ## trial_dev1                -0.12      0.27    -0.64     0.43 1.00     3807
-    ## syntax_dev1:trial_dev1     0.07      0.19    -0.30     0.45 1.00     5264
+    ## Intercept                  2.90      0.44     2.13     3.83 1.00     2170
+    ## syntax_dev1                0.66      0.20     0.29     1.07 1.00     5180
+    ## trial_dev1                -0.12      0.27    -0.66     0.42 1.00     4387
+    ## syntax_dev1:trial_dev1     0.08      0.19    -0.29     0.45 1.00     5771
     ##                        Tail_ESS
-    ## Intercept                  3039
-    ## syntax_dev1                5110
-    ## trial_dev1                 4380
-    ## syntax_dev1:trial_dev1     4901
+    ## Intercept                  4084
+    ## syntax_dev1                4610
+    ## trial_dev1                 5133
+    ## syntax_dev1:trial_dev1     5524
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential

@@ -60,7 +60,7 @@ The power analysis script can be found under: [https://github.com/polina-tsvilod
 
 Here is the credible interval over the estimate for the effect of syntax in the critical condition over the progressing simulations, faceted by number of simulated subjects:
 
-```{r, echo=FALSE, fig.height=15, fig.width= 8, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, fig.height=15, fig.width= 10, message=FALSE, warning=FALSE}
 setwd("results/sim_200_bySubj-byItem")
 full_data_200 <- list.files(
                     pattern = "direct_mod_power_analysis_fullData_final*"
@@ -71,13 +71,13 @@ full_data_200 %>%
   mutate(n.item = as.factor(n.item)) %>%
   filter(key == "syntax_critical") %>%
   filter(seed %in% seq(1, 200, by = 5)) %>%
-  ggplot(aes(x = seed, y = mean, ymin = lower, ymax = upper, color = n.item)) +
+  ggplot(aes(x = seed, y = mean, ymin = lower, ymax = upper)) +
   geom_hline(yintercept = c(0), color = "white") +
   geom_pointrange(fatten = 1/2) +
   labs(x = "simulation index",
        y = "critical syntax CrI") +
 #  ylim(-1, 4) +
-  facet_wrap(~n.subj, ncol=1)
+  facet_wrap(n.subj~n.item, ncol = 3)
 ```
 
 
