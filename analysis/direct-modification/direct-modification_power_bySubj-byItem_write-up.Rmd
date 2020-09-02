@@ -84,8 +84,13 @@ full_data_200 %>%
 The results of the simulations reveal the following power for subject-numbers between 150 and 600, increasing by 50 subjects and over 12, 16, 20 items can be found under [https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv](https://github.com/polina-tsvilodub/refpred/blob/master/analysis/direct-modification/results/direct_mod_power_analysis_bySubj-byItem_4000iter_200sim_summary.csv).
 
 The power plotted as a function of number of simulations reveals oscillations of the power for less than 200 simulations:
-``` {r, echo=FALSE, fig.height=12, fig.width= 5, message=FALSE, warning=FALSE}
-read_csv("results/power_analysis_bySubj-byItem_4000iter_running_power.csv") %>%
+``` {r, echo=FALSE, fig.height=12, fig.width= 8, message=FALSE, warning=FALSE}
+running_power_5_10_items <- rbind(
+  read_csv("results/power_analysis_bySubj-byItem_4000iter_running_power.csv"),
+  read_csv("results/power_analysis_3000iter_200sim_running_power.csv") %>% mutate(n.item = 5)
+  )
+
+running_power_5_10_items %>%
   mutate(n.subj = as.factor(n.subj),
          n.item = as.factor(n.item)) %>%
   ggplot(., aes(x = n.sim, y = power_syntax, color = n.item) ) +
@@ -99,7 +104,7 @@ read_csv("results/power_analysis_bySubj-byItem_4000iter_running_power.csv") %>%
 
 ```
 
-Overall, we see that simulations of around 250 subjects already achieve a power of 0.8 and 300 subjects around 0.85, and the number of items does not seem to have a large effect for any number of subjects but  350.
+Overall, we see that simulations of around 250 subjects already achieve a power of 0.8 and 300 subjects around 0.85 for 12 items or more. The number of items does not seem to have a large effect for more than 400 subjects.
 
 #### Attrition rates in the pilots
 Over the course of all 6 pilots, we recruited 207 participants and excluded 27 (13%), mostly due to failing the warm-up trials (i.e., taking more than 4 attempts to provide correct picture labels upon correction on labeling warm-up trials; 17 participants, 8%) or reporting a native language other than English. The rate of invalid responses post-exclusion (i.e., unclassifiable free-production responses) is around 1-3%. The participants were paid $1.00/participant. 

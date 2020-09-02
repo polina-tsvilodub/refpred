@@ -39,39 +39,39 @@ summary(pilot_model)
     ## Group-Level Effects: 
     ## ~target (Number of levels: 10) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.26      0.20     0.01     0.75 1.00     3942
-    ## sd(syntax_dev1)                0.21      0.17     0.01     0.63 1.00     3884
-    ## sd(trial_dev1)                 0.47      0.26     0.05     1.06 1.00     2890
-    ## sd(syntax_dev1:trial_dev1)     0.25      0.20     0.01     0.73 1.00     3717
+    ## sd(Intercept)                  0.26      0.21     0.01     0.76 1.00     2434
+    ## sd(syntax_dev1)                0.21      0.17     0.01     0.63 1.00     3168
+    ## sd(trial_dev1)                 0.47      0.26     0.06     1.05 1.00     2107
+    ## sd(syntax_dev1:trial_dev1)     0.24      0.19     0.01     0.72 1.00     2666
     ##                            Tail_ESS
-    ## sd(Intercept)                  5024
-    ## sd(syntax_dev1)                4855
-    ## sd(trial_dev1)                 2692
-    ## sd(syntax_dev1:trial_dev1)     4967
+    ## sd(Intercept)                  2358
+    ## sd(syntax_dev1)                3340
+    ## sd(trial_dev1)                 2181
+    ## sd(syntax_dev1:trial_dev1)     3242
     ## 
     ## ~workerid (Number of levels: 180) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  3.10      0.42     2.37     3.98 1.00     2993
-    ## sd(syntax_dev1)                0.41      0.25     0.02     0.94 1.00     1981
-    ## sd(trial_dev1)                 0.74      0.31     0.11     1.35 1.00     1235
-    ## sd(syntax_dev1:trial_dev1)     0.28      0.20     0.01     0.75 1.00     3132
+    ## sd(Intercept)                  3.09      0.42     2.36     3.99 1.00     1756
+    ## sd(syntax_dev1)                0.41      0.25     0.02     0.95 1.00     1418
+    ## sd(trial_dev1)                 0.73      0.31     0.12     1.33 1.00     1056
+    ## sd(syntax_dev1:trial_dev1)     0.28      0.20     0.01     0.73 1.00     2108
     ##                            Tail_ESS
-    ## sd(Intercept)                  4713
-    ## sd(syntax_dev1)                3421
-    ## sd(trial_dev1)                 1686
-    ## sd(syntax_dev1:trial_dev1)     4516
+    ## sd(Intercept)                  3331
+    ## sd(syntax_dev1)                2801
+    ## sd(trial_dev1)                 1269
+    ## sd(syntax_dev1:trial_dev1)     3281
     ## 
     ## Population-Level Effects: 
     ##                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                  2.91      0.42     2.14     3.81 1.00     4079
-    ## syntax_dev1                0.66      0.19     0.29     1.06 1.00     9093
-    ## trial_dev1                -0.12      0.27    -0.68     0.42 1.00     7818
-    ## syntax_dev1:trial_dev1     0.08      0.19    -0.29     0.45 1.00     9760
+    ## Intercept                  2.89      0.44     2.12     3.82 1.00     1822
+    ## syntax_dev1                0.65      0.19     0.29     1.05 1.00     4037
+    ## trial_dev1                -0.12      0.27    -0.64     0.43 1.00     3807
+    ## syntax_dev1:trial_dev1     0.07      0.19    -0.30     0.45 1.00     5264
     ##                        Tail_ESS
-    ## Intercept                  5258
-    ## syntax_dev1                6206
-    ## trial_dev1                 5343
-    ## syntax_dev1:trial_dev1     5870
+    ## Intercept                  3039
+    ## syntax_dev1                5110
+    ## trial_dev1                 4380
+    ## syntax_dev1:trial_dev1     4901
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -114,8 +114,9 @@ oscillations of the power for less than 200 simulations:
 ![](direct-modification_power_bySubj-byItem_write-up_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 Overall, we see that simulations of around 250 subjects already achieve
-a power of 0.8 and 300 subjects around 0.85, and the number of items
-does not seem to have a large effect for any number of subjects but 350.
+a power of 0.8 and 300 subjects around 0.85 for 12 items or more. The
+number of items does not seem to have a large effect for more than 400
+subjects.
 
 #### Attrition rates in the pilots
 
