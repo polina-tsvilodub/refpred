@@ -161,5 +161,10 @@ ggplot(full_df, aes(x = fixef_syntax_critical, y = random_syntax_critical)) +
   ggtitle("Posterior on syntax effects in the critical condition")
 
 #ggsave("figs/direct_mod_FE_RE_posterior.pdf", width = 6 , height = 4)
-
+ggplot(full_df, aes(x = fixef_syntax_critical, y = random_syntax_critical)) +
+  stat_bin2d(aes(fill = after_stat(density))) +
+  xlab("Fixed effect of syntax in critical condition") +
+  ylab("Random effects of syntax in critical condition") +
+  ggtitle("Posterior on syntax effects in the critical condition")
+#ggsave("figs/direct_mod_FE_RE_posterior_tiled.pdf", width = 6 , height = 4)
 ```
