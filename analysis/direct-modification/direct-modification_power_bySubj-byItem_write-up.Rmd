@@ -34,8 +34,8 @@ contrasts(pilot_data$syntax_dev) <- contr.sum(2)
 
 # fit full desired model on pilot data
 pilot_model <- brm(
-  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev || workerid)
-  + (1 + syntax_dev*trial_dev || target),
+  response_num ~ syntax_dev * trial_dev + (1 + syntax_dev*trial_dev | workerid)
+  + (1 + syntax_dev*trial_dev | target),
   data = pilot_data,
   family = "bernoulli",
   chains = 4,
@@ -128,3 +128,38 @@ Overall, we see that simulations of around 250 subjects already achieve a power 
 
 #### Attrition rates in the pilots
 Over the course of all 6 pilots, we recruited 207 participants and excluded 27 (13%), mostly due to failing the warm-up trials (i.e., taking more than 4 attempts to provide correct picture labels upon correction on labeling warm-up trials; 17 participants, 8%) or reporting a native language other than English. The rate of invalid responses post-exclusion (i.e., unclassifiable free-production responses) is around 1-3%. The participants were paid $1.00/participant. 
+
+#### Posterior distribution of critical syntax effects in pilot data 
+This plot shows the joint posterior of fixed and random effects of syntax in the critical condition, given pilot data:
+
+``` {r}
+# extract posterior contrast of interest of fixed effects
+fixef_posteriors <- pilot_model %>%
+  spread_draws(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`) %>%
+    # extract contrasts of interest, especially effect of syntax by-trial
+    mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+           critical_pred = b_Intercept - b_syntax_dev1 - b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+           syntax_critical = critical_subj - critical_pred, # subject vs pred syntax
+           filler_subj = b_Intercept + b_syntax_dev1 + b_trial_dev1 + `b_syntax_dev1:trial_dev1`,
+           filler_pred = b_Intercept - b_syntax_dev1 + b_trial_dev1 - `b_syntax_dev1:trial_dev1`,
+           syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate syntax
+    select(b_Intercept, b_syntax_dev1, b_trial_dev1, `b_syntax_dev1:trial_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+    gather(key, val) 
+
+# extract random effects 
+ranef_posterior <- pilot_model %>%
+  spread_draws(sd_target__syntax_dev1, `sd_target__syntax_dev1:trial_dev1`) %>% 
+  mutate(random_syntax_critical = 2*sd_target__syntax_dev1 - 2*`sd_target__syntax_dev1:trial_dev1`) %>%
+  select(random_syntax_critical)
+
+full_df <- tibble( fixef_posteriors %>% filter(key == "syntax_critical"), ranef_posterior) %>% rename(fixef_syntax_critical = val)
+
+ggplot(full_df, aes(x = fixef_syntax_critical, y = random_syntax_critical)) +
+  geom_density_2d() + 
+  xlab("Fixed effect of syntax in critical condition") +
+  ylab("Random effects of syntax in critical condition") +
+  ggtitle("Posterior on syntax effects in the critical condition")
+
+#ggsave("figs/direct_mod_FE_RE_posterior.pdf", width = 6 , height = 4)
+
+```
