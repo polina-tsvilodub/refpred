@@ -153,6 +153,7 @@ ranef_posterior <- pilot_model %>%
   select(random_syntax_critical)
 
 full_df <- tibble( fixef_posteriors %>% filter(key == "syntax_critical"), ranef_posterior) %>% rename(fixef_syntax_critical = val)
+#write_csv(full_df, "results/full_pilotData_syntax_critical_FE_RE_posterior_samples.csv")
 
 ggplot(full_df, aes(x = fixef_syntax_critical, y = random_syntax_critical)) +
   geom_density_2d() + 
