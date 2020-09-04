@@ -377,3 +377,97 @@ displayMarginals(pragmaticListener(
   //   "dog",
   //   0.5))
   //
+
+
+  // display("speaker prior")
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   0.5,
+  //   "runPriorOnly"))
+  //
+  //
+  // display("normal-sized great dane; reference goal")
+  //
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   1,
+  //   false))
+  //
+  // display("normal-sized great dane; predication goal")
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   0,
+  //   false))
+  //
+  // display("normal-sized great dane; refpred goal 50% mixture")
+  //
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   0.5,
+  //   false))
+  //
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1},
+  //   "greatdane",
+  //   "positive",
+  //   context['dog'],
+  //   0.5,
+  //   false))
+  //
+  //
+  //
+  // display("large-sized great dane; reference goal")
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1.3},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   1,
+  //   false))
+  //
+  // display("large-sized great dane; predication goal")
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property:  1.7},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   0,
+  //   false))
+  //
+  // display("large-sized great dane; refpred goal 50% mixture")
+  //
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property:  1.7},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   0.5,
+  //   false))
+  //
+  //
+  //
+  // viz.table(speaker1(
+  //   {kind: 'greatdane', id: "gd1", property: 1.7},
+  //   "dog",
+  //   "positive",
+  //   context['dog'],
+  //   false))
