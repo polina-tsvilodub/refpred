@@ -20,13 +20,6 @@ var stateParams = {
 var stateVals = [-2,-1.7,-1.3,-1,-0.7,-0.3,0,0.3,0.7,1,1.3,1.7,2]
 
 
-//     map(
-//   round,
-//   _.range(stateParams.dog.mu - 3 * stateParams.dog.sigma,
-//           stateParams.dog.mu + 3 * stateParams.dog.sigma + stateParams.dog.sigma/binParam,
-//           stateParams.dog.sigma/binParam)
-// );
-
 // probabilitites of possible sizes depending on cc
 var stateProbs = cache(function(cc) {
   return map(function(s){
@@ -58,7 +51,7 @@ var sizePrior = function(cc) {
 }
 ///
 
-// joint state prior: the referent is sampled from the union of the context & the target
+// joint state prior: the referent is sampled from the context
 // this allows to compute how informative an N is in order to refer to a target in the given context
 // their sizes are sampled from a distribution set by the subordinate comparison class
 // corresponding the sampled referent or the passed CC
@@ -70,9 +63,7 @@ var sizePrior = function(cc) {
 var statePriorL1 = function(context) {
   Infer({
     model: function() {
-//       var cont = _.union(context, [target]);
-//       var ref = uniformDraw(context);
-      var ref = categorical({vs: context, ps: [1,1,1,1,1,1]});
+      var ref = uniformDraw(context);
       // account for the L0 / L1 distinction
       var size = categorical({vs: stateVals, ps: stateProbs(ref["kind"])});
       return {
@@ -83,17 +74,15 @@ var statePriorL1 = function(context) {
     }
   })
 };
+
 // L0 state prior, relying on the passed CC only
 // aslo used for threshold sampling
 var statePriorL0 = function(cc, cont) {
-//   display(cc)
+
   Infer({
     model: function() {
-      //       var cont = _.union(context, [target]);
-//       display(cc)
       var ref = uniformDraw(cont);
       var size = categorical({vs: stateVals, ps: stateProbs(cc)});
-      //       var size = categorical({vs: stateVals, ps: stateProbs(ref.kind)});
       return {
         referent: ref,
         property: size
@@ -114,6 +103,7 @@ var context = {
     {kind: "chihuahua", id : "ch1"},
     {kind: "chihuahua", id: "ch2"}
   ],
+  // the listener does not have access to the properties of the individual context members (i.e., there is no size property)
   greatdane: [
     {kind: "greatdane", id: "gd1a"},
     {kind: "greatdane", id: "gd2a"},
@@ -124,26 +114,21 @@ var context = {
   ]
 }
 
-
+// compute meaning of subject
 var meaning_reference = function(referring_expression, referent){
   return referring_expression == 'that' ? true :
   referring_expression == "dog" ? true :
   referring_expression == referent.kind
 }
 
+// compute meaning of predicate
 var meaning_predication = function(adj, property_val, threshold){
-  //   display(adj)
-  //   display(property_val + " " + threshold)
   return adj == "big" ? property_val > threshold :
   adj == "small" ? property_val < threshold :
   true
 }
 
 var meaningFn = function(utt, state, threshold, adj) {
-  //   display(JSON.stringify(utt))
-  //   display(JSON.stringify(state))
-  //   display(threshold)
-  //   display(adj)
   // assume subject contributes to reference, predicate to predication
   var RefTruthVal = meaning_reference(utt.subject, state.referent)
   var PredTruthVal = meaning_predication(adj, state.property, threshold)
@@ -152,255 +137,191 @@ var meaningFn = function(utt, state, threshold, adj) {
 
 var UtterancePrior = cache(function(form, subordinate_label){
   Infer({model: function(){
-    //     var adj = uniformDraw([form == "positive" ? "big" : "small", "silence"])
     var adj = form == "positive" ? "big" : "small"
-
+// the noun can appear either in the subject or in the predicate
     var noun_position = uniformDraw(['subject', 'predicate'])
+    // the noun can be either the sub or the basic target label
     var noun_label = uniformDraw([subordinate_label, "dog"])
 
     var subject = noun_position == "subject" ? noun_label : "that"
-    var predicate = noun_position == "subject" ? adj : adj + " " + noun_label//uniformDraw([subordinate_label, "dog", cc])
-
+    var predicate = noun_position == "subject" ? adj : adj + " " + noun_label
     return {subject, predicate}
   }})
 })
 
 
-// one joint L0, who computes the literal meaning of an utterance given a specific QUD,
-// and a context, a target, a CC and a threshold
-// var listener0 = function(utt, context, target, cc, threshold, qud) {
-// var listener0 = function(utt, context, cc, threshold, qud) {
+// one joint L0, who computes the literal meaning of an utterance given a specific
+// context, utterance and comparison class intended by the speaker
+
 var listener0 = function(utt, cc, context) {
   Infer({
     method: "enumerate",
     model: function() {
-      // assume subject contributes to reference, predicate to predication
+      // assume subject contributes to reference, predicate *probabilistically*
+      // contributes to predication
+
       // check if predicate contains the comparison class
       var splitPred = utt['predicate'].split(" ");
       var npInPredicate = splitPred.length > 1;
-//             display(JSON.stringify(utt))
-      // soft constraint on N in pred == CC
-      // for p > 0.5, the size distribution inferred by L1 from pred-N sentences is tighter around N = CC
-      var comparisonClass = npInPredicate ? flip(0.5) ? splitPred[1] : cc : cc //uniformDraw([cc, splitPred[1]]) : cc
-//             display(comparisonClass)
-      //       display(context)
-      //       display(target)
-      var state = sample(statePriorL0(comparisonClass, context))
-//       display(JSON.stringify(state))
-      var threshold = sample(thresholdPrior("positive"))
 
+      // add a soft constraint on whether the predicate N is the CC instead of hard-coding
+      // for p > 0.5 in the flip(), the size distribution inferred by L1 from pred-N sentences is tighter around N = CC
+      var comparisonClass = npInPredicate ? flip(0.5) ? splitPred[1] : cc : cc
+      // sample state
+      var state = sample(statePriorL0(comparisonClass, context))
+      // move threshold inference to L0
+      var threshold = sample(thresholdPrior("positive"))
 
       // get the meaning of the utterance for sampled state
       var m = meaningFn(utt, state, threshold, splitPred[0])
       condition(m)
-      //       return {referent: state.referent, qudAnswer: qudAnswer, cc: c} //
+
       return {kind: state.referent.kind, id: state.referent.id, property: state.property} //{qudVal: qudVal}//, cc: c} //
     }
   })
 }
+
 // viz.marginals(listener0(
 // //   {subject: "greatdane", predicate: "big"},
 //   {subject: "that", predicate: "big greatdane"},
-//   "dog", // if no NP in predicate?
+//   "greatdane", // if no NP in predicate?
 //   context["dog"]
 // ))
 
 // viz.marginals(listener0(
 //   {subject: "greatdane", predicate: "big"},
 // //   {subject: "that", predicate: "big greatdane"},
-//   "dog", // if no NP in predicate?
+//   "greatdane", // if no NP in predicate?
 //   context["dog"]
 // ))
 
 
+// NEW: in this model, the comparison class to be communicated is a *choice* made
+// by S1, given the target property she wants to bring across,
+// as opposed to CC being a listed variable passed from L1.
+// That is, the speaker *chooses* the bare adjective to mean either "big for a dog" or "big for a great dane"
 
-// var speaker1 = function(state, cc, form, context, qud, priorOnly){
-var speaker1 = function(state, form, context, ref_utility_weight, priorOnly){
+// the advantage of this approach is that it eliminates unintuitive predictions where
+// the speaker chooses to say "That's a big Great Dane" more often when she intends
+// the basic-level relative to the subordinate CC
+// The speaker is assumed to maximize the basic utility of the utterance communicating the
+// joint state (as opposed to a mixture model for the separate goals)
+var speaker1 = function(state, form, context, priorOnly){
   Infer({
     method: "enumerate",
     model: function() {
       var cc = uniformDraw([state.kind, "dog"]);
       var utterance = sample(UtterancePrior(form, state.kind))
-//       display('before l0')
       var jL0 = listener0(utterance, cc, context)
-//       display('after l0')
 
-//       var L0_ref = marginalize(jL0, "id")
-//       var L0_pred = marginalize(jL0, "property")
-
-//       var ref_utility = L0_ref.score(state.id)
-//       var pred_utility = L0_pred.score(state.property)
-//       var full_utility = ref_utility_weight * ref_utility +
-//           (1 - ref_utility_weight) * pred_utility
       var full_utility = jL0.score({kind: state.kind, id: state.id, property: state.property})
       factor(priorOnly == "runPriorOnly" ? 0 : 3*full_utility)
-
+      // return the utterance and the CC
       return {utterance, cc}
     }
   })
 }
 
+//   display("speaker prior")
+//   viz.table(speaker1(
+//     {kind: 'greatdane', id: "gd1", property: 1},
+//     "positive",
+//     context['dog'],
+//     "runPriorOnly"))
 
-var pragmaticListener = function(utterance, target_kind, form, cont, ref_utility_weight) {
-  // target is the referent in the expt, just for easier representation
-  // it is just pooled with the context, it could also be represented directly as part of the context set
+// display("normal-sized great dane")
+//   viz.table(speaker1(
+//     {kind: 'greatdane', id: "gd1", property: 1},
+//     "positive",
+//     context['dog'],
+//     false))
+
+
+// display("large-sized great dane")
+//   viz.table(speaker1(
+//     {kind: 'greatdane', id: "gd1", property: 1.7},
+//     "positive",
+//     context['dog'],
+//     false))
+
+// display("Marginal distributions:")
+// display("normal-sized great dane")
+// viz.marginals(speaker1(
+//     {kind: 'greatdane', id: "gd1", property: 1},
+//     "positive",
+//     context['dog'],
+//     false))
+
+
+// display("large-sized great dane")
+// viz.marginals(speaker1(
+//     {kind: 'greatdane', id: "gd1", property: 1.7},
+//     "positive",
+//     context['dog'],
+//     false))
+
+// the pragmatic listener model is then built following the lexical enrichment
+// model (Problang)
+var pragmaticListener = function(utterance, target_kind, form, cont) {
   Infer({
-        method: "enumerate",
+    method: "enumerate",
     model: function(){
       // uncertainty about the comparison class (super vs. sub)
       var cc = uniformDraw([target_kind, "dog"])
-      print(cc)
+//       print(cc)
       var currentContext = context[cont]
       // L1 doesn't know the referent and its size
-//       display(target_kind)
       var state = sample(statePriorL1( currentContext))
       var state_obj = {kind: state.referent, id: state.id, property: state.property}
-//             display('before s1')
-//       display(state_obj)
-      var S1 = speaker1(state_obj, form, currentContext, ref_utility_weight, false);
-//             display('after s1')
 
-//           print(S1)
-//           display(S1.score({utterance, cc}))
+      var S1 = speaker1(state_obj, form, currentContext, false);
+      // compared the CC the listener is uncertain about to the CC the speaker decided on,
+      // following the lexical enrichment model from problang
       factor(S1.score({utterance, cc}));
       return { comparisonClass: cc, referent: state.referent, property: state.property}
-//       return { comparisonClass: c, referent: state.referent, property: state.property}
 
     }})
 }
 
-// display(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1},
-// //     "dog",
-//     "positive",
-//     context['dog'],
-//     0.5, false).score({{subject: "greatdane", predicate: "big"}, "dog"}))
+// display("That greatdane is big")
+// viz.marginals(pragmaticListener(
+//   {subject: "greatdane", predicate: "big"},
+//   "greatdane",
+//   "positive",
+//   "dog"))
 
-display("That greatdane is big")
-viz.marginals(pragmaticListener(
-  {subject: "greatdane", predicate: "big"},
-  "greatdane",
-  "positive",
-  "dog",
-  0.5), "comparisonClass")
-
-display("that's a big greatdane")
-viz.marginals(pragmaticListener(
-  {subject: "that", predicate: "big greatdane"},
-  "greatdane",
-  "positive",
-  "dog",
-  0.5))
+// display("that's a big greatdane")
+// viz.marginals(pragmaticListener(
+//   {subject: "that", predicate: "big greatdane"},
+//   "greatdane",
+//   "positive",
+//   "dog"))
 
 // display("That dog is big")
 // viz.marginals(pragmaticListener(
 //   {subject: "dog", predicate: "big"},
 //   "greatdane",
 //   "positive",
-//   "dog",
-//   0.5))
+//   "dog"))
 
 // display("that's a big dog")
 // viz.marginals(pragmaticListener(
 //   {subject: "that", predicate: "big dog"},
 //   "greatdane",
 //   "positive",
-//   "dog",
-//   0.5))
+//   "dog"))
 
 // display("sub context")
+// display("That Great Dane is big")
 // viz.marginals(pragmaticListener(
 //   {subject: "greatdane", predicate: "big"},
 //   "greatdane",
 //   "positive",
-//   "greatdane",
-//   0.5))
+//   "greatdane"))
+
+// display("That's a big great dane")
 // viz.marginals(pragmaticListener(
 //   {subject: "that", predicate: "big greatdane"},
 //   "greatdane",
 //   "positive",
-//   "greatdane",
-//   0.5))
-
-
-  // viz.marginals(pragmaticListener(
-  //   {subject: "greatdane", predicate: "big"},
-  //   "greatdane",
-  //   "positive",
-  //   "dog",
-  //   0.5))
-  //
-  // viz.marginals(pragmaticListener(
-  //   {subject: "that", predicate: "big greatdane"},
-  //   "greatdane",
-  //   "positive",
-  //   "dog",
-  //   0.5))
-  //
-
-
-//   display("speaker prior")
-//   viz.table(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1},
-// //     "dog",
-//     "positive",
-//     context['dog'],
-//     0.5,
-//     "runPriorOnly"))
-
-//   //
-// //   display("normal-sized great dane; reference goal")
-
-
-//   viz.table(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1},
-// //     "dog",
-//     "positive",
-//     context['dog'],
-//     1,
-//     false))
-
-// //   display("normal-sized great dane; predication goal")
-
-//   viz.table(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1.7},
-// //     "dog",
-//     "positive",
-//     context['dog'],
-//     0,
-//     false))
-
-//   display("normal-sized great dane; refpred goal 50% mixture")
-
-
-//   viz.table(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1},
-//     "dog",
-//     "positive",
-//     context['dog'],
-//     0.5,
-//     false))
-
-
-//   viz.table(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1},
-//     "greatdane",
-//     "positive",
-//     context['dog'],
-//     0.5,
-//     false))
-
-//   //
-//   //
-//   // display("large-sized great dane; reference goal")
-//   //
-//   viz.table(speaker1(
-//     {kind: 'greatdane', id: "gd1", property: 1.3},
-//     "greatdane",
-//     "positive",
-//     context['dog'],
-//     0.5,
-//     false))
-  //
-  // display("large-sized great dane; predication goal")
-  //
+//   "greatdane"))
