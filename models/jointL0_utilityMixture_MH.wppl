@@ -318,6 +318,7 @@ var pragmaticListener = function(utterance, target_kind, form, cont, ref_utility
       // L1 doesn't know the referent and its size
 //       display(target_kind)
       var state = sample(statePriorL0(target_kind, currentContext))
+      // var state = sample(statePriorL1(currentContext, target_kind))
       var state_obj = {kind: state.referent.kind, id: state.referent.id, property: state.property}
 //             display('before s1')
       var S1 = speaker1(state_obj, c, form, currentContext, ref_utility_weight, false);
