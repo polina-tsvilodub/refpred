@@ -153,6 +153,11 @@ var UtterancePrior = cache(function(form, subordinate_label){
 // one joint L0, who computes the literal meaning of an utterance given a specific
 // context, utterance and comparison class intended by the speaker
 
+// NEW: the comparison class is not mapped deterministically to the predicate N anymore
+// the listener is uncertain whether the N is the comparison class or whether it is the CC passed from S1
+// this allows to integrate the influence of the inferred CC variable value into predicate N sentences
+// it is *crucial* for getting the expected pattern of inference over the CC by L1 under this model
+// if the mapping is deterministic, L1 is uncertain about the CC (infers 0.5:0.5 distribution)
 var listener0 = function(utt, cc, context) {
   Infer({
     method: "enumerate",

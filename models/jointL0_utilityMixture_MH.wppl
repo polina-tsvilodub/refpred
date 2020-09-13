@@ -70,12 +70,13 @@ var sizePrior = function(cc) {
 var statePriorL1 = function(context, target) {
   Infer({
     model: function() {
-      var cont = _.union(context, [target]);
-      var ref = categorical({vs: cont, ps: [1,1,1,1,1,1,1]})["referent"];
+//      var cont = _.union(context, [target]);
+      var ref = categorical({vs: cont, ps: [1,1,1,1,1,1]});
       // account for the L0 / L1 distinction
-      var size = categorical({vs: stateVals, ps: stateProbs(ref)});
+      var size = categorical({vs: stateVals, ps: stateProbs(ref["kind"])});
       return {
-        referent: ref,
+        referent: ref["kind"],
+        id: ref["id"],
         property: size
       }
     }
@@ -215,6 +216,7 @@ var listener0 = function(utt, cc, context) {
       var splitPred = utt['predicate'].split(" ");
       var npInPredicate = splitPred.length > 1;
 //             display(JSON.stringify(utt))
+// var comparisonClass = npInPredicate ? flip(0.5) ? splitPred[1] : cc : cc
       var comparisonClass = npInPredicate ? splitPred[1] : cc
 //             display(comparisonClass)
       //       display(context)
@@ -280,8 +282,10 @@ var speaker1 = function(state, cc, form, context, ref_utility_weight, priorOnly)
   Infer({
     method: "enumerate",
     model: function() {
+    var compClass = uniformDraw(["dog", state.kind])
       var utterance = sample(UtterancePrior(form, state.kind))
 //       display('before l0')
+// var jL0 = listener0(utterance, compClass, context)
       var jL0 = listener0(utterance, cc, context)
 //       display('after l0')
 
@@ -294,7 +298,7 @@ var speaker1 = function(state, cc, form, context, ref_utility_weight, priorOnly)
           (1 - ref_utility_weight) * pred_utility
 
       factor(priorOnly == "runPriorOnly" ? 0 : 3*full_utility)
-
+// return {utterance, compClass}
       return utterance
     }
   })
@@ -309,6 +313,7 @@ var pragmaticListener = function(utterance, target_kind, form, cont, ref_utility
     model: function(){
       // uncertainty about the comparison class (super vs. sub)
       var c = uniformDraw([target_kind, "dog"])
+      // var compClass = uniformDraw([target_kind, "dog"])
       var currentContext = context[cont]
       // L1 doesn't know the referent and its size
 //       display(target_kind)
@@ -320,8 +325,10 @@ var pragmaticListener = function(utterance, target_kind, form, cont, ref_utility
 
       //     print(S1)
       //     display(S1.score(utterance))
+      // factor(S1.score({utterance, compClass}))
       observe(S1, utterance);
       return { comparisonClass: c, referent: state.referent, property: state.property}
+      //       return { comparisonClass: compClass, referent: state.referent, property: state.property}
 //       return { comparisonClass: c, referent: state.referent, property: state.property}
 
     }})
