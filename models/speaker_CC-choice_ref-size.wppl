@@ -330,3 +330,24 @@ var pragmaticListener = function(utterance, target_kind, form, cont) {
 //   "greatdane",
 //   "positive",
 //   "greatdane"))
+
+
+var conditions = [
+  {utt: {subject: "greatdane", predicate: "big"}, sub: "greatdane", form: "positive", context: "dog", text: "That Great Dane is big", noun: "greatdane"},
+  {utt: {subject: "that", predicate: "big greatdane"}, sub: "greatdane", form: "positive", context: "dog", text: "That's a big Great Dane", noun: "greatdane"},
+  {utt: {subject: "dog", predicate: "big"}, sub: "greatdane", form: "positive", context: "dog", text: "That dog is big", noun: "dog"},
+  {utt: {subject: "that", predicate: "big dog"}, sub: "greatdane", form: "positive", context: "dog", text: "That's a big dog", noun: "dog"}
+]
+
+var L1predictions = map(function(stim){
+  var L1posterior = pragmaticListener(stim.utt, stim.sub, stim.form, stim.context)
+  return {
+//     utterance: JSON.stringify(stim.utt),
+    utterance: stim.text,
+ //   "noun": stim.noun,
+    "P(superordinate comparison class)": exp(marginalize(L1posterior, "comparisonClass").score("dog")),
+ //   model: "L1"
+  }
+}, conditions)
+
+viz.bar(L1predictions)
