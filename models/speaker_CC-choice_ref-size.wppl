@@ -276,8 +276,8 @@ var pragmaticListener = function(utterance, target_kind, form, cont) {
 //       print(cc)
       var currentContext = context[cont]
       // L1 doesn't know the referent and its size
-      var state = sample(statePriorL1( currentContext))
-      var state_obj = {kind: state.referent, id: state.id, property: state.property}
+      var state = sample(statePriorL0(target_kind, currentContext))
+      var state_obj = {kind: state.referent.kind, id: state.referent.id, property: state.property}
 
       var S1 = speaker1(state_obj, form, currentContext, false);
       // compared the CC the listener is uncertain about to the CC the speaker decided on,
