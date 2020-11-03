@@ -1,31 +1,68 @@
 // In this file trial data and some functions for trial data creation are specified
 
+///////////////////////////
+// number of items used (up to 5 possible)
+// total number of main trials is then 2 x num_trials
+//   adjust if needed
+const num_trials = 4
+//////////////////////////
+
+const noun_item_list = {
+  service: ["dogs2"],
+  prize: ["dogs1"],
+  landmark: ["trees", "buildings", "flowers"],
+  gift: ["flowers", "dogs1"],
+  rescue: ["dogs2", "fish", "birds"]
+}
+
+// sample four our of five critical nouns with corresponding items, and make sure items are used =< 1 time
+function get_items(noun_item_list, num_trials){
+  // get four nouns
+  const nouns = _.shuffle(Object.keys(noun_item_list)).slice(0, num_trials);
+  console.log("nouns:", nouns);
+  const items = [];
+  // get items for the nouns
+  for(i = 0; i < num_trials; i++) {
+    // grab one random item possible for a noun
+    var item = noun_item_list[nouns[i]][Math.floor(Math.random() * noun_item_list[nouns[i]].length)];
+    items.push(item);
+  };
+  console.log("items:", items);
+
+  // check if there are items which occur twice
+  if (_.uniq(items).length < num_trials) {
+    get_items(noun_item_list, num_trials);
+  } else {
+    // if all items unique, return item-noun pairs list (of the form ["item1_noun1", "item2_noun2"...])
+    var items_list = _.flatten(_.map(_.zip(items, nouns), function([a, b]){return a.concat("_", b);}));
+    console.log(items_list);
+  }
+
+  return items_list;
+}
+
+// get item-noun pairs used for a participant
+var item_noun_pairs = get_items(noun_item_list, num_trials);
+console.log("Item-noun pairs:", item_noun_pairs)
+
+////////////////////////
+// based on the item-nouns, create single trials
+
+
 // half of the trials with big (0), half of trials with small (1) targets
 
-// 4 trials with basic-level np (0), 4 trials with subordinate np (1), 4 trials with 'one' (2) (position in referent-list)
-// const referent = _.shuffle([0,0,0,0, 1,1,1,1, 2,2,2,2])
-
-// 6 trials with predicate syntax (0), six trials with subject syntax (1)
-// const syntactic_cond = _.shuffle([0,0,0,1,1,1])
-
 const target_size = _.shuffle([0,0,0,1,1,1])
-const pic_order = function() {
-  return _.shuffle([0,1])
-}
-// const syntax = ["subject", "predicate"]
+// const pic_order = function() {
+//   return _.shuffle([0,1])
+// }
 
 const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
-console.log(contexts)
+// console.log(contexts)
 const synt_adj0 = _.shuffle(["congr_subj_0", "congr_pred_0", "congr_subj_1", "congr_pred_1"]);
 console.log(synt_adj0)
 // console.log(synt_adj)
 const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_subj", "congr_subj"]);
 console.log("Filler conditions:", filler_cond)
-///////////////////////////
-//   adjust if needed
-const num_trials = 4
-//////////////////////////
-
 
 // creating views with all the necessary information
 function create_view(items, target_size, contexts, num_trials, synt_adj0, filler_cond ) {
