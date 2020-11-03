@@ -8,41 +8,40 @@ const num_trials = 4
 //////////////////////////
 
 const noun_item_list = {
-  service: ["dogs2"],
-  prize: ["dogs1"],
+  service: ["dogs1"],
+  prize: ["dogs2"],
   landmark: ["trees", "buildings", "flowers"],
-  gift: ["flowers", "dogs1"],
-  rescue: ["dogs2", "fish", "birds"]
+  gift: ["flowers", "dogs2"],
+  rescue: ["dogs1", "fish", "birds"]
 }
 
 // sample four our of five critical nouns with corresponding items, and make sure items are used =< 1 time
 function get_items(noun_item_list, num_trials){
   // get four nouns
+
   const nouns = _.shuffle(Object.keys(noun_item_list)).slice(0, num_trials);
   console.log("nouns:", nouns);
-  const items = [];
-  // get items for the nouns
-  for(i = 0; i < num_trials; i++) {
-    // grab one random item possible for a noun
-    var item = noun_item_list[nouns[i]][Math.floor(Math.random() * noun_item_list[nouns[i]].length)];
-    items.push(item);
-  };
-  console.log("items:", items);
-
+  var items = [];
   // check if there are items which occur twice
-  if (_.uniq(items).length < num_trials) {
-    get_items(noun_item_list, num_trials);
-  } else {
-    // if all items unique, return item-noun pairs list (of the form ["item1_noun1", "item2_noun2"...])
-    var items_list = _.flatten(_.map(_.zip(items, nouns), function([a, b]){return a.concat("_", b);}));
-    console.log(items_list);
-  }
-
-  return items_list;
+  while (_.uniq(items).length < num_trials) {
+  // get items for the nouns
+      var new_items = [];
+      for(i = 0; i < num_trials; i++) {
+        // grab one random item possible for a noun
+        var item = noun_item_list[nouns[i]][Math.floor(Math.random() * noun_item_list[nouns[i]].length)];
+        new_items.push(item);
+      };
+      console.log("items:", new_items);
+        // if all items unique, return item-noun pairs list (of the form ["item1_noun1", "item2_noun2"...])
+      var items_list = _.flatten(_.map(_.zip(new_items, nouns), function([a, b]){return a.concat("_", b);}));
+      console.log(items_list);
+      items = new_items;
+    }
+    return items_list;
 }
 
 // get item-noun pairs used for a participant
-var item_noun_pairs = get_items(noun_item_list, num_trials);
+const item_noun_pairs = get_items(noun_item_list, num_trials);
 console.log("Item-noun pairs:", item_noun_pairs)
 
 ////////////////////////
@@ -52,9 +51,6 @@ console.log("Item-noun pairs:", item_noun_pairs)
 // half of the trials with big (0), half of trials with small (1) targets
 
 const target_size = _.shuffle([0,0,0,1,1,1])
-// const pic_order = function() {
-//   return _.shuffle([0,1])
-// }
 
 const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
 // console.log(contexts)
@@ -69,49 +65,61 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
   const expt_views = []
   // the iterator iterates over all the contexts and takes one target per context (either big or small)
   for ( i = 0; i < num_trials; i ++) {
-    const critical_size = synt_adj0[i].split("_")[2]
+    const critical_size = synt_adj0[i].split("_")[2];
+    console.log(contexts[i]);
+    var n2 = contexts[i].split("_")[1];
+    // if( n2 == "service") {
+    //   n2 = "service-animal"
+    // } else if (n2 == "prize") {
+    //   n2 = "prize-winner"
+    // } else {
+    //   n2 = n2
+    // }
+    console.log("N2:", n2);
+    const item = contexts[i].split("_")[0];
+    console.log("item:", item);
     const view = {
       trial_type: "critical",
-      context: items[contexts[i]][critical_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
-      context_picture: items[contexts[i]][critical_size].context_picture, // context picture is chose (it is the same for both big and small targets)
+      context: items[item][n2][critical_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
+      context_picture: items[item][n2][critical_size].context_picture, // context picture is chose (it is the same for both big and small targets)
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
-      target_picture: items[contexts[i]][critical_size].target, // target picture, differs for bis and small target
-      item: contexts[i],
-      target: items[contexts[i]][critical_size].item,
-      target_size: items[contexts[i]][critical_size].adj_congr,
-      ref_np: items[contexts[i]][critical_size].reference
+      target_picture: items[item][n2][critical_size].target, // target picture, differs for bis and small target
+      item: item,
+      target: items[item][n2][critical_size].item,
+      target_size: items[item][n2][critical_size].adj_congr,
+      ref_np: items[item][n2][critical_size].reference
     }
     // modify utterance etc depending on specific condition
     if (synt_adj0[i].split("_")[0] == "congr") {
 
-      view.adj = items[contexts[i]][critical_size].adj_congr;
+      view.adj = items[item][n2][critical_size].adj_congr;
       view.adj_cond = "congruent";
 
       if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
-        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].adj_congr + " " + items[contexts[i]][critical_size].item + " is a " + items[contexts[i]][critical_size].reference + ".</b>";
-        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_congr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_congr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][critical_size].adj_congr + " " + items[item][n2][critical_size].item + " is a " + items[item][n2][critical_size].reference + ".</b>";
+        view.question = "What do you think your friend is saying it is " + items[item][n2][critical_size].adj_congr + " relative to?";
+        view.paraphrase = "It is " + items[item][n2][critical_size].adj_congr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         view.syntax = "pred";
-        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].reference + " is a "  + items[contexts[i]][critical_size].adj_congr + " " + items[contexts[i]][critical_size].item + ".</b>";
-        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_congr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_congr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][critical_size].reference + " is a "  + items[item][n2][critical_size].adj_congr + " " + items[item][n2][critical_size].item + ".</b>";
+        view.question = "What do you think your friend is saying it is " + items[item][n2][critical_size].adj_congr + " relative to?";
+        view.paraphrase = "It is " + items[item][n2][critical_size].adj_congr + " relative to other " ;// paraphrase template
       }
 
     } else { // incongruent condition
-      view.adj = items[contexts[i]][critical_size].adj_incongr;
+      view.adj = items[item][n2][critical_size].adj_incongr;
       view.adj_cond = "incongruent";
       if (synt_adj0[i].split("_")[1] == "subj") {
         view.syntax = "subj";
-        view.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][critical_size].adj_incongr + " " + items[contexts[i]][critical_size].item + " is a " + items[contexts[i]][critical_size].reference + ".</b>";
-        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_incongr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" +"That " + items[item][n2][critical_size].adj_incongr + " " + items[item][n2][critical_size].item + " is a " + items[item][n2][critical_size].reference + ".</b>";
+        view.question = "What do you think your friend is saying it is " + items[item][n2][critical_size].adj_incongr + " relative to?";
+        view.paraphrase = "It is " + items[item][n2][critical_size].adj_incongr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         view.syntax = "pred";
-        view.utterance = "Your friend says: <br/><b>" + "That " + items[contexts[i]][critical_size].reference + " is a "  + items[contexts[i]][critical_size].adj_incongr + " " + items[contexts[i]][critical_size].item + ".</b>";
-        view.question = "What do you think your friend is saying it is " + items[contexts[i]][critical_size].adj_incongr + " relative to?";
-        view.paraphrase = "It is " + items[contexts[i]][critical_size].adj_incongr + " relative to other " ;// paraphrase template
+        view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][critical_size].reference + " is a "  + items[item][n2][critical_size].adj_incongr + " " + items[item][n2][critical_size].item + ".</b>";
+        view.question = "What do you think your friend is saying it is " + items[item][n2][critical_size].adj_incongr + " relative to?";
+        view.paraphrase = "It is " + items[item][n2][critical_size].adj_incongr + " relative to other " ;// paraphrase template
       }
     }
     // end of critical view creation
@@ -130,45 +138,45 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
     const filler = {
       trial_type: "filler",
       context: "You and your friend see the following:", // target_size indicates if the target is big or small within the given context
-      context_picture: items[contexts[i]][filler_size].context_picture_filler, // context picture is chose (it is the same for both big and small targets)
+      context_picture: items[item][n2][filler_size].context_picture_filler, // context picture is chose (it is the same for both big and small targets)
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
-      target_picture: items[contexts[i]][filler_size].target_filler, // target picture, differs for bis and small target
-      item: contexts[i],
-      target: items[contexts[i]][filler_size].item,
-      target_size: items[contexts[i]][filler_size].adj_congr,
-      ref_np: items[contexts[i]][filler_size].reference
+      target_picture: items[item][n2][filler_size].target_filler, // target picture, differs for bis and small target
+      item: item,
+      target: items[item][n2][filler_size].item,
+      target_size: items[item][n2][filler_size].adj_congr,
+      ref_np: items[item][n2][filler_size].reference
     }
 
     if (filler_cond[i].split("_")[0] == "congr") {
 
-      filler.adj = items[contexts[i]][filler_size].adj_congr;
+      filler.adj = items[item][n2][filler_size].adj_congr;
       filler.adj_cond = "congruent";
 
       if (synt_adj0[i].split("_")[1] == "pred") { // if critical trials is predicate N, do subject N filler
         filler.syntax = "subj";
-        filler.utterance = "Your friend says: <br/><b>" + "That "  + items[contexts[i]][filler_size].item + " is " + items[contexts[i]][filler_size].adj_congr + ".</b>";
-        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_congr + " relative to?";
-        filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_congr + " relative to other " ;// paraphrase template
+        filler.utterance = "Your friend says: <br/><b>" + "That "  + items[item][n2][filler_size].item + " is " + items[item][n2][filler_size].adj_congr + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_congr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_congr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         filler.syntax = "pred";
-        filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[contexts[i]][filler_size].adj_congr + " " + items[contexts[i]][filler_size].item + ".</b>";
-        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_congr + " relative to?";
-        filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_congr + " relative to other " ;// paraphrase template
+        filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[item][n2][filler_size].adj_congr + " " + items[item][n2][filler_size].item + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_congr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_congr + " relative to other " ;// paraphrase template
       }
 
     } else { // incongruent condition
-      filler.adj = items[contexts[i]][filler_size].adj_incongr;
+      filler.adj = items[item][n2][filler_size].adj_incongr;
       filler.adj_cond = "incongruent";
       if (synt_adj0[i].split("_")[1] == "pred") {
         filler.syntax = "subj";
-        filler.utterance = "Your friend says: <br/><b>" +"That " + items[contexts[i]][filler_size].item + " is " + items[contexts[i]][filler_size].adj_incongr + ".</b>";
-        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
-        filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_incongr + " relative to other " ;// paraphrase template
+        filler.utterance = "Your friend says: <br/><b>" +"That " + items[item][n2][filler_size].item + " is " + items[item][n2][filler_size].adj_incongr + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_incongr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_incongr + " relative to other " ;// paraphrase template
       } else { // predicative condition
         filler.syntax = "pred";
-        filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[contexts[i]][filler_size].adj_incongr + " " + items[contexts[i]][filler_size].item + ".</b>";
-        filler.question = "What do you think your friend is saying it is " + items[contexts[i]][filler_size].adj_incongr + " relative to?";
-        filler.paraphrase = "It is " + items[contexts[i]][filler_size].adj_incongr + " relative to other " ;// paraphrase template
+        filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[item][n2][filler_size].adj_incongr + " " + items[item][n2][filler_size].item + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_incongr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_incongr + " relative to other " ;// paraphrase template
       }
     }
     // end filler creation
@@ -184,9 +192,9 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
 
 const items = {
   // "_b" are the big referents
-  dogs1: [
+  dogs1: {
   // first set contains the basic-level context
-    {
+    service: [{
      item: "doberman",
      context_sent: "You and your friend are at an animal training ground ",
      context_picture: "images/dog-parade-basic.png",
@@ -210,12 +218,40 @@ const items = {
     target_filler: "images/chihuahua_filler.png",
     // first array are utterances in predicate, second is subject utterances
     reference: "service-animal"
-    }
-  ],
-  // "_s" are the small referents
+  }
+],
+rescue: [
+  {
+   item: "doberman",
+   context_sent: "You visit your friend who works at an animal shelter ",
+   context_picture: "images/dog-parade-basic-rescue.png",
+   context_picture_filler: "images/dog-parade-basic_filler.png",
+   adj_congr: "big",
+   adj_incongr: "small",
+   target: "images/doberman-rescue.png",
+   target_filler: "images/doberman_filler.png",
+   // first array is subject  , second is predicate
+   reference: "rescue" // critical utterances
+ },
+ // second set contains the subordinate context
+ {
+  item: "chihuahua",
+  context_sent: "You visit your friend who works at an animal shelter ",
+  context_picture: "images/dog-parade-basic-rescue.png",
+  context_picture_filler: "images/dog-parade-basic_filler.png",
+  adj_congr: "small",
+  adj_incongr: "big",
+  target: "images/chihuahua-rescue.png",
+  target_filler: "images/chihuahua_filler.png",
+  // first array are utterances in predicate, second is subject utterances
+  reference: "rescue"
+}
+]
+  },
 
-  dogs2: [
-    {
+  dogs2: {
+    prize: [
+      {
      item: "Great Dane",
      context_sent: "You and your friend are at a pet show ",
      context_picture: "images/dog-parade-basic2.png",
@@ -236,10 +272,35 @@ const items = {
     target: "images/pug.png",
     target_filler: "images/pug_filler.png",
     reference: "prize-winner"
-   }
-  ],
-  birds: [
+  }],
+  gift: [
     {
+   item: "Great Dane",
+   context_sent: "Your friend is a big pet lover. Your friend's birthday was last week. You and your friend are at their house ",
+   context_picture: "images/dog-parade-basic2-gift.png",
+   context_picture_filler: "images/dog-parade-basic2_filler.png",
+   adj_congr: "big",
+   adj_incongr: "small",
+   target: "images/great-dane-gift.png",
+   target_filler: "images/great-dane_filler.png",
+   reference: "gift"
+ },
+ {
+  item: "pug",
+  context_sent: "Your friend is a big pet lover. Your friend's birthday was last week. You and your friend are at their house ",
+  context_picture: "images/dog-parade-basic2-gift.png",
+  context_picture_filler: "images/dog-parade-basic2_filler.png",
+  adj_congr: "small",
+  adj_incongr: "big",
+  target: "images/pug-gift.png",
+  target_filler: "images/pug_filler.png",
+  reference: "gift"
+}
+  ]
+  },
+  birds: {
+    rescue:[
+          {
      item: "eagle",
      context_sent: "You visit your friend who works at an animal shelter ",
      context_picture: "images/bird-parade-basic.png",
@@ -261,30 +322,35 @@ const items = {
     target_filler: "images/hummingbird_filler.png",
     reference: "rescue"
    }
-  ],
-  // fish: [
-  //   {
-  //    item: "tuna",
-  //    context_sent: "You and your friend are at a fish market ",
-  //    context_picture: "images/fish-parade-basic.png",
-  //    adj_congr: "big",
-  //    adj_incongr: "small",
-  //    target: "images/tuna_net.png",
-  //    utterances: ["That big tuna is a gem", "That gem is a big tuna"],
-  //    reference: "gem"
-  //  },
-  //  {
-  //   item: "clownfish",
-  //   context_sent: "You and your friend are at a fish market ",
-  //   context_picture: "images/fish-parade-basic.png",
-  //   adj_congr: "small",
-  //   adj_incongr: "big",
-  //   target: "images/clownfish_net.png",
-  //   utterances: ["That small clownfish is a gem", "That gem is a small clownfish"],
-  //   reference: "gem"
-  //  }
-  // ],
-  flowers: [
+   ]
+  },
+  fish: {
+    rescue:[
+    {
+     item: "tuna",
+     context_sent: "You visit your friend who works as a marine biologist ",
+     context_picture: "images/fish-parade-basic.png",
+     context_picture_filler: "images/fish-parade-basic_filler.png",
+     adj_congr: "big",
+     adj_incongr: "small",
+     target: "images/tuna_net.png",
+     target_filler: "images/tuna_filler.png",
+     reference: "rescue"
+   },
+   {
+    item: "clownfish",
+    context_sent: "You visit your friend who works as a marine biologist ",
+    context_picture: "images/fish-parade-basic.png",
+    context_picture_filler: "images/fish-parade-basic_filler.png",
+    adj_congr: "small",
+    adj_incongr: "big",
+    target: "images/clownfish_net.png",
+    target_filler: "images/clownfish_filler.png",
+    reference: "rescue"
+   }]
+  },
+  flowers: {
+  gift: [
   {
    item: "sunflower",
    context_sent: "You and your friend are at their garden ",
@@ -306,10 +372,34 @@ const items = {
    target: "images/dandelion.png",
    target_filler: "images/dandelion_filler.png",
    reference: "gift"
+ }],
+ landmark: [
+   {
+    item: "sunflower",
+    context_sent: "You and your friend walk to a cabin you are renting for the weekend for the first time. You  want to memorize the path ",
+    context_picture: "images/flower-parade-basic-landmark.png",
+    context_picture_filler: "images/flower-parade-basic_filler.png",
+    adj_congr: "big",
+    adj_incongr: "small",
+    target: "images/sunflower-landmark.png",
+    target_filler: "images/sunflower_filler.png",
+    reference: "landmark"
+  },
+   {
+    item: "dandelion",
+    context_sent: "You and your friend walk to a cabin you are renting for the weekend for the first time. You  want to memorize the path ",
+    context_picture: "images/flower-parade-basic-landmark.png",
+    context_picture_filler: "images/flower-parade-basic_filler.png",
+    adj_congr: "small",
+    adj_incongr: "big",
+    target: "images/dandelion-landmark.png",
+    target_filler: "images/dandelion_filler.png",
+    reference: "landmark"
   }
- ],
-  trees: [
-    {
+ ]
+ },
+  trees: {
+    landmark: [    {
      item: "redwood",
      context_sent: "You and your friend walk to your friend's cabin in a park for the first time. You want to memorize the path ",
      context_picture: "images/tree-parade-basic.png",
@@ -330,195 +420,343 @@ const items = {
    target: "images/bonsai_stick.png",
    target_filler: "images/bonsai_filler.png",
    reference: "landmark"
+ }]
+},
+buildings: {
+  landmark: [
+    {
+     item: "skyscraper",
+     context_sent: "You visit your friend who lives in another city. You take a walk ",
+     context_picture: "images/buildings-parade-basic.png",
+     context_picture_filler: "images/buildings-parade-basic_filler.png",
+     adj_congr: "big",
+     adj_incongr: "small",
+     target: "images/skyscraper-landmark.png",
+     target_filler: "images/skyscraper-landmark-filler.png",
+     reference: "landmark"
+   },
+  {
+   item: "stripmall",
+   context_sent:  "You visit your friend who lives in another city. You take a walk ",
+   context_picture: "images/buildings-parade-basic.png",
+   context_picture_filler: "images/buildings-parade-basic_filler.png",
+   adj_congr: "small",
+   adj_incongr: "big",
+   target: "images/stripmall-landmark.png",
+   target_filler: "images/stripmall-landmark-filler.png",
+   reference: "landmark"
  }
- ]
+  ]
+}
 }
 
 // warm-up trial information
 // a warm-up block contains the same targets that the following main block contains
 const warmup_trials = {
   dogs1: {
+    service: {
+        train: {
+          item: "dogs1",
+          examples: _.shuffle([{picture:"warmup/chihuahua1.png", question:"This is a chihuahua."},
+                               {picture: "warmup/doberman1.png", question: "This is a doberman."}]),
+          picture1: "warmup/chihuahua1.png",
+          picture2: "warmup/doberman1.png",
+          text: "Please look at the objects below.",
+          question1: "This is a chihuahua.",
+          question3: "This is a doberman."
+       },
+      label: {
+        item: "dogs1",
+        examples: _.shuffle([{picture:"warmup/chihuahua2.png", correct: ["chihuahua"], question: "This is a "},
+                   {picture: "warmup/doberman2.png", correct:  ["doberman"], question: "This is a "}]),
+        // picture1: "warmup/chihuahua2.png",
+        // picture2: "warmup/doberman2.png",
+        // correct1: ["chihuahua"], // correct labels for the feedback
+        // correct2: ["doberman"],
+        correct3: "dogs",
+        text: "Please label the pictures below.",
+        question1: "This is a ",
+        question2: "These are both ",
+        question3: "This is a "
+      },
+      ref: {
+        item: "dogs1",
+        picture1: "warmup/beagle_service.png",
+        picture2: "warmup/doberman_service.png",
+        question: " <br> These dogs are service-animals. Notice the leash on them."
+      }
+    },
+  rescue: {
     train: {
-    item: "dogs1",
-    examples: _.shuffle([{picture:"warmup/chihuahua1.png", question:"This is a chihuahua."},
-                         {picture: "warmup/doberman1.png", question: "This is a doberman."}]),
-    picture1: "warmup/chihuahua1.png",
-    picture2: "warmup/doberman1.png",
-    text: "Please look at the objects below.",
-    question1: "This is a chihuahua.",
-    question3: "This is a doberman."
+      item: "dogs1",
+      examples: _.shuffle([{picture:"warmup/chihuahua1.png", question:"This is a chihuahua."},
+                           {picture: "warmup/doberman1.png", question: "This is a doberman."}]),
+      picture1: "warmup/chihuahua1.png",
+      picture2: "warmup/doberman1.png",
+      text: "Please look at the objects below.",
+      question1: "This is a chihuahua.",
+      question3: "This is a doberman."
    },
+    label: {
+      item: "dogs1",
+      examples: _.shuffle([{picture:"warmup/chihuahua2.png", correct: ["chihuahua"], question: "This is a "},
+                 {picture: "warmup/doberman2.png", correct:  ["doberman"], question: "This is a "}]),
+      // picture1: "warmup/chihuahua2.png",
+      // picture2: "warmup/doberman2.png",
+      // correct1: ["chihuahua"], // correct labels for the feedback
+      // correct2: ["doberman"],
+      correct3: "dogs",
+      text: "Please label the pictures below.",
+      question1: "This is a ",
+      question2: "These are both ",
+      question3: "This is a "
+    },
+    ref: {
+      item: "dogs1",
+      picture1: "warmup/beagle-rescue.png",
+      picture2: "warmup/doberman-rescue.png",
+      question: " <br> These dogs are rescues. Notice the collar on them."
+    }
+  }
+},
+dogs2: {
+  prize: {
+      train: {
+          item: "dogs2",
+          examples: _.shuffle([{picture:"warmup/pug1.png", question:"This is a pug."},
+                               {picture: "warmup/great-dane1.png", question: "This is a Great Dane."}]),
+          picture1: "warmup/pug1.png",
+          picture2: "warmup/great-dane1.png",
+          default1: ["pug"],
+          default2: ["great dane"],
+          text: "Please look at the objects below.",
+          question1: "This is a pug.",
+          question3: "This is a Great Dane."
+      },
+      label: {
+          item: "dogs2",
+          examples: _.shuffle([{picture: "warmup/pug2.png", question: "This is a ", correct: ["pug"]},
+                               {picture: "warmup/great-dane2.png",question: "This is a ", correct: ["great dane"]}]),
+          // picture1: "warmup/pug2.png",
+          // picture2: "warmup/great-dane2.png",
+          // correct1: ["pug"],
+          // correct2: ["great dane"],
+          correct3: "dogs",
+          text: "Please label the pictures below.",
+          question1: "This is a ",
+          question2: "These are both ",
+          question3: "This is a "
+        },
+      ref: {
+        item: "dogs2",
+        picture1: "warmup/pug_prize.png",
+        picture2: "warmup/great-dane_prize.png",
+        question:" <br>These dogs are prize-winners. Notice the bow on them."
+      }
+    },
+  gift: {
+    train: {
+        item: "dogs2",
+        examples: _.shuffle([{picture:"warmup/pug1.png", question:"This is a pug."},
+                             {picture: "warmup/great-dane1.png", question: "This is a Great Dane."}]),
+        picture1: "warmup/pug1.png",
+        picture2: "warmup/great-dane1.png",
+        default1: ["pug"],
+        default2: ["great dane"],
+        text: "Please look at the objects below.",
+        question1: "This is a pug.",
+        question3: "This is a Great Dane."
+    },
+    label: {
+        item: "dogs2",
+        examples: _.shuffle([{picture: "warmup/pug2.png", question: "This is a ", correct: ["pug"]},
+                             {picture: "warmup/great-dane2.png",question: "This is a ", correct: ["great dane"]}]),
+        // picture1: "warmup/pug2.png",
+        // picture2: "warmup/great-dane2.png",
+        // correct1: ["pug"],
+        // correct2: ["great dane"],
+        correct3: "dogs",
+        text: "Please label the pictures below.",
+        question1: "This is a ",
+        question2: "These are both ",
+        question3: "This is a "
+      },
+    ref: {
+      item: "dogs2",
+      picture1: "warmup/pug-gift.png",
+      picture2: "warmup/great-dane-gift.png",
+      question:" <br>These dogs are gifts. Notice the bow on them."
+    }
+  }
+},
+birds: {
+  rescue: {
+      train: {
+          item: "birds",
+          examples: _.shuffle([{picture:"warmup/hummingbird1.png", question:"This is a hummingbird."},
+                               {picture: "warmup/eagle1.png", question: "This is an eagle."}]),
+          picture1: "warmup/hummingbird1.png",
+          picture2: "warmup/eagle1.png",
+          default1: ["hummingbird"],
+          default2: ["eagle"],
+          text: "Please look at the objects below.",
+          question1: "This is a hummingbird.",
+          question3: "This is an eagle."
+      },
+      label: {
+          item: "birds",
+          examples: _.shuffle([{picture: "warmup/hummingbird2.png", question: "This is a ", correct: ["hummingbird"]},
+                               {picture: "warmup/eagle2.png",question: "This is an ", correct: ["eagle"]}]),
+          // picture1: "warmup/hummingbird2.png",
+          // picture2: "warmup/eagle2.png",
+          // correct1: ["hummingbird"],
+          // correct2: ["eagle"],
+          correct3: "birds",
+          text: "Please label the pictures below.",
+          question1: "This is a ",
+          question2: "These are both ",
+          question3: "This is an "
+    },
+      ref: {
+        item: "birds",
+        picture1: "warmup/hummingbird_rescue.png",
+        picture2: "warmup/eagle_rescue.png",
+        question: " <br> These are rescue animals (or, rescues). Notice the tag on them."
+      }
+}
+},
+flowers: {
+  gift: {
+      train: {
+        item: "flowers",
+        examples: _.shuffle([{picture:"warmup/dandelion1.png", question:"This is a dandelion."},
+                             {picture: "warmup/sunflower1.png", question: "This is a sunflower."}]),
+        picture1: "warmup/dandelion1.png",
+        picture2: "warmup/sunflower1.png",
+        default1: ["dandelion"],
+        default2: ["sunflower"],
+        text: "Please look at the objects below.",
+        question1: "This is a dandelion.",
+        question3: "This is a sunflower."
+      },
+      label: {
+        item: "flowers",
+        examples: _.shuffle([{picture: "warmup/dandelion2.png", question: "This is a ", correct: ["dandelion"]},
+                             {picture: "warmup/sunflower2.png",question: "This is a ", correct: ["sunflower"]}]),
+        // picture1: "warmup/dandelion2.png",
+        // picture2: "warmup/sunflower2.png",
+        // correct1: ["dandelion"],
+        // correct2: ["sunflower"],
+        correct3: "flowers",
+        text: "Please label the pictures below.",
+        question1: "This is a ",
+        question2: "These are both ",
+        question3: "This is a "
+    },
+      ref: {
+        item: "flowers",
+        picture1: "warmup/dandelion_gift.png",
+        picture2: "warmup/sunflower_gift.png",
+        question: " <br> These flowers are gifts. Notice the bows on the pots."
+      }
+  },
+  landmark: {
+    train: {
+      item: "flowers",
+      examples: _.shuffle([{picture:"warmup/dandelion1.png", question:"This is a dandelion."},
+                           {picture: "warmup/sunflower1.png", question: "This is a sunflower."}]),
+      picture1: "warmup/dandelion1.png",
+      picture2: "warmup/sunflower1.png",
+      default1: ["dandelion"],
+      default2: ["sunflower"],
+      text: "Please look at the objects below.",
+      question1: "This is a dandelion.",
+      question3: "This is a sunflower."
+    },
+    label: {
+      item: "flowers",
+      examples: _.shuffle([{picture: "warmup/dandelion2.png", question: "This is a ", correct: ["dandelion"]},
+                           {picture: "warmup/sunflower2.png",question: "This is a ", correct: ["sunflower"]}]),
+      // picture1: "warmup/dandelion2.png",
+      // picture2: "warmup/sunflower2.png",
+      // correct1: ["dandelion"],
+      // correct2: ["sunflower"],
+      correct3: "flowers",
+      text: "Please label the pictures below.",
+      question1: "This is a ",
+      question2: "These are both ",
+      question3: "This is a "
+  },
+    ref: {
+      item: "flowers",
+      picture1: "warmup/dandelion-landmark.png",
+      picture2: "warmup/sunflower-landmark.png",
+      question: " <br> These flowers are landmarks. Notice the signs in the pots."
+    }
+  }
+},
+fish: {
+  rescue: {
+      train: {
+        item: "fish",
+        examples: _.shuffle([{picture:"warmup/clownfish1.png", question:"This is a clownfish."},
+                             {picture: "warmup/tuna1.png", question: "This is a tuna."}]),
+        picture1: "warmup/tuna1.png",
+        picture2: "warmup/clownfish1.png",
+        default1: ["tuna"],
+        default2: ["clownfish"],
+        text: "This one is done for you.",
+        question1: "This is a ",
+        question3: "This is a "
+      },
+      label:  {
+        item: "fish",
+        examples: _.shuffle([{picture: "warmup/clownfish2.png", question: "This is a ", correct: ["clownfish"]},
+                             {picture: "warmup/tuna2.png",question: "This is a ", correct: ["tuna"]}]),
+        // picture1: "warmup/tuna2.png",
+        // picture2: "warmup/clownfish2.png",
+        // correct1: ["tuna"],
+        // correct2: ["clownfish"],
+        correct3: "fish",
+        text: "Your turn! Please label the pictures below.",
+        question1: "This is a ",
+        question3: "This is a "
+      },
+      ref: {
+        item: "flowers",
+        picture1: "warmup/tuna_rescue.png",
+        picture2: "warmup/clownfish_rescue.png",
+        question: " <br> These fish are rescues. Notice the nets they were caught in."
+      }
+  }
+},
+trees: {
+  landmark: {
+  train: {
+    item: "trees",
+    examples: _.shuffle([{picture:"warmup/redwood1.png", question:"This is a redwood."},
+                         {picture: "warmup/bonsai1.png", question: "This is a bonsai."}]),
+    picture1: "warmup/redwood1.png",
+    picture2: "warmup/bonsai1.png",
+    default1: ["redwood"],
+    default2: ["bonsai"],
+    text: "Please look at the objects below.",
+    question1: "This is a redwood.",
+    question3: "This is a bonsai."
+  },
   label: {
-    item: "dogs1",
-    examples: _.shuffle([{picture:"warmup/chihuahua2.png", correct: ["chihuahua"], question: "This is a "},
-               {picture: "warmup/doberman2.png", correct:  ["doberman"], question: "This is a "}]),
-    // picture1: "warmup/chihuahua2.png",
-    // picture2: "warmup/doberman2.png",
-    // correct1: ["chihuahua"], // correct labels for the feedback
-    // correct2: ["doberman"],
-    correct3: "dogs",
+    item: "trees",
+    examples: _.shuffle([{picture: "warmup/redwood2.png", question: "This is a ", correct: "redwood or sequoia (choose one)"},
+                         {picture: "warmup/bonsai2.png",question: "This is a ", correct: ["bonsai"]}]),
+    // picture1: "warmup/redwood2.png",
+    // picture2: "warmup/bonsai2.png",
+    // correct1: "redwood or sequoia (choose one)",
+    // correct2: ["bonsai"],
+    correct3: "trees",
     text: "Please label the pictures below.",
     question1: "This is a ",
     question2: "These are both ",
     question3: "This is a "
-  },
-  ref: {
-    item: "dogs1",
-    picture1: "warmup/beagle_service.png",
-    picture2: "warmup/doberman_service.png",
-    question: " <br> These dogs are service-animals. Notice the leash on them."
-  }
-},
-dogs2: {
-  train: {
-  item: "dogs2",
-  examples: _.shuffle([{picture:"warmup/pug1.png", question:"This is a pug."},
-                       {picture: "warmup/great-dane1.png", question: "This is a Great Dane."}]),
-  picture1: "warmup/pug1.png",
-  picture2: "warmup/great-dane1.png",
-  default1: ["pug"],
-  default2: ["great dane"],
-  text: "Please look at the objects below.",
-  question1: "This is a pug.",
-  question3: "This is a Great Dane."
-  },
-  label: {
-  item: "dogs2",
-  examples: _.shuffle([{picture: "warmup/pug2.png", question: "This is a ", correct: ["pug"]},
-                       {picture: "warmup/great-dane2.png",question: "This is a ", correct: ["great dane"]}]),
-  // picture1: "warmup/pug2.png",
-  // picture2: "warmup/great-dane2.png",
-  // correct1: ["pug"],
-  // correct2: ["great dane"],
-  correct3: "dogs",
-  text: "Please label the pictures below.",
-  question1: "This is a ",
-  question2: "These are both ",
-  question3: "This is a "
-},
-ref: {
-  item: "dogs2",
-  picture1: "warmup/pug_prize.png",
-  picture2: "warmup/great-dane_prize.png",
-  question:" <br>These dogs are prize-winners. Notice the bow on them."
-}
-},
-birds: {
-  train: {
-  item: "birds",
-  examples: _.shuffle([{picture:"warmup/hummingbird1.png", question:"This is a hummingbird."},
-                       {picture: "warmup/eagle1.png", question: "This is an eagle."}]),
-  picture1: "warmup/hummingbird1.png",
-  picture2: "warmup/eagle1.png",
-  default1: ["hummingbird"],
-  default2: ["eagle"],
-  text: "Please look at the objects below.",
-  question1: "This is a hummingbird.",
-  question3: "This is an eagle."
-  },
-  label: {
-  item: "birds",
-  examples: _.shuffle([{picture: "warmup/hummingbird2.png", question: "This is a ", correct: ["hummingbird"]},
-                       {picture: "warmup/eagle2.png",question: "This is an ", correct: ["eagle"]}]),
-  // picture1: "warmup/hummingbird2.png",
-  // picture2: "warmup/eagle2.png",
-  // correct1: ["hummingbird"],
-  // correct2: ["eagle"],
-  correct3: "birds",
-  text: "Please label the pictures below.",
-  question1: "This is a ",
-  question2: "These are both ",
-  question3: "This is an "
-},
-ref: {
-  item: "birds",
-  picture1: "warmup/hummingbird_rescue.png",
-  picture2: "warmup/eagle_rescue.png",
-  question: " <br> These are rescue animals (or, rescues). Notice the tag on them."
-}
-},
-flowers: {
-  train: {
-  item: "flowers",
-  examples: _.shuffle([{picture:"warmup/dandelion1.png", question:"This is a dandelion."},
-                       {picture: "warmup/sunflower1.png", question: "This is a sunflower."}]),
-  picture1: "warmup/dandelion1.png",
-  picture2: "warmup/sunflower1.png",
-  default1: ["dandelion"],
-  default2: ["sunflower"],
-  text: "Please look at the objects below.",
-  question1: "This is a dandelion.",
-  question3: "This is a sunflower."
-  },
-  label: {
-  item: "flowers",
-  examples: _.shuffle([{picture: "warmup/dandelion2.png", question: "This is a ", correct: ["dandelion"]},
-                       {picture: "warmup/sunflower2.png",question: "This is a ", correct: ["sunflower"]}]),
-  // picture1: "warmup/dandelion2.png",
-  // picture2: "warmup/sunflower2.png",
-  // correct1: ["dandelion"],
-  // correct2: ["sunflower"],
-  correct3: "flowers",
-  text: "Please label the pictures below.",
-  question1: "This is a ",
-  question2: "These are both ",
-  question3: "This is a "
-},
-ref: {
-  item: "flowers",
-  picture1: "warmup/dandelion_gift.png",
-  picture2: "warmup/sunflower_gift.png",
-  question: " <br> These flowers are gifts. Notice the bows on the pots."
-}
-},
-// fish: {
-//   train: {
-//   item: "fish",
-//   picture1: "warmup/swordfish1.png",
-//   picture2: "warmup/goldfish1.png",
-//   default1: ["swordfish"],
-//   default2: ["goldfish"],
-//   text: "This one is done for you.",
-//   question1: "This is a ",
-//   question3: "This is a "
-//   },
-//   label:  {
-//   item: "fish",
-//   picture1: "warmup/swordfish2.png",
-//   picture2: "warmup/goldfish2.png",
-//   correct1: ["swordfish"],
-//   correct2: ["goldfish"],
-//   text: "Your turn! Please label the pictures below.",
-//   question1: "This is a ",
-//   question3: "This is a "
-//   }
-// },
-trees: {
-  train: {
-  item: "trees",
-  examples: _.shuffle([{picture:"warmup/redwood1.png", question:"This is a redwood."},
-                       {picture: "warmup/bonsai1.png", question: "This is a bonsai."}]),
-  picture1: "warmup/redwood1.png",
-  picture2: "warmup/bonsai1.png",
-  default1: ["redwood"],
-  default2: ["bonsai"],
-  text: "Please look at the objects below.",
-  question1: "This is a redwood.",
-  question3: "This is a bonsai."
-  },
-  label: {
-  item: "trees",
-  examples: _.shuffle([{picture: "warmup/redwood2.png", question: "This is a ", correct: "redwood or sequoia (choose one)"},
-                       {picture: "warmup/bonsai2.png",question: "This is a ", correct: ["bonsai"]}]),
-  // picture1: "warmup/redwood2.png",
-  // picture2: "warmup/bonsai2.png",
-  // correct1: "redwood or sequoia (choose one)",
-  // correct2: ["bonsai"],
-  correct3: "trees",
-  text: "Please label the pictures below.",
-  question1: "This is a ",
-  question2: "These are both ",
-  question3: "This is a "
 },
 ref: {
   item: "trees",
@@ -527,9 +765,48 @@ ref: {
   question: " <br> These trees are landmarks. Notice the signs on them."
 }
 }
+},
+
+buildings: {
+  landmark: {
+    train: {
+      item: "buildings",
+      examples: _.shuffle([{picture:"warmup/skyscraper1.png", question:"This is a skyscraper."},
+                           {picture: "warmup/stripmall1.png", question: "This is a stripmall."}]),
+      picture1: "warmup/skyscraper1.png",
+      picture2: "warmup/stripmall1.png",
+      default1: ["skyscraper"],
+      default2: ["stripmall"],
+      text: "Please look at the objects below.",
+      question1: "This is a skyscraper.",
+      question3: "This is a stripmall."
+    },
+    label: {
+      item: "buildings",
+      examples: _.shuffle([{picture: "warmup/skyscraper2.png", question: "This is a ", correct: "skyscraper"},
+                           {picture: "warmup/stripmall2.png",question: "This is a ", correct: ["stripmall"]}]),
+      // picture1: "warmup/redwood2.png",
+      // picture2: "warmup/bonsai2.png",
+      // correct1: "redwood or sequoia (choose one)",
+      // correct2: ["bonsai"],
+      correct3: "buildings",
+      text: "Please label the pictures below.",
+      question1: "This is a ",
+      question2: "These are both ",
+      question3: "This is a "
+   },
+    ref: {
+      item: "buildings",
+      picture1: "warmup/skyscraper_landmark.png",
+      picture2: "warmup/stripmall_landmark.png",
+      question: " <br> These buildings are landmarks. Notice the flags on them."
+    }
+  }
 }
 
-const main_trials = create_view(items, target_size, contexts, num_trials, synt_adj0, filler_cond)
+}
+
+const main_trials = create_view(items, target_size, item_noun_pairs, num_trials, synt_adj0, filler_cond)
 
 // shuffle sets of warmup trials and the corresponding big and small targets
  // x: warmup trial
@@ -537,11 +814,13 @@ const main_trials = create_view(items, target_size, contexts, num_trials, synt_a
  // z: small target
  // the trials are already shuffled in the context list
 
+// item_noun_pairs[0].split("_")[0] - item; [1] - N2
+
 const trials = [
-  {x:warmup_trials[contexts[0]], y:main_trials[0], z:main_trials[1]},
-  {x:warmup_trials[contexts[1]], y:main_trials[2], z:main_trials[3]},
-  {x:warmup_trials[contexts[2]], y:main_trials[4], z:main_trials[5]},
-  {x:warmup_trials[contexts[3]], y:main_trials[6], z:main_trials[7]},
+  {x:warmup_trials[item_noun_pairs[0].split("_")[0]][item_noun_pairs[0].split("_")[1]], y:main_trials[0], z:main_trials[1]},
+  {x:warmup_trials[item_noun_pairs[1].split("_")[0]][item_noun_pairs[1].split("_")[1]], y:main_trials[2], z:main_trials[3]},
+  {x:warmup_trials[item_noun_pairs[2].split("_")[0]][item_noun_pairs[2].split("_")[1]], y:main_trials[4], z:main_trials[5]},
+  {x:warmup_trials[item_noun_pairs[3].split("_")[0]][item_noun_pairs[3].split("_")[1]], y:main_trials[6], z:main_trials[7]},
   //{x:warmup_trials[contexts[4]], y:main_trials[], z:main_trials[0]},
 //  {x:warmup_trials[contexts[5]], y:main_trials[5]}
 ]
