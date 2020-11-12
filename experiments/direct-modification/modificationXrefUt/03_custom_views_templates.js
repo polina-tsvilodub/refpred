@@ -12,28 +12,29 @@ const custom_botcaptcha = function(config){
         <h1 class='magpie-view-title'>Are you a bot?</h1>
         <br />
         <section class="magpie-text-container" align="center">
-            <p class="magpie-text-container">${config.speaker} says to ${config.listener}: It's a beautiful day, isn't it?</p>
+            <p class="magpie-text-container" align="center">${config.speaker} says to ${config.listener}: It's a beautiful day, isn't it?</p>
         </section>
         <br />
         <section class="magpie-text-container" align="center">
-            <p class="magpie-text-container" id="quest-response">Who is ${config.speaker} talking to?</p>
-            <section class="magpie-text-container" align="center">
-                <p class="magpie-text-container">Please enter your answer in lower case.</p>
+            <p class="magpie-text-container" id="quest-response" align="center">Who is ${config.speaker} talking to?</p>
+            <section class="magpie-answer-container" align="center">
+                <p class="magpie-text-container" align="center">Please enter your answer in lower case.</p>
             </section
             <br />
+            <section class="magpie-view-question" align="center">
             <textarea rows="1" cols="15" name="botresponse" id="listener-response"></textarea>
-
+            </section>
         </section>
         <br />
         <button class="magpie-view-button" id='next'>Let's go!</button>
         <section class="answer-container" align="center">
-            <p class="text" id="error_incorrect" style="color: #7CB637">This is incorrect.</p>
-            <p class="text" id="error_2more" style="color: #7CB637">You have 2 more trials.</p>
-            <p class="text" id="error_1more" style="color: #7CB637">You have 1 more trial.</p>
-            <p class="text" id="error" style="color: #7CB637">Error: You failed the comprehension questions too many times.
+            <p class="text" id="error_incorrect" style="color: #7CB637" align="center">This is incorrect.</p>
+            <p class="text" id="error_2more" style="color: #7CB637" align="center">You have 2 more trials.</p>
+            <p class="text" id="error_1more" style="color: #7CB637" align="center">You have 1 more trial.</p>
+            <p class="text" id="error" style="color: #7CB637" align="center">Error: You failed the comprehension questions too many times.
             You are not permitted to complete the HIT. Please click 'Return HIT' to avoid any impact on your approval rating.
             <br/><br/>
-            If you believe you are receiving thin message in error, please email <a href="mailto:polinats@mit.edu">polinats@mit.edu</a> </p>
+            If you believe you are receiving thin message in error, please email <a href="mailto:tessler@mit.edu">tessler@mit.edu</a> </p>
         </section>
         </div>`);
 // don't allow to press enter in the response field
@@ -174,7 +175,7 @@ const custom_comp_class_warmup = function(config, startingTime) {
     trials: config.trials,
     render: function(CT, magpie, startingTime) {
       $("main").html(`<div class='magpie-view'>
-      <h1 class='magpie-view-title'> Instructions</h1>
+      <h1 class='magpie-view-title'>Practice Round</h1>
       <section class="magpie-text-container">
         <p class="magpie-view-question">${config.context}</p>
       </section>
@@ -661,7 +662,7 @@ const custom_intro_view = function(config) {
           <section class="magpie-text-container">
             <p class="magpie-view-text"> Thank you for taking part in our study. We are studying how people talk about things around them. The study will take about 7-9 minutes.<br /> <br />
 
-            <p class="magpie-view-text" style="font-family:Courier New, Courier"> Please note: There will be multiple posted versions of this HIT (name:<b> Flowers - 555</b>) throughout the next few days.
+            <p class="magpie-view-text" style="font-family:Courier New, Courier"> Please note: There will be multiple posted versions of this HIT (name:<b> Gifts - 101</b>) throughout the next few days.
             Please attempt only one HIT in this series. You will not be allowed to complete multiple HITs in this series. </br> </br>
             </p>
             <p class="magpie-view-text">

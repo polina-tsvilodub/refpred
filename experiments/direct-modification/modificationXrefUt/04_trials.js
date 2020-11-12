@@ -52,7 +52,7 @@ console.log("Item-noun pairs:", item_noun_pairs)
 
 const target_size = _.shuffle([0,0,0,1,1,1])
 
-const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
+// const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
 // console.log(contexts)
 const synt_adj0 = _.shuffle(["congr_subj_0", "congr_pred_0", "congr_subj_1", "congr_pred_1"]);
 console.log(synt_adj0)
@@ -276,7 +276,7 @@ rescue: [
   gift: [
     {
    item: "Great Dane",
-   context_sent: "Your friend is a big pet lover. Your friend's birthday was last week. You and your friend are at their house ",
+   context_sent: "You and your friend are at a pet store ",
    context_picture: "images/dog-parade-basic2-gift.png",
    context_picture_filler: "images/dog-parade-basic2_filler.png",
    adj_congr: "big",
@@ -287,7 +287,7 @@ rescue: [
  },
  {
   item: "pug",
-  context_sent: "Your friend is a big pet lover. Your friend's birthday was last week. You and your friend are at their house ",
+  context_sent: "You and your friend are at a pet store ",
   context_picture: "images/dog-parade-basic2-gift.png",
   context_picture_filler: "images/dog-parade-basic2_filler.png",
   adj_congr: "small",
@@ -353,7 +353,7 @@ rescue: [
   gift: [
   {
    item: "sunflower",
-   context_sent: "You and your friend are at their garden ",
+   context_sent: "You and your friend are at a garden store ",
    context_picture: "images/flower-parade-basic.png",
    context_picture_filler: "images/flower-parade-basic_filler.png",
    adj_congr: "big",
@@ -364,7 +364,7 @@ rescue: [
  },
   {
    item: "dandelion",
-   context_sent: "You and your friend are at their garden ",
+   context_sent: "You and your friend are at a garden store ",
    context_picture: "images/flower-parade-basic.png",
    context_picture_filler: "images/flower-parade-basic_filler.png",
    adj_congr: "small",
@@ -376,7 +376,7 @@ rescue: [
  landmark: [
    {
     item: "sunflower",
-    context_sent: "You and your friend walk to a cabin you are renting for the weekend for the first time. You  want to memorize the path ",
+    context_sent: "You and your friend walk to a cabin you are renting for the weekend for the first time. You go along the path ",
     context_picture: "images/flower-parade-basic-landmark.png",
     context_picture_filler: "images/flower-parade-basic_filler.png",
     adj_congr: "big",
@@ -387,7 +387,7 @@ rescue: [
   },
    {
     item: "dandelion",
-    context_sent: "You and your friend walk to a cabin you are renting for the weekend for the first time. You  want to memorize the path ",
+    context_sent: "You and your friend walk to a cabin you are renting for the weekend for the first time. You go along the path ",
     context_picture: "images/flower-parade-basic-landmark.png",
     context_picture_filler: "images/flower-parade-basic_filler.png",
     adj_congr: "small",
@@ -585,7 +585,7 @@ dogs2: {
       item: "dogs2",
       picture1: "warmup/pug-gift.png",
       picture2: "warmup/great-dane-gift.png",
-      question:" <br>These dogs are gifts. Notice the bow on them."
+      question:" <br>You are at a pet store, and you see these dogs. These dogs are already sold and are being given as gifts. Notice the bows on them."
     }
   }
 },
@@ -657,7 +657,7 @@ flowers: {
         item: "flowers",
         picture1: "warmup/dandelion_gift.png",
         picture2: "warmup/sunflower_gift.png",
-        question: " <br> These flowers are gifts. Notice the bows on the pots."
+        question: " <br>You are at a garden store, and you see these flowers. These flowers are already sold and are being given as gifts. Notice the bows on the pots."
       }
   },
   landmark: {
@@ -718,8 +718,9 @@ fish: {
         // correct1: ["tuna"],
         // correct2: ["clownfish"],
         correct3: "fish",
-        text: "Your turn! Please label the pictures below.",
+        text: "Please label the pictures below.",
         question1: "This is a ",
+        question2: "These are both ",
         question3: "This is a "
       },
       ref: {
