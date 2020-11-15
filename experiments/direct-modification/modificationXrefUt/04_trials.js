@@ -20,7 +20,7 @@ function get_items(noun_item_list, num_trials){
   // get four nouns
 
   const nouns = _.shuffle(Object.keys(noun_item_list)).slice(0, num_trials);
-  console.log("nouns:", nouns);
+  // console.log("nouns:", nouns);
   var items = [];
   // check if there are items which occur twice
   while (_.uniq(items).length < num_trials) {
@@ -31,10 +31,10 @@ function get_items(noun_item_list, num_trials){
         var item = noun_item_list[nouns[i]][Math.floor(Math.random() * noun_item_list[nouns[i]].length)];
         new_items.push(item);
       };
-      console.log("items:", new_items);
+      // console.log("items:", new_items);
         // if all items unique, return item-noun pairs list (of the form ["item1_noun1", "item2_noun2"...])
       var items_list = _.flatten(_.map(_.zip(new_items, nouns), function([a, b]){return a.concat("_", b);}));
-      console.log(items_list);
+      // console.log(items_list);
       items = new_items;
     }
     return items_list;
@@ -66,18 +66,11 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
   // the iterator iterates over all the contexts and takes one target per context (either big or small)
   for ( i = 0; i < num_trials; i ++) {
     const critical_size = synt_adj0[i].split("_")[2];
-    console.log(contexts[i]);
+    // console.log(contexts[i]);
     var n2 = contexts[i].split("_")[1];
-    // if( n2 == "service") {
-    //   n2 = "service-animal"
-    // } else if (n2 == "prize") {
-    //   n2 = "prize-winner"
-    // } else {
-    //   n2 = n2
-    // }
-    console.log("N2:", n2);
+    // console.log("N2:", n2);
     const item = contexts[i].split("_")[0];
-    console.log("item:", item);
+    // console.log("item:", item);
     const view = {
       trial_type: "critical",
       context: items[item][n2][critical_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
