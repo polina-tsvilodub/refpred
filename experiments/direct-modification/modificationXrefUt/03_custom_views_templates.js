@@ -704,15 +704,53 @@ const custom_intro_view = function(config) {
            }
 
 
-          let next = $("#next");
+          // let next = $("#next");
+          // next.on("click", function() {
+          //   if (bad_worker) {
+          //     $("#please-return").removeClass('magpie-nodisplay')
+          //   } else {
+          //     magpie.findNextView();
+          //   }
+          // });
+          // startingTime = Date.now();
+          let prolificId;
+          const prolificForm = `<p id="prolific-id-form">
+                      <label for="prolific-id">Please, enter your Prolific ID</label>
+                      <input type="text" id="prolific-id" />
+                  </p>`;
+
+          const next = $("#next");
+
+          function showNextBtn() {
+              if (prolificId.val().trim() !== "") {
+                  next.removeClass("magpie-nodisplay");
+              } else {
+                  next.addClass("magpie-nodisplay");
+              }
+          }
+
+          if (magpie.deploy.deployMethod === "Prolific") {
+              $(".magpie-text-container").append(prolificForm);
+              next.addClass("magpie-nodisplay");
+              prolificId = $("#prolific-id");
+
+              prolificId.on("keyup", function() {
+                  showNextBtn();
+              });
+
+              prolificId.on("focus", function() {
+                  showNextBtn();
+              });
+          }
+
+          // moves to the next view
           next.on("click", function() {
-            if (bad_worker) {
-              $("#please-return").removeClass('magpie-nodisplay')
-            } else {
+              if (magpie.deploy.deployMethod === "Prolific") {
+                  magpie.global_data.prolific_id = prolificId.val().trim();
+              }
+
               magpie.findNextView();
-            }
           });
-          startingTime = Date.now();
       },
       CT: 0,
       trials: config.trials
