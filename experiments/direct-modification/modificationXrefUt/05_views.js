@@ -83,8 +83,12 @@ const thanks = magpieViews.view_generator("thanks", {
         magpie.submission.submit(magpie);
 
         if (magpie.deploy.deployMethod === "Prolific") {
-          proliferate.submit(magpie.trial_data);
+          proliferate.submit({
+            trials: magpie.trial_data,
+            subject: magpie.global_data
+          });
         }
+        // console.log(magpie.trial_data);
     }
 }
 
