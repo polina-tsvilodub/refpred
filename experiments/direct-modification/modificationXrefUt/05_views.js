@@ -30,7 +30,65 @@ const thanks = magpieViews.view_generator("thanks", {
   name: 'thanks',
   title: 'Thank you for taking part in this experiment!',
   prolificConfirmText: 'Press the button'
-});
+},
+{
+  handle_response_function: function(config, CT, magpie, answer_container_generator, startingTime) {
+        const prolificConfirmText = magpieUtils.view.setter.prolificConfirmText(config.prolificConfirmText,
+            "Please press the button below to confirm that you completed the experiment with Prolific");
+        if (
+            magpie.deploy.is_MTurk ||
+            magpie.deploy.deployMethod === "directLink" ||
+            magpie.deploy.deployMethod === "localServer"
+        ) {
+            // updates the fields in the hidden form with info for the MTurk's server
+            $("#main").html(
+                `<div class='magpie-view magpie-thanks-view'>
+                            <h2 id='warning-message' class='magpie-warning'>Submitting the data
+                                <p class='magpie-view-text'>please do not close the tab</p>
+                                <div class='magpie-loader'></div>
+                            </h2>
+                            <h1 id='thanks-message' class='magpie-thanks magpie-nodisplay'>${
+                    config.title
+                    }</h1>
+                        </div>`
+            );
+        } else if (magpie.deploy.deployMethod === "Prolific") {
+            $("#main").html(
+                `<div class='magpie-view magpie-thanks-view'>
+                            <h2 id='warning-message' class='magpie-warning'>Submitting the data
+                                <p class='magpie-view-text'>please do not close the tab</p>
+                                <div class='magpie-loader'></div>
+                            </h2>
+                            <h1 id='thanks-message' class='magpie-thanks magpie-nodisplay'>${
+                    config.title
+                    }</h1>
+                            <p id='extra-message' class='magpie-view-text magpie-nodisplay'>
+                                ${prolificConfirmText}
+                                <a href="${
+                    magpie.deploy.prolificURL
+                    }" class="magpie-view-button prolific-url">Confirm</a>
+                            </p>
+                        </div>`
+            );
+        } else if (magpie.deploy.deployMethod === "debug") {
+            $("main").html(
+                `<div id='magpie-debug-table-container' class='magpie-view magpie-thanks-view'>
+                            <h1 class='magpie-view-title'>Debug Mode</h1>
+                        </div>`
+            );
+        } else {
+            console.error("No such magpie.deploy.deployMethod");
+        }
+
+        magpie.submission.submit(magpie);
+
+        if (magpie.deploy.deployMethod === "Prolific") {
+          proliferate.submit(magpie.trial_data);
+        }
+    }
+}
+
+);
 
 // comparison class inference task comprehension trial
 const comp_class_warmup = custom_comp_class_warmup({
