@@ -260,7 +260,7 @@ var pragmaticListener = function(utterance, target_kind, form, cont, ref_utility
 
 var speaker2 = cache(function(state, cc, form, context, ref_utility_weight) {
   Infer({
-//    method: "enumerate",
+    method: "enumerate",
     model: function() {
 //       display("args to S2")
 //       display(JSON.stringify(state))
@@ -286,6 +286,13 @@ var speaker2 = cache(function(state, cc, form, context, ref_utility_weight) {
 //   "dog",
 //   0.5
 // ))
+// viz.table(speaker2(
+//   {kind: 'greatdane', id: "gd1", property: 0},
+//   "greatdane",
+//   "positive",
+//   "dog",
+//   0.5
+// ))
 
 // L2 reasoning about the comparison class only, following L2 model from the big cc-paper
 var listener2 = function(utterance, target_kind, form, cont, ref_utility_weight){
@@ -305,13 +312,13 @@ var listener2 = function(utterance, target_kind, form, cont, ref_utility_weight)
   })
 }
 
-viz.marginals(listener2(
-  {subject: "greatdane", predicate: "big"},
-  "greatdane",
-  "positive",
-  "dog",
-  0.5
-))
+// viz.marginals(listener2(
+//  {subject: "greatdane", predicate: "big"},
+//  "greatdane",
+//  "positive",
+//  "dog",
+//  0.5
+// ))
 
 //   viz.marginals(pragmaticListener(
 //     {subject: "greatdane", predicate: "big"},
