@@ -273,18 +273,7 @@ var speaker2 = cache(function(state, cc, form, context, ref_utility_weight) {
       var listener1 = pragmaticListener(utterance, state.kind, form, context, ref_utility_weight)
       display("S2 inference")
 //       display(listener1)
-      var L1_ref = marginalize(listener1, "referent")
-      var L1_pred = marginalize(listener1, "property")
-
-      var ref_utility = L1_ref.score({kind: state.kind, id: state.id})
-      var pred_utility = L1_pred.score(state.property)
-      display("S2 ut")
-      display(ref_utility)
-      display(pred_utility)
-
-      var full_ut = ref_utility_weight * ref_utility +
-          (1-ref_utility_weight) * pred_utility
-      factor(3 * full_ut)
+      factor(3 * listener1.score([ cc, state.kind, state.property]))
       return utterance
     }
   })
@@ -381,5 +370,3 @@ viz.marginals(listener2(
 //     context['dog'],
 //     0.5,
 //     false))
-
-  
