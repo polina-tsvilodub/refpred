@@ -43,7 +43,7 @@ d_label_warmup_more1 <- d_modRef_Native %>%
   filter( (trial_name == "warmup1") | (trial_name == "warmup2")) %>%
   group_by(submission_id) %>%
   filter(attempts > 1) %>% ungroup() %>% 
-  select(workerid, picture1, response1, picture2, response2, attempts)
+  select(submission_id, picture1, response1, picture2, response2, attempts)
 
 d_modRef_filter <- anti_join(d_modRef_Native, d_failed_cc_warmup, by = c("submission_id"))
 d_modRef_filter <- anti_join(d_modRef_filter, d_failed_label_warmup, by = c("submission_id"))
