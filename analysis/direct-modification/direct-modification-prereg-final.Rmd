@@ -677,6 +677,15 @@ d_modRef_main_responseCat_3way %>%
   facet_wrap(ref_np~syntax, ncol=2) 
 ```
 
+More count plots: 
+```{r counts-byN2, fig.height=15, fig.width=6}
+d_modRef_main_responseCat_3way %>%
+  filter(trial_type == "critical") %>%
+  ggplot(., aes(x = syntax, fill = response_cat)) +
+  geom_bar(alpha = 0.8, position = position_dodge(width = 1)) +
+  facet_wrap(ref_np~target, nrow=5) 
+```
+
 ## Exploratory descriptive stats
 Look at the number of non-switchers (participants sticking to one type of response throughout): 
 ```{r}
