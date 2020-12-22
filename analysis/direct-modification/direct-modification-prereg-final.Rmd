@@ -706,7 +706,12 @@ d_modRef_main_responseCat_3way %>% filter(trial_type == "critical") %>%
                                      N2 = ifelse(is.na(N2), 0, N2),
                                      subordinate = ifelse(is.na(subordinate), 0, subordinate),
                                      sum = basic + N2 + subordinate) %>%
-  filter((basic == sum) | (N2 == sum) | (subordinate == sum)) %>% nrow()
+  filter((basic == sum) | (N2 == sum) | (subordinate == sum)) -> non_switchers_critical
+
+non_switchers_critical %>% nrow()
 
 113/300
+
+# which categories do subjects stick to?
+non_switchers_critical %>% pivot_longer(cols = c("basic", "N2", "subordinate"), names_to = "response_cat", values_to = "count") %>% filter(count != 0) %>% group_by(response_cat) %>% count()
 ```
