@@ -451,6 +451,87 @@ Compute the probability of the effect of syntax in the critical condition being 
 posterior_samples %>% filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
 ```
 
+Exploratory model on data without N2 responses
+```{r warning=FALSE, message=FALSE}
+d_modRef_main_responseCat_noN2 <- d_modRef_main_responseCat_3way %>% filter (response_cat != "N2")
+
+logistic_model_noN2 <- brm(
+  response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + 
+    (1 + syntax_dev * trial_type_dev | target),
+  data = d_modRef_main_responseCat_noN2,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4 #, 
+#  control = list(adapt_delta = 0.9)
+) 
+summary(logistic_model_noN2)
+```
+```{r, echo=F}
+logistic_model_noN2 %>%
+  spread_draws(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_type_dev1 - `b_syntax_dev1:trial_type_dev1`,
+         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_type_dev1 + `b_syntax_dev1:trial_type_dev1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_type_dev1 + `b_syntax_dev1:trial_type_dev1`,
+         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_type_dev1 - `b_syntax_dev1:trial_type_dev1`,
+         syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate
+  select(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+  summarise(
+    mean = mean(val),
+    lower = quantile(val, probs = 0.025),
+    upper = quantile(val, probs = 0.975)
+  ) -> posterior_samples_noN2
+posterior_samples_noN2
+```
+Compute the probability of the effect of syntax in the critical condition being credible given the data without N2 responses:
+```{r, echo=F}
+logistic_model_noN2 %>%
+  spread_draws(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1 - b_trial_type_dev1 - `b_syntax_dev1:trial_type_dev1`,
+         critical_pred = b_Intercept - b_syntax_dev1 - b_trial_type_dev1 + `b_syntax_dev1:trial_type_dev1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax_dev1 + b_trial_type_dev1 + `b_syntax_dev1:trial_type_dev1`,
+         filler_pred = b_Intercept - b_syntax_dev1 + b_trial_type_dev1 - `b_syntax_dev1:trial_type_dev1`,
+         syntax_filler = filler_subj - filler_pred) %>% # subject vs predicate
+  select(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`, critical_subj, critical_pred, syntax_critical, filler_subj, filler_pred, syntax_filler) %>%
+  gather(key, val) %>%
+ filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
+```
+
+### Critical trials only
+
+Fit the preregistered logistic model to critical trials only:
+```{r, message=FALSE, warning=FALSE}
+d_modRef_main_critical <- d_modRef_main_responseCat %>% filter(trial_type == "critical")
+
+logistic_model_critical <- brm(
+  response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + 
+    (1 + syntax_dev | target),
+  data = d_modRef_main_critical,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4 )
+
+summary(logistic_model_critical)
+```
+Compute the probability of the effect of syntax being greater than 0:
+```{r, echo=F}
+logistic_model_critical %>%
+  spread_draws(b_Intercept, b_syntax_dev1) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1,
+         critical_pred = b_Intercept - b_syntax_dev1,
+         syntax_critical = critical_subj - critical_pred # subject vs predicate 
+         ) %>% 
+  select(b_Intercept, b_syntax_dev1, critical_subj, critical_pred, syntax_critical) %>%
+  gather(key, val) %>%
+ filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
+```
+
+### Multinomial regression
 We might run an exploratory multinomial regression in run on the 3-way classified responses on the whole dataset, but it takes quite long and not sure how much sense that makes.
 ```{r multinomial-model, warning=FALSE, message=F, eval=F}
 # make the response category a factor
@@ -509,21 +590,41 @@ posteriors_multinomial_critical <- model_multinomial_critical %>%
          N2_syntax = N2_subj - N2_pred,
          sub_syntax = sub_subj - sub_pred
                          ) %>%
-  select(basic_syntax, N2_syntax, sub_syntax) %>%
+  select(basic_subj, basic_pred, N2_subj, N2_pred, sub_subj, sub_pred, basic_syntax, N2_syntax, sub_syntax) %>%
   gather(key, val) %>%
   group_by(key) %>%
   summarise(
     mean = mean(val),
-    lower = quantile(val, probs = 0.025),
-    upper = quantile(val, probs = 0.975)
+    lower = HDInterval::hdi(val, credMass = 0.95)[1],
+    upper = HDInterval::hdi(val, credMass = 0.95)[2]
   )
 
 posteriors_multinomial_critical
 ```
 
+Compute likelihood of a credible effect of syntax for the subordinate response category:
+```{r, echo=FALSE}
+model_multinomial_critical %>%
+  spread_draws(b_muN2_Intercept, b_musubordinate_Intercept, b_muN2_syntax_dev1, b_musubordinate_syntax_dev1) %>%
+  mutate(basic_subj = exp(0)/(exp(b_muN2_Intercept + b_muN2_syntax_dev1) + exp(b_musubordinate_Intercept + b_musubordinate_syntax_dev1) + exp(0)),
+         basic_pred = exp(0) / (exp(b_muN2_Intercept - b_muN2_syntax_dev1) + exp(b_musubordinate_Intercept - b_musubordinate_syntax_dev1) + exp(0)),
+         N2_subj = exp(b_muN2_Intercept + b_muN2_syntax_dev1) / (exp(b_muN2_Intercept + b_muN2_syntax_dev1) + exp(b_musubordinate_Intercept + b_musubordinate_syntax_dev1) + exp(0)),
+         N2_pred = exp(b_muN2_Intercept - b_muN2_syntax_dev1) / (exp(b_muN2_Intercept - b_muN2_syntax_dev1) + exp(b_musubordinate_Intercept - b_musubordinate_syntax_dev1) + exp(0)),
+         sub_subj = exp(b_musubordinate_Intercept + b_musubordinate_syntax_dev1) / (exp(b_muN2_Intercept + b_muN2_syntax_dev1) + exp(b_musubordinate_Intercept + b_musubordinate_syntax_dev1) + exp(0)),
+         sub_pred = exp(b_musubordinate_Intercept - b_musubordinate_syntax_dev1) / (exp(b_muN2_Intercept - b_muN2_syntax_dev1) + exp(b_musubordinate_Intercept - b_musubordinate_syntax_dev1) + exp(0)),
+         basic_syntax = basic_subj - basic_pred,
+         N2_syntax = N2_subj - N2_pred,
+         sub_syntax = sub_subj - sub_pred
+                         ) %>%
+  select(basic_subj, basic_pred, N2_subj, N2_pred, sub_subj, sub_pred, basic_syntax, N2_syntax, sub_syntax) %>%
+  gather(key, val) %>%
+  filter(key == "sub_syntax") %>%
+  summarize(prob = mean(val < 0))
+```
+
 ## Detailed plots
 Here the proportion of non-matching responses by-syntax in the critical condition is plotted by-item:
-```{r plot-byItem, fig.height=15, fig.width=6}
+```{r plot-byItem, fig.height=15, fig.width=10}
 d_modRef_main_responseCat %>%  
   group_by(syntax, trial_type, target) %>%
   tidyboot_mean(column = response_num) -> d_modRef_main_responseCat.targets
@@ -541,11 +642,11 @@ d_modRef_main_responseCat.targets %>%
                      breaks = c(0, 0.5, 1))+
   ylab("Proportion of non-matching responses") +
   #theme_bw() +
-  facet_wrap(~target, ncol=1) 
+  facet_wrap(~target, ncol=2) 
 ```
 
 Here, the proportion of non-matching responses is plotted by-N2. The landmark items (buildings, trees and flowers) seem to be less sensitive to syntactic manipulations. 
-```{r plot-byN2}
+```{r plot-byN2, fig.height=15, fig.width=6}
 
 d_modRef_main_responseCat %>%  
   group_by(syntax, trial_type, ref_np) %>%
@@ -574,4 +675,25 @@ d_modRef_main_responseCat_3way %>%
   ggplot(., aes(x = response_cat, fill = response_cat)) +
   geom_bar(alpha = 0.8) +
   facet_wrap(ref_np~syntax, ncol=2) 
+```
+
+## Exploratory descriptive stats
+Look at the number of non-switchers (participants sticking to one type of response throughout): 
+```{r}
+# number of participants not switching between matching & non-matching responses 
+d_modRef_main_responseCat %>% group_by(submission_id, response_cat) %>% count() %>% spread(response_cat, n) %>% filter((is.na(match) | is.na(nonmatch))) %>% nrow() 
+
+# proportion of non-switching participants under two-way response classification
+125/300
+
+# number of participants not switching the response category under 3-way response categorization
+d_modRef_main_responseCat_3way %>% group_by(submission_id, response_cat) %>% count() %>% 
+  spread(response_cat, n) %>% mutate(basic = ifelse(is.na(basic), 0, basic),
+                                     N2 = ifelse(is.na(N2), 0, N2),
+                                     subordinate = ifelse(is.na(subordinate), 0, subordinate),
+                                     sum = basic + N2 + subordinate) %>%
+  filter((basic == sum) | (N2 == sum) | (subordinate == sum)) %>% nrow()
+
+# proportion of non-switching participants under 3-way response classification 
+76/300
 ```
