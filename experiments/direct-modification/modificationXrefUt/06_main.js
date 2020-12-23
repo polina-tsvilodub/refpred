@@ -39,7 +39,7 @@ $("document").ready(function() {
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
             deployMethod: "Prolific",
             contact_email: "tessler@mit.edu",
-            prolificURL: "https://app.prolific.co/submissions/complete?cc=711444FF"
+            prolificURL: "https://app.prolific.co/submissions/complete?cc=8B3D7173"
         },
 
         uniqueTurkerID:  'c5b1af1b32b784735f0e082929dd7fcc',
