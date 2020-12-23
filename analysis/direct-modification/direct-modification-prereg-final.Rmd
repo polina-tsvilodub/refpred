@@ -77,34 +77,42 @@ Check the balancing of conditions:
 ```{r count}
 d_modRef_filter300 %>% count(trial_type, syntax, target_size)
 ```
+Add unique identifiers of the items resulting from the combination of the context and the N2:
+```{r items}
+d_modRef_filter300 <- d_modRef_filter300 %>% mutate(
+  unique_target = paste(target, ref_np, sep = "_")
+)
+```
 
 ### Response Classification
 
 #### Minimal exclusions
 
-First, invalid responses are excluded. This is a minimal pre-processing step:  Excluded responses consist of disjunctions/conjunctions, massive misspellings, compare the referent to a size, or to an invalid subordinate category (reference failure). This excludes 21 responses (0.9%).
+First, invalid responses are excluded. This is a minimal pre-processing step:  Excluded responses consist of massive misspellings, compare the referent to a size, or to an invalid subordinate category (reference failure). This excludes 14 responses (0.6%).
 
 ``` {r invalid}
 d_modRef_main <- d_modRef_filter300 %>% filter((trial_name == "custom_main_text1") |
                                 (trial_name == "custom_main_text2")) %>%
-  select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type, ref_np )
+  select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type, ref_np, unique_target )
 
 d_modRef_main %>% distinct(response) %>% View()
 
-# exclude 21 answers with minimal exclusion criteria
+# exclude 14 answers with minimal exclusion criteria
 d_modRef_valid <- d_modRef_main %>% 
-  subset(., !(tolower(response) %in% c("deandal", "compared to the other fish", "compared to the fish", "the size of the flower", "pigeon or other common birds", "a rose", "pigeon", "trees or himself", "dogs or the bow", "landmark or trees", "bow/gift", "sunflowers or bigger flowers", "child", "himself and the other trees", "the size of other birds", "his own size", "human", "flowers and landmark", "a person", "his award")))
-
+  subset(., !(tolower(response) %in% c("deandal", "the size of the flower", "pigeon or other common birds", "a rose", "pigeon", "trees or himself", "child", "himself and the other trees", "the size of other birds", "his own size", "human", "a person", "his award")))
+# "sunflowers or bigger flowers", 
 ```
 
 Then, the minimally cleaned responses are classified as matching the critical noun (= subordinate) vs. non-matching (i.e., basic-level, matchin N2, superordinate). 
 ```{r classify}
-# classify 2379 responses 
+# classify 2386 responses 
 d_modRef_main_responseCat <- d_modRef_valid %>% 
   mutate(response_cat = ifelse(
     tolower(response) %in% 
       c("building", "buildings", "flower", "flowers", "potted plants", "plants", "fish",
         "fishes", "dog", "dogs", "tree", "trees", "bird", "birds",  
+         "compared to the other fish", "compared to the fish",
+        "dogs or the bow", "landmark or trees", "bow/gift", "flowers and landmark",
         "flowers in the distance", "other flowers", "the other flowers", "the other dogs",
         "big dogs", "birds in the distance", "flowers that are already sold", "flowers.",
         "the other buildings around it", "the dogs around it", "the buildings around it",
@@ -179,7 +187,8 @@ d_modRef_main_responseCat_3way <- d_modRef_main_responseCat %>%
                                        "prize-winners", "prize winner", "prizewinners",
         "prize winners", "dog gifts", "land mark trees", "smaller service animals",
         "flower gifts", "the other prize winner", "the other service animal", "show winner",
-         "gift", "gifts", "gifts.", "prize-winners.", "present", "winner", "contestants"
+         "gift", "gifts", "gifts.", "prize-winners.", "present", "winner", "contestants", 
+        "bow/gift",  "flowers and landmark"
                                        ), "N2", "subordinate")
     )
   )
@@ -225,11 +234,9 @@ d_modRef_main_responseCat_3way %>%
 
 #### More possible exclusions 
 Yet since the responses are quite noisy, we might consider excluding further responses. The paraphrase template is "It is {big, small} relative to other ___". Therefore, responses starting with "to the..." or "to other..." etc are technically ungrammatical. So the following preprocessing excludes the aforementioned responses additionally to the exclusions made before.
-This excludes 77 responses in total (3.2%).
+This would exclude 77 responses in total (3.2%). But we decided to **not** exclude ungrammatical responses.
 
-If we are being really strict, responses starting with "the.." could also be excluded (tbd).
-
-```{r invalid2}
+```{r invalid2, echo=FALSE, eval=F}
 # apply more strict exclusion criteria
 
 d_modRef_valid_strict <- d_modRef_main %>%
@@ -259,8 +266,8 @@ For instance, some responses refer to perceptual categories. as e.g., "birds you
 
 There are also compound responses just difficult to classify, some of them containing both a subordinate noun and a basic-level noun or N2 ("trees other than the other red wood", "to the doberman service-animal", "prize winning pugs", "other bonsai trees", "tuna fish", "bonsai trees", "the prize-winner pug", "other clownfish rescues", "hummingbirds that have been rescued", "great dane dogs", "redwood trees"). So far, all these responses containing a subordinate N are classified as subordinate (= matching).   
 
-These responses are classified in non-matching vs matching:
-```{r classify-strict}
+```{r classify-strict, echo=FALSE, eval=FALSE}
+# These responses are classified in non-matching vs matching:
 d_modRef_main_responseCat_strict <- d_modRef_valid_strict %>% 
   mutate(response_cat = ifelse(
     tolower(response) %in% 
@@ -297,8 +304,8 @@ d_modRef_main_responseCat_strict <- d_modRef_valid_strict %>%
 
 ```
 
-3-way classification of strictly preproccesed responses:
-```{r classify3way-strict}
+```{r classify3way-strict, echo=FALSE, eval=FALSE}
+# 3-way classification of strictly preproccesed responses:
 d_modRef_main_responseCat_strict_3way <- d_modRef_main_responseCat_strict %>%
   mutate(
     response_cat = ifelse(
@@ -338,10 +345,12 @@ d_modRef_main_responseCat_strict_3way <- d_modRef_main_responseCat_strict %>%
 
 ```
 
+
+```{r plot-strict, echo=FALSE, eval=FALSE}
 ##### Plots
 
-The proportion of non-matching responses in the strictly preprocessed data is plotted by-syntax and by-trial type. No qualitative differences appear under the more strict preprocessing. 
-```{r plot-strict, echo=FALSE}
+#The proportion of non-matching responses in the strictly preprocessed data is plotted by-syntax and by-trial type. No qualitative differences appear under the more strict preprocessing. 
+
 bar.width = 0.8
 d_modRef_main_responseCat_strict %>%  
   group_by(syntax, trial_type) %>%
@@ -363,8 +372,9 @@ d_modRef_main_responseCat.strict.bs %>%
   ggtitle("Proportion of non-matching responses")
 ```
 
-3-way response category counts in the strictly preprocessed data:
-```{r plot2-strict, echo = F}
+```{r plot2-strict, echo = F, eval=FALSE}
+# 3-way response category counts in the strictly preprocessed data:
+
 # more fine-grained comparison class types within critical trials
 d_modRef_main_responseCat_strict_3way %>%
   filter(trial_type == "critical") %>%
@@ -381,24 +391,28 @@ The predictors are deviation-coded.
 ```{r stats, warning=F, message=F, echo=F}
 d_modRef_main_responseCat %>% 
   mutate(syntax_dev = factor(syntax, levels = c("subj", "pred")),
-         trial_type_dev = factor(trial_type, levels = c( "filler", "critical"))) -> d_modRef_main_responseCat
+         trial_type_dev = factor(trial_type, levels = c( "filler", "critical")),
+         adj_dev = factor(adj, levels = c("big", "small"))) -> d_modRef_main_responseCat
 
 contrasts(d_modRef_main_responseCat$syntax_dev) <- contr.sum(2)
 contrasts(d_modRef_main_responseCat$trial_type_dev) <- contr.sum(2)
+contrasts(d_modRef_main_responseCat$adj_dev) <- contr.sum(2)
 
 # same for 3-way classified data
 d_modRef_main_responseCat_3way %>% 
   mutate(syntax_dev = factor(syntax, levels = c("subj", "pred")),
-         trial_type_dev = factor(trial_type, levels = c( "filler", "critical"))) -> d_modRef_main_responseCat_3way
+         trial_type_dev = factor(trial_type, levels = c( "filler", "critical")),
+         adj_dev = factor(adj, levels = c("big", "small"))) -> d_modRef_main_responseCat_3way
 
 contrasts(d_modRef_main_responseCat_3way$syntax_dev) <- contr.sum(2)
 contrasts(d_modRef_main_responseCat_3way$trial_type_dev) <- contr.sum(2)
+contrasts(d_modRef_main_responseCat$adj_dev) <- contr.sum(2)
 ```
 First, the preregistered Bayesian logistic regression is run. Maximal RE structure is included:
 ```{r model, warning=FALSE, message=FALSE}
 model <- brm(
   response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + 
-    (1 + syntax_dev * trial_type_dev | target),
+    (1 + syntax_dev * trial_type_dev | unique_target), 
   data = d_modRef_main_responseCat,
   family = "bernoulli",
   cores = 4,
@@ -451,13 +465,14 @@ Compute the probability of the effect of syntax in the critical condition being 
 posterior_samples %>% filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
 ```
 
-Exploratory model on data without N2 responses
+### Basic and subordinate responses only
+Exploratory model on data without N2 responses:
 ```{r warning=FALSE, message=FALSE}
 d_modRef_main_responseCat_noN2 <- d_modRef_main_responseCat_3way %>% filter (response_cat != "N2")
 
 logistic_model_noN2 <- brm(
   response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + 
-    (1 + syntax_dev * trial_type_dev | target),
+    (1 + syntax_dev * trial_type_dev | unique_target),
   data = d_modRef_main_responseCat_noN2,
   family = "bernoulli",
   cores = 4,
@@ -467,6 +482,7 @@ logistic_model_noN2 <- brm(
 ) 
 summary(logistic_model_noN2)
 ```
+
 ```{r, echo=F}
 logistic_model_noN2 %>%
   spread_draws(b_Intercept, b_syntax_dev1, b_trial_type_dev1, `b_syntax_dev1:trial_type_dev1`) %>%
@@ -501,6 +517,43 @@ logistic_model_noN2 %>%
  filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
 ```
 
+Exploratory model on critical trials without N2 responses only (should match the contrast in the rate of basic level responses in the multinomial model on critical responses):
+```{r, message=F, warning=F}
+d_modRef_main_responseCat_noN2_critical <- d_modRef_main_responseCat_3way %>% filter (response_cat != "N2", trial_type == "critical")
+
+logistic_model_noN2_critical <- brm(
+  response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + 
+    (1 + syntax_dev | unique_target),
+  data = d_modRef_main_responseCat_noN2_critical,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4 #, 
+#  control = list(adapt_delta = 0.9)
+) 
+summary(logistic_model_noN2_critical)
+
+```
+
+Compute the contrast of effect of syntax:
+```{r, echo=F}
+logistic_model_noN2_critical %>%
+  spread_draws(b_Intercept, b_syntax_dev1) %>%
+  mutate(critical_subj = b_Intercept + b_syntax_dev1,
+         critical_pred = b_Intercept - b_syntax_dev1,
+         syntax_critical = critical_subj - critical_pred # subject vs predicate 
+         ) %>% 
+  select(b_Intercept, b_syntax_dev1, critical_subj, critical_pred, syntax_critical) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+  summarise(
+    mean = mean(val),
+    lower = quantile(val, probs = 0.025),
+    upper = quantile(val, probs = 0.975)
+  )
+ #filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
+```
+
 ### Critical trials only
 
 Fit the preregistered logistic model to critical trials only:
@@ -509,7 +562,7 @@ d_modRef_main_critical <- d_modRef_main_responseCat %>% filter(trial_type == "cr
 
 logistic_model_critical <- brm(
   response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + 
-    (1 + syntax_dev | target),
+    (1 + syntax_dev | unique_target),
   data = d_modRef_main_critical,
   family = "bernoulli",
   cores = 4,
@@ -518,6 +571,7 @@ logistic_model_critical <- brm(
 
 summary(logistic_model_critical)
 ```
+
 Compute the probability of the effect of syntax being greater than 0:
 ```{r, echo=F}
 logistic_model_critical %>%
@@ -531,6 +585,38 @@ logistic_model_critical %>%
  filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
 ```
 
+### Exploratory models with FE of adjective
+
+Exploratory model on both trial types with a fixed effect of adjective (big vs. small):
+```{r adjective-FE, message=FALSE, warning=FALSE}
+logistic_model_adjectiveFE <- brm(
+  response_num ~ syntax_dev * trial_type_dev * adj_dev +
+    (1 + syntax_dev * trial_type_dev + adj_dev | submission_id) +   
+    (1 + syntax_dev * trial_type_dev | unique_target), 
+  data = d_modRef_main_responseCat,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4, 
+  control = list(adapt_delta = 0.9)
+)
+summary(logistic_model_adjectiveFE)
+```
+
+Exploratory model with FE of adjective on critical trials only:
+```{r adjective-FE-critical, message=FALSE, warning=FALSE}
+logistic_model_adjectiveFE_critical <- brm(
+  response_num ~ syntax_dev * adj_dev + (1 + syntax_dev + adj_dev | submission_id) + 
+    (1 + syntax_dev | unique_target),
+  data = d_modRef_main_critical,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4 )
+summary(logistic_model_adjectiveFE_critical)
+```
+
+
 ### Multinomial regression
 We might run an exploratory multinomial regression in run on the 3-way classified responses on the whole dataset, but it takes quite long and not sure how much sense that makes.
 ```{r multinomial-model, warning=FALSE, message=F, eval=F}
@@ -540,7 +626,7 @@ d_modRef_main_responseCat_3way <- d_modRef_main_responseCat_3way %>%
 
 model_multinomial <- brm(
   response_cat ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev || submission_id) + 
-    (1 + syntax_dev * trial_type_dev || target),
+    (1 + syntax_dev * trial_type_dev || unique_target),
   data = d_modRef_main_responseCat_3way,
   family = "categorical",
   cores = 3,
@@ -562,7 +648,7 @@ contrasts(d_modRef_main_3way_critical$syntax_dev) <- contr.sum(2)
 
 model_multinomial_critical <- brm(
   response_cat ~ syntax_dev + (1 + syntax_dev || submission_id) + 
-    (1 + syntax_dev || target),
+    (1 + syntax_dev || unique_target),
   data = d_modRef_main_3way_critical,
   family = "categorical",
   cores = 3,
@@ -677,8 +763,8 @@ d_modRef_main_responseCat_3way %>%
   facet_wrap(ref_np~syntax, ncol=2) 
 ```
 
-More count plots: 
-```{r counts-byN2, fig.height=15, fig.width=6}
+More count plots: response category counts by syntax (x-axis) and by unique target (N2 & target): 
+```{r counts-byN2-byTarget, fig.height=15, fig.width=6}
 d_modRef_main_responseCat_3way %>%
   filter(trial_type == "critical") %>%
   ggplot(., aes(x = syntax, fill = response_cat)) +

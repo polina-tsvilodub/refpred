@@ -111,26 +111,35 @@ d_modRef_filter300 %>% count(trial_type, syntax, target_size)
     ## 8 filler     subj   small         300
     ## 9 <NA>       <NA>   <NA>         1785
 
+Add unique identifiers of the items resulting from the combination of
+the context and the N2:
+
+``` r
+d_modRef_filter300 <- d_modRef_filter300 %>% mutate(
+  unique_target = paste(target, ref_np, sep = "_")
+)
+```
+
 ### Response Classification
 
 #### Minimal exclusions
 
 First, invalid responses are excluded. This is a minimal pre-processing
-step: Excluded responses consist of disjunctions/conjunctions, massive
-misspellings, compare the referent to a size, or to an invalid
-subordinate category (reference failure). This excludes 21 responses
-(0.9%).
+step: Excluded responses consist of massive misspellings, compare the
+referent to a size, or to an invalid subordinate category (reference
+failure). This excludes 14 responses (0.6%).
 
 ``` r
 d_modRef_main <- d_modRef_filter300 %>% filter((trial_name == "custom_main_text1") |
                                 (trial_name == "custom_main_text2")) %>%
-  select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type, ref_np )
+  select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type, ref_np, unique_target )
 
 d_modRef_main %>% distinct(response) %>% View()
 
-# exclude 21 answers with minimal exclusion criteria
+# exclude 14 answers with minimal exclusion criteria
 d_modRef_valid <- d_modRef_main %>% 
-  subset(., !(tolower(response) %in% c("deandal", "compared to the other fish", "compared to the fish", "the size of the flower", "pigeon or other common birds", "a rose", "pigeon", "trees or himself", "dogs or the bow", "landmark or trees", "bow/gift", "sunflowers or bigger flowers", "child", "himself and the other trees", "the size of other birds", "his own size", "human", "flowers and landmark", "a person", "his award")))
+  subset(., !(tolower(response) %in% c("deandal", "the size of the flower", "pigeon or other common birds", "a rose", "pigeon", "trees or himself", "child", "himself and the other trees", "the size of other birds", "his own size", "human", "a person", "his award")))
+# "sunflowers or bigger flowers", 
 ```
 
 Then, the minimally cleaned responses are classified as matching the
@@ -138,12 +147,14 @@ critical noun (= subordinate) vs. non-matching (i.e., basic-level,
 matchin N2, superordinate).
 
 ``` r
-# classify 2379 responses 
+# classify 2386 responses 
 d_modRef_main_responseCat <- d_modRef_valid %>% 
   mutate(response_cat = ifelse(
     tolower(response) %in% 
       c("building", "buildings", "flower", "flowers", "potted plants", "plants", "fish",
         "fishes", "dog", "dogs", "tree", "trees", "bird", "birds",  
+         "compared to the other fish", "compared to the fish",
+        "dogs or the bow", "landmark or trees", "bow/gift", "flowers and landmark",
         "flowers in the distance", "other flowers", "the other flowers", "the other dogs",
         "big dogs", "birds in the distance", "flowers that are already sold", "flowers.",
         "the other buildings around it", "the dogs around it", "the buildings around it",
@@ -220,7 +231,8 @@ d_modRef_main_responseCat_3way <- d_modRef_main_responseCat %>%
                                        "prize-winners", "prize winner", "prizewinners",
         "prize winners", "dog gifts", "land mark trees", "smaller service animals",
         "flower gifts", "the other prize winner", "the other service animal", "show winner",
-         "gift", "gifts", "gifts.", "prize-winners.", "present", "winner", "contestants"
+         "gift", "gifts", "gifts.", "prize-winners.", "present", "winner", "contestants", 
+        "bow/gift",  "flowers and landmark"
                                        ), "N2", "subordinate")
     )
   )
@@ -257,34 +269,8 @@ further responses. The paraphrase template is "It is {big, small}
 relative to other \_\_\_“. Therefore, responses starting with”to the…"
 or “to other…” etc are technically ungrammatical. So the following
 preprocessing excludes the aforementioned responses additionally to the
-exclusions made before. This excludes 77 responses in total (3.2%).
-
-If we are being really strict, responses starting with “the..” could
-also be excluded (tbd).
-
-``` r
-# apply more strict exclusion criteria
-
-d_modRef_valid_strict <- d_modRef_main %>%
-  subset(., !(tolower(response) %in% c(
-"deandal", "compared to the other fish", "compared to the fish", "the size of the flower",
-"pigeon or other common birds", "a rose", "pigeon", "trees or himself", "dogs or the bow",
-"landmark or trees", "bow/gift", "sunflowers or bigger flowers", "child", 
-"himself and the other trees", "the size of other birds", "his own size", "human", 
-"flowers and landmark", "a person", "his award", "other flowers", "the other flowers", 
-"the other dogs", "the other buildings around it", "the other flowers around it", "other plants",
-"other trees", "other rescue dogs\nother rescue dogs", "other floers", "other birds",
-"the other prize winner dogs", "the other smaller birds", "the other plants they are seeing",
-"the other trees you have seen", "the other flowers at the shop", "the other trees",
-"other buildings", "the other service dogs", "the other rescue birds", 
-"other landmarked flowers.", "other fish", "other prize-winner dogs", "otherprize winning dog",
-"the other prize winner", "the other service animal",
-# also some subordinate responses start with "other"
-"other doberman", "other bonsai trees", "other eagles", "other hummingbirds", 
-"other sunflowers", "other clownfish rescues", "the other dandelion", "the other chihuahua", 
-"the other doberman", "other dandelions"
-  )))
-```
+exclusions made before. This would exclude 77 responses in total (3.2%).
+But we decided to **not** exclude ungrammatical responses.
 
 Furthermore, there are some responses where the classification might not
 be clear.
@@ -310,99 +296,6 @@ rescues”, “hummingbirds that have been rescued”, “great dane dogs”,
 “redwood trees”). So far, all these responses containing a subordinate
 N are classified as subordinate (= matching).
 
-These responses are classified in non-matching vs matching:
-
-``` r
-d_modRef_main_responseCat_strict <- d_modRef_valid_strict %>% 
-  mutate(response_cat = ifelse(
-    tolower(response) %in% 
-      c("building", "buildings", "flower", "flowers", "potted plants", "plants", "fish",
-        "fishes", "dog", "dogs", "tree", "trees", "bird", "birds",  
-        "flowers in the distance", 
-        "big dogs", "birds in the distance", "flowers that are already sold", "flowers.",
-        "the dogs around it", "the buildings around it",
-        "flowers around it", "dogs around it",  
-        "fish in the tank", "flowers with red bows", "dogs with red bows", 
-        "dogs with leashes", "birda", "breeds", "pets", "trees\ntrees", "dogs that are gifts",
-        "rescued fish","dogs.", "fish.", "dogs with medals", "smaller dogs", "dogs with bows", 
-        "building with landmarks", "guide dogs", "landmark buildings", 
-        "flowers along the path", "flowers in the pots", "gift flowers", "dogd", 
-        "birds you have seen",
-        "smaller trees like the bonsai", "dogs that you have seen so far", "trees in general",
-        "fish\nfish", "trees other than the other red wood", 
-        "training dogs", "contestants", "gods", "small dogs",
-        "landmark flowers", "dogs in the contest", "the smaller dogs", "the smaller flowers", 
-        "birds in the group", "fowers", "flowers at the garden store","flowers in the group",
-        "present", "winner", "rescued dogs", 
-        
-        "landmark", "landmarks", "service-animal", "service-animals", "service animals",
-        "rescue", "rescues", "prize-winner", "prize-winners", "prize winner", "prizewinners",
-        "prize winners", "dog gifts", "land mark trees", "smaller service animals",
-        "prize-winner dogs", "rescue fish", "prize winning dogs", "prize-winning dogs",
-        "landmark trees", "flower gifts", "show winner",
-        "prize dogs", "rescue birds", "service dogs", "gift", "gifts", "gifts.", "prize dog",
-        "big trees with a landmark", "prize-winners."), 
-    "nonmatch", "match"
-  ),
-  response_num = ifelse(response_cat == "nonmatch", 1, 0)
-  )
-```
-
-3-way classification of strictly preproccesed responses:
-
-``` r
-d_modRef_main_responseCat_strict_3way <- d_modRef_main_responseCat_strict %>%
-  mutate(
-    response_cat = ifelse(
-      tolower(response) %in% 
-        c("building", "buildings", "flower", "flowers", "potted plants", "plants", "fish",
-        "fishes", "dog", "dogs", "tree", "trees", "bird", "birds", "other dogs", 
-        "flowers in the distance", "other flowers", "the other flowers", "the other dogs",
-        "big dogs", "birds in the distance", "flowers that are already sold", "flowers.",
-        "the other buildings around it", "the dogs around it", "the buildings around it",
-        "flowers around it", "dogs around it",  
-        "fish in the tank", "flowers with red bows", "dogs with red bows", 
-        "dogs with leashes", "birda", "breeds", "pets", "trees\ntrees", "dogs that are gifts",
-        "rescued fish","dogs.", "fish.", "dogs with medals", "smaller dogs", "dogs with bows", 
-        "building with landmarks", "guide dogs", "landmark buildings", 
-        "flowers along the path", "flowers in the pots", "gift flowers", "dogd", 
-        "birds you have seen",
-        "smaller trees like the bonsai", "dogs that you have seen so far", "trees in general",
-        "fish\nfish", "trees other than the other red wood", 
-        "training dogs",  "gods", "small dogs",
-        "landmark flowers",  "dogs in the contest", 
-         "the smaller dogs", "the smaller flowers", 
-        "birds in the group", "fowers", 
-        "flowers at the garden store","flowers in the group", "prize-winner dogs",
-        "rescued dogs", "rescue fish", "prize winning dogs", "prize-winning dogs",
-         "landmark trees",
-        "prize dogs", "rescue birds", "service dogs", "prize dog", "big trees with a landmark"
-        ), "basic",
-      ifelse( tolower(response) %in% c("landmark", "landmarks", "service-animal", "service-animals",
-                                       "service animals", "rescue", "rescues", "prize-winner",
-                                       "prize-winners", "prize winner", "prizewinners",
-        "prize winners", "dog gifts", "land mark trees", "smaller service animals",
-        "flower gifts", "show winner",
-         "gift", "gifts", "gifts.", "prize-winners.", "present", "winner", "contestants"
-                                       ), "N2", "subordinate")
-    )
-  )
-```
-
-##### Plots
-
-The proportion of non-matching responses in the strictly preprocessed
-data is plotted by-syntax and by-trial type. No qualitative differences
-appear under the more strict preprocessing.
-
-    ## Warning: `cols` is now required when using unnest().
-    ## Please use `cols = c(strap)`
-
-![](direct-modification-prereg-final_files/figure-gfm/plot-strict-1.png)<!-- -->
-
-3-way response category counts in the strictly preprocessed data:
-![](direct-modification-prereg-final_files/figure-gfm/plot2-strict-1.png)<!-- -->
-
 ## Stats
 
 In the following, the dataset where less strict exclusions were applied
@@ -414,7 +307,7 @@ structure is included:
 ``` r
 model <- brm(
   response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + 
-    (1 + syntax_dev * trial_type_dev | target),
+    (1 + syntax_dev * trial_type_dev | unique_target), 
   data = d_modRef_main_responseCat,
   family = "bernoulli",
   cores = 4,
@@ -452,93 +345,93 @@ summary(model)
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + (1 + syntax_dev * trial_type_dev | target) 
-    ##    Data: d_modRef_main_responseCat (Number of observations: 2379) 
+    ## Formula: response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + (1 + syntax_dev * trial_type_dev | unique_target) 
+    ##    Data: d_modRef_main_responseCat (Number of observations: 2386) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 300) 
     ##                                                  Estimate Est.Error l-95% CI
-    ## sd(Intercept)                                        2.58      0.21     2.20
-    ## sd(syntax_dev1)                                      0.29      0.16     0.02
-    ## sd(trial_type_dev1)                                  0.31      0.16     0.02
-    ## sd(syntax_dev1:trial_type_dev1)                      0.38      0.17     0.04
-    ## cor(Intercept,syntax_dev1)                          -0.20      0.37    -0.82
-    ## cor(Intercept,trial_type_dev1)                      -0.23      0.35    -0.82
-    ## cor(syntax_dev1,trial_type_dev1)                     0.08      0.42    -0.75
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.33      0.31    -0.84
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.07      0.40    -0.72
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.36      0.39    -0.56
+    ## sd(Intercept)                                        2.57      0.21     2.19
+    ## sd(syntax_dev1)                                      0.31      0.17     0.02
+    ## sd(trial_type_dev1)                                  0.33      0.16     0.03
+    ## sd(syntax_dev1:trial_type_dev1)                      0.39      0.17     0.04
+    ## cor(Intercept,syntax_dev1)                          -0.22      0.35    -0.82
+    ## cor(Intercept,trial_type_dev1)                      -0.26      0.34    -0.82
+    ## cor(syntax_dev1,trial_type_dev1)                     0.11      0.41    -0.70
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.34      0.30    -0.84
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.13      0.40    -0.68
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.40      0.37    -0.51
     ##                                                  u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                                        3.03 1.00     1358
-    ## sd(syntax_dev1)                                      0.61 1.00      849
-    ## sd(trial_type_dev1)                                  0.62 1.00      879
-    ## sd(syntax_dev1:trial_type_dev1)                      0.68 1.00      834
-    ## cor(Intercept,syntax_dev1)                           0.57 1.00     3299
-    ## cor(Intercept,trial_type_dev1)                       0.52 1.00     3748
-    ## cor(syntax_dev1,trial_type_dev1)                     0.81 1.00     1336
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.36 1.00     3452
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.80 1.00     1220
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.90 1.00      895
+    ## sd(Intercept)                                        3.00 1.00     1243
+    ## sd(syntax_dev1)                                      0.63 1.01      732
+    ## sd(trial_type_dev1)                                  0.64 1.00      822
+    ## sd(syntax_dev1:trial_type_dev1)                      0.70 1.01      697
+    ## cor(Intercept,syntax_dev1)                           0.55 1.00     3340
+    ## cor(Intercept,trial_type_dev1)                       0.51 1.00     3566
+    ## cor(syntax_dev1,trial_type_dev1)                     0.81 1.00     1205
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.35 1.00     3031
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.82 1.00     1135
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.91 1.00      938
     ##                                                  Tail_ESS
-    ## sd(Intercept)                                        2391
-    ## sd(syntax_dev1)                                      1634
-    ## sd(trial_type_dev1)                                  1312
-    ## sd(syntax_dev1:trial_type_dev1)                      1077
-    ## cor(Intercept,syntax_dev1)                           3213
-    ## cor(Intercept,trial_type_dev1)                       3221
-    ## cor(syntax_dev1,trial_type_dev1)                     2597
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           3562
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         2430
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     1726
+    ## sd(Intercept)                                        2633
+    ## sd(syntax_dev1)                                      1396
+    ## sd(trial_type_dev1)                                  1290
+    ## sd(syntax_dev1:trial_type_dev1)                       632
+    ## cor(Intercept,syntax_dev1)                           3185
+    ## cor(Intercept,trial_type_dev1)                       3301
+    ## cor(syntax_dev1,trial_type_dev1)                     2262
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           3028
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         1965
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     2075
     ## 
-    ## ~target (Number of levels: 14) 
+    ## ~unique_target (Number of levels: 20) 
     ##                                                  Estimate Est.Error l-95% CI
-    ## sd(Intercept)                                        0.72      0.20     0.41
-    ## sd(syntax_dev1)                                      0.14      0.10     0.01
-    ## sd(trial_type_dev1)                                  0.33      0.16     0.05
-    ## sd(syntax_dev1:trial_type_dev1)                      0.11      0.09     0.00
-    ## cor(Intercept,syntax_dev1)                           0.15      0.42    -0.71
-    ## cor(Intercept,trial_type_dev1)                       0.20      0.35    -0.51
-    ## cor(syntax_dev1,trial_type_dev1)                     0.05      0.44    -0.80
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.07      0.43    -0.75
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.00      0.45    -0.81
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.18      0.44    -0.70
+    ## sd(Intercept)                                        0.65      0.17     0.38
+    ## sd(syntax_dev1)                                      0.11      0.09     0.00
+    ## sd(trial_type_dev1)                                  0.29      0.15     0.03
+    ## sd(syntax_dev1:trial_type_dev1)                      0.13      0.10     0.00
+    ## cor(Intercept,syntax_dev1)                           0.08      0.43    -0.75
+    ## cor(Intercept,trial_type_dev1)                       0.21      0.35    -0.53
+    ## cor(syntax_dev1,trial_type_dev1)                    -0.00      0.44    -0.80
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.01      0.42    -0.78
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)        -0.01      0.44    -0.80
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.10      0.43    -0.74
     ##                                                  u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                                        1.18 1.00     2056
-    ## sd(syntax_dev1)                                      0.38 1.00     2506
-    ## sd(trial_type_dev1)                                  0.68 1.00     1361
-    ## sd(syntax_dev1:trial_type_dev1)                      0.33 1.00     2478
-    ## cor(Intercept,syntax_dev1)                           0.85 1.00     6303
-    ## cor(Intercept,trial_type_dev1)                       0.79 1.00     4251
-    ## cor(syntax_dev1,trial_type_dev1)                     0.80 1.00     1733
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.83 1.00     6834
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.80 1.00     4367
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.89 1.00     4320
+    ## sd(Intercept)                                        1.05 1.00     1874
+    ## sd(syntax_dev1)                                      0.34 1.00     2976
+    ## sd(trial_type_dev1)                                  0.61 1.01     1516
+    ## sd(syntax_dev1:trial_type_dev1)                      0.36 1.00     2332
+    ## cor(Intercept,syntax_dev1)                           0.83 1.00     5727
+    ## cor(Intercept,trial_type_dev1)                       0.80 1.00     3980
+    ## cor(syntax_dev1,trial_type_dev1)                     0.79 1.00     1998
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.79 1.00     6079
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.81 1.00     3848
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.85 1.00     4505
     ##                                                  Tail_ESS
-    ## sd(Intercept)                                        2853
-    ## sd(syntax_dev1)                                      3231
-    ## sd(trial_type_dev1)                                  1437
-    ## sd(syntax_dev1:trial_type_dev1)                      2337
-    ## cor(Intercept,syntax_dev1)                           3951
-    ## cor(Intercept,trial_type_dev1)                       3678
-    ## cor(syntax_dev1,trial_type_dev1)                     3235
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           4608
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         4655
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     4825
+    ## sd(Intercept)                                        2904
+    ## sd(syntax_dev1)                                      3079
+    ## sd(trial_type_dev1)                                  2087
+    ## sd(syntax_dev1:trial_type_dev1)                      2717
+    ## cor(Intercept,syntax_dev1)                           3890
+    ## cor(Intercept,trial_type_dev1)                       3435
+    ## cor(syntax_dev1,trial_type_dev1)                     3437
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           4125
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         4454
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     4361
     ## 
     ## Population-Level Effects: 
     ##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                       1.89      0.28     1.36     2.45 1.00     1074
-    ## syntax_dev1                     0.55      0.11     0.34     0.76 1.00     2973
-    ## trial_type_dev1                 0.12      0.14    -0.16     0.40 1.00     3068
-    ## syntax_dev1:trial_type_dev1     0.33      0.11     0.11     0.54 1.00     3079
+    ## Intercept                       1.84      0.25     1.36     2.35 1.00     1416
+    ## syntax_dev1                     0.55      0.10     0.35     0.75 1.00     2720
+    ## trial_type_dev1                 0.07      0.12    -0.17     0.31 1.00     3058
+    ## syntax_dev1:trial_type_dev1     0.32      0.11     0.11     0.53 1.00     2534
     ##                             Tail_ESS
-    ## Intercept                       1854
-    ## syntax_dev1                     4137
-    ## trial_type_dev1                 3784
-    ## syntax_dev1:trial_type_dev1     3646
+    ## Intercept                       2408
+    ## syntax_dev1                     3595
+    ## trial_type_dev1                 3671
+    ## syntax_dev1:trial_type_dev1     3666
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -574,18 +467,18 @@ model_draws
 ```
 
     ## # A tibble: 10 x 4
-    ##    key                            mean  lower upper
-    ##    <chr>                         <dbl>  <dbl> <dbl>
-    ##  1 b_Intercept                   1.89   1.36  2.45 
-    ##  2 b_syntax_dev1                 0.551  0.337 0.756
-    ##  3 b_syntax_dev1:trial_type_dev1 0.330  0.114 0.541
-    ##  4 b_trial_type_dev1             0.117 -0.157 0.397
-    ##  5 critical_pred                 1.55   0.951 2.21 
-    ##  6 critical_subj                 2.00   1.35  2.72 
-    ##  7 filler_pred                   1.13   0.505 1.80 
-    ##  8 filler_subj                   2.89   2.15  3.71 
-    ##  9 syntax_critical               0.442 -0.116 1.02 
-    ## 10 syntax_filler                 1.76   1.16  2.38
+    ##    key                             mean  lower upper
+    ##    <chr>                          <dbl>  <dbl> <dbl>
+    ##  1 b_Intercept                   1.84    1.36  2.35 
+    ##  2 b_syntax_dev1                 0.549   0.349 0.750
+    ##  3 b_syntax_dev1:trial_type_dev1 0.323   0.113 0.527
+    ##  4 b_trial_type_dev1             0.0730 -0.167 0.306
+    ##  5 critical_pred                 1.54    1.00  2.13 
+    ##  6 critical_subj                 1.99    1.41  2.66 
+    ##  7 filler_pred                   1.04    0.475 1.64 
+    ##  8 filler_subj                   2.78    2.14  3.48 
+    ##  9 syntax_critical               0.452  -0.103 1.03 
+    ## 10 syntax_filler                 1.75    1.16  2.36
 
 Compute the probability of the effect of syntax in the critical
 condition being credible:
@@ -597,16 +490,18 @@ posterior_samples %>% filter(key == "syntax_critical") %>% summarize(prob = mean
     ## # A tibble: 1 x 1
     ##    prob
     ##   <dbl>
-    ## 1 0.941
+    ## 1 0.947
 
-Exploratory model on data without N2 responses
+### Basic and subordinate responses only
+
+Exploratory model on data without N2 responses:
 
 ``` r
 d_modRef_main_responseCat_noN2 <- d_modRef_main_responseCat_3way %>% filter (response_cat != "N2")
 
 logistic_model_noN2 <- brm(
   response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + 
-    (1 + syntax_dev * trial_type_dev | target),
+    (1 + syntax_dev * trial_type_dev | unique_target),
   data = d_modRef_main_responseCat_noN2,
   family = "bernoulli",
   cores = 4,
@@ -644,93 +539,93 @@ summary(logistic_model_noN2)
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + (1 + syntax_dev * trial_type_dev | target) 
-    ##    Data: d_modRef_main_responseCat_noN2 (Number of observations: 2194) 
+    ## Formula: response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + (1 + syntax_dev * trial_type_dev | unique_target) 
+    ##    Data: d_modRef_main_responseCat_noN2 (Number of observations: 2199) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 300) 
     ##                                                  Estimate Est.Error l-95% CI
-    ## sd(Intercept)                                        2.74      0.24     2.30
-    ## sd(syntax_dev1)                                      0.35      0.18     0.03
-    ## sd(trial_type_dev1)                                  0.40      0.19     0.04
-    ## sd(syntax_dev1:trial_type_dev1)                      0.37      0.18     0.02
-    ## cor(Intercept,syntax_dev1)                          -0.30      0.35    -0.85
-    ## cor(Intercept,trial_type_dev1)                      -0.36      0.33    -0.85
-    ## cor(syntax_dev1,trial_type_dev1)                     0.16      0.40    -0.67
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.15      0.34    -0.76
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.04      0.40    -0.74
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.24      0.40    -0.64
+    ## sd(Intercept)                                        2.70      0.23     2.29
+    ## sd(syntax_dev1)                                      0.37      0.18     0.03
+    ## sd(trial_type_dev1)                                  0.42      0.18     0.05
+    ## sd(syntax_dev1:trial_type_dev1)                      0.37      0.18     0.03
+    ## cor(Intercept,syntax_dev1)                          -0.33      0.34    -0.86
+    ## cor(Intercept,trial_type_dev1)                      -0.38      0.31    -0.86
+    ## cor(syntax_dev1,trial_type_dev1)                     0.20      0.39    -0.63
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.16      0.35    -0.77
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.06      0.41    -0.73
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.29      0.39    -0.56
     ##                                                  u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                                        3.26 1.00     1025
-    ## sd(syntax_dev1)                                      0.70 1.00      886
-    ## sd(trial_type_dev1)                                  0.75 1.01      599
-    ## sd(syntax_dev1:trial_type_dev1)                      0.71 1.00      609
-    ## cor(Intercept,syntax_dev1)                           0.50 1.00     3072
-    ## cor(Intercept,trial_type_dev1)                       0.41 1.00     2804
-    ## cor(syntax_dev1,trial_type_dev1)                     0.81 1.00     1230
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.58 1.00     3524
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.78 1.00     1121
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.87 1.00     1237
+    ## sd(Intercept)                                        3.20 1.00     1033
+    ## sd(syntax_dev1)                                      0.72 1.00      773
+    ## sd(trial_type_dev1)                                  0.76 1.01      746
+    ## sd(syntax_dev1:trial_type_dev1)                      0.71 1.01      508
+    ## cor(Intercept,syntax_dev1)                           0.47 1.00     2748
+    ## cor(Intercept,trial_type_dev1)                       0.34 1.00     2663
+    ## cor(syntax_dev1,trial_type_dev1)                     0.85 1.00     1236
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.59 1.00     2683
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.82 1.00     1066
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.88 1.00     1226
     ##                                                  Tail_ESS
-    ## sd(Intercept)                                        2695
-    ## sd(syntax_dev1)                                      1436
-    ## sd(trial_type_dev1)                                   883
-    ## sd(syntax_dev1:trial_type_dev1)                      1237
-    ## cor(Intercept,syntax_dev1)                           3686
-    ## cor(Intercept,trial_type_dev1)                       2745
-    ## cor(syntax_dev1,trial_type_dev1)                     2276
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           2864
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         2155
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     2078
+    ## sd(Intercept)                                        2349
+    ## sd(syntax_dev1)                                      1118
+    ## sd(trial_type_dev1)                                   726
+    ## sd(syntax_dev1:trial_type_dev1)                      1045
+    ## cor(Intercept,syntax_dev1)                           2406
+    ## cor(Intercept,trial_type_dev1)                       2790
+    ## cor(syntax_dev1,trial_type_dev1)                     1638
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           2867
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         2187
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     2319
     ## 
-    ## ~target (Number of levels: 14) 
+    ## ~unique_target (Number of levels: 20) 
     ##                                                  Estimate Est.Error l-95% CI
-    ## sd(Intercept)                                        0.89      0.24     0.52
-    ## sd(syntax_dev1)                                      0.16      0.11     0.01
-    ## sd(trial_type_dev1)                                  0.37      0.16     0.09
+    ## sd(Intercept)                                        0.76      0.18     0.46
+    ## sd(syntax_dev1)                                      0.13      0.10     0.01
+    ## sd(trial_type_dev1)                                  0.31      0.15     0.04
     ## sd(syntax_dev1:trial_type_dev1)                      0.14      0.10     0.01
-    ## cor(Intercept,syntax_dev1)                           0.19      0.42    -0.68
-    ## cor(Intercept,trial_type_dev1)                      -0.00      0.34    -0.65
-    ## cor(syntax_dev1,trial_type_dev1)                    -0.03      0.43    -0.80
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.05      0.42    -0.76
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)        -0.05      0.44    -0.82
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.28      0.42    -0.63
+    ## cor(Intercept,syntax_dev1)                           0.12      0.43    -0.71
+    ## cor(Intercept,trial_type_dev1)                       0.01      0.35    -0.64
+    ## cor(syntax_dev1,trial_type_dev1)                    -0.08      0.44    -0.84
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.01      0.43    -0.78
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)        -0.04      0.44    -0.83
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.18      0.43    -0.71
     ##                                                  u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                                        1.46 1.00     1919
-    ## sd(syntax_dev1)                                      0.43 1.00     2090
-    ## sd(trial_type_dev1)                                  0.73 1.00     1738
-    ## sd(syntax_dev1:trial_type_dev1)                      0.38 1.00     2263
-    ## cor(Intercept,syntax_dev1)                           0.88 1.00     5545
-    ## cor(Intercept,trial_type_dev1)                       0.66 1.00     3987
-    ## cor(syntax_dev1,trial_type_dev1)                     0.77 1.00     1387
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.80 1.00     6407
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.77 1.00     3154
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.90 1.00     4029
+    ## sd(Intercept)                                        1.18 1.00     1822
+    ## sd(syntax_dev1)                                      0.38 1.00     2281
+    ## sd(trial_type_dev1)                                  0.63 1.00     1560
+    ## sd(syntax_dev1:trial_type_dev1)                      0.37 1.00     1996
+    ## cor(Intercept,syntax_dev1)                           0.85 1.00     6161
+    ## cor(Intercept,trial_type_dev1)                       0.67 1.00     3578
+    ## cor(syntax_dev1,trial_type_dev1)                     0.76 1.00     1556
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.79 1.00     5833
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.78 1.00     3393
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.88 1.00     3369
     ##                                                  Tail_ESS
-    ## sd(Intercept)                                        3261
-    ## sd(syntax_dev1)                                      2536
-    ## sd(trial_type_dev1)                                  1917
-    ## sd(syntax_dev1:trial_type_dev1)                      2727
-    ## cor(Intercept,syntax_dev1)                           4338
-    ## cor(Intercept,trial_type_dev1)                       4239
-    ## cor(syntax_dev1,trial_type_dev1)                     2455
-    ## cor(Intercept,syntax_dev1:trial_type_dev1)           3846
-    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         3737
-    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     4114
+    ## sd(Intercept)                                        3418
+    ## sd(syntax_dev1)                                      2760
+    ## sd(trial_type_dev1)                                  1644
+    ## sd(syntax_dev1:trial_type_dev1)                      2189
+    ## cor(Intercept,syntax_dev1)                           4332
+    ## cor(Intercept,trial_type_dev1)                       2983
+    ## cor(syntax_dev1,trial_type_dev1)                     2935
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           3861
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         4218
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     4280
     ## 
     ## Population-Level Effects: 
     ##                             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                       1.76      0.33     1.13     2.43 1.00     1006
-    ## syntax_dev1                     0.61      0.12     0.38     0.83 1.00     2534
-    ## trial_type_dev1                 0.29      0.15    -0.02     0.58 1.00     2443
-    ## syntax_dev1:trial_type_dev1     0.32      0.11     0.10     0.54 1.00     2879
+    ## Intercept                       1.68      0.27     1.16     2.21 1.00      984
+    ## syntax_dev1                     0.60      0.11     0.38     0.82 1.00     2581
+    ## trial_type_dev1                 0.24      0.14    -0.05     0.50 1.00     2694
+    ## syntax_dev1:trial_type_dev1     0.31      0.11     0.10     0.53 1.00     2743
     ##                             Tail_ESS
-    ## Intercept                       1977
-    ## syntax_dev1                     3294
-    ## trial_type_dev1                 2884
-    ## syntax_dev1:trial_type_dev1     3567
+    ## Intercept                       2232
+    ## syntax_dev1                     3712
+    ## trial_type_dev1                 3835
+    ## syntax_dev1:trial_type_dev1     4147
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -741,16 +636,16 @@ summary(logistic_model_noN2)
     ## # A tibble: 10 x 4
     ##    key                            mean   lower upper
     ##    <chr>                         <dbl>   <dbl> <dbl>
-    ##  1 b_Intercept                   1.76   1.13   2.43 
-    ##  2 b_syntax_dev1                 0.605  0.377  0.833
-    ##  3 b_syntax_dev1:trial_type_dev1 0.319  0.100  0.538
-    ##  4 b_trial_type_dev1             0.288 -0.0173 0.584
-    ##  5 critical_pred                 1.18   0.464  2.00 
-    ##  6 critical_subj                 1.75   0.986  2.60 
-    ##  7 filler_pred                   1.12   0.451  1.84 
-    ##  8 filler_subj                   2.97   2.18   3.84 
-    ##  9 syntax_critical               0.573 -0.0384 1.19 
-    ## 10 syntax_filler                 1.85   1.21   2.52
+    ##  1 b_Intercept                   1.68   1.16   2.21 
+    ##  2 b_syntax_dev1                 0.596  0.376  0.819
+    ##  3 b_syntax_dev1:trial_type_dev1 0.309  0.0960 0.530
+    ##  4 b_trial_type_dev1             0.241 -0.0453 0.503
+    ##  5 critical_pred                 1.16   0.522  1.82 
+    ##  6 critical_subj                 1.73   1.06   2.44 
+    ##  7 filler_pred                   1.02   0.413  1.62 
+    ##  8 filler_subj                   2.83   2.15   3.61 
+    ##  9 syntax_critical               0.575 -0.0175 1.18 
+    ## 10 syntax_filler                 1.81   1.20   2.45
 
 Compute the probability of the effect of syntax in the critical
 condition being credible given the data without N2 responses:
@@ -758,7 +653,102 @@ condition being credible given the data without N2 responses:
     ## # A tibble: 1 x 1
     ##    prob
     ##   <dbl>
-    ## 1 0.968
+    ## 1 0.972
+
+Exploratory model on critical trials without N2 responses only (should
+match the contrast in the rate of basic level responses in the
+multinomial model on critical responses):
+
+``` r
+d_modRef_main_responseCat_noN2_critical <- d_modRef_main_responseCat_3way %>% filter (response_cat != "N2", trial_type == "critical")
+
+logistic_model_noN2_critical <- brm(
+  response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + 
+    (1 + syntax_dev | unique_target),
+  data = d_modRef_main_responseCat_noN2_critical,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4 #, 
+#  control = list(adapt_delta = 0.9)
+) 
+```
+
+    ## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+    ## clang -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -D_REENTRANT  -DBOOST_DISABLE_ASSERTS -DBOOST_PENDING_INTEGER_LOG2_HPP -include stan/math/prim/mat/fun/Eigen.hpp   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include  -fPIC  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -c foo.c -o foo.o
+    ## In file included from <built-in>:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:88:
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name 'namespace'
+    ## namespace Eigen {
+    ## ^
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected ';' after top level declarator
+    ## namespace Eigen {
+    ##                ^
+    ##                ;
+    ## In file included from <built-in>:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+    ## #include <complex>
+    ##          ^~~~~~~~~
+    ## 3 errors generated.
+    ## make: *** [foo.o] Error 1
+
+``` r
+summary(logistic_model_noN2_critical)
+```
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + (1 + syntax_dev | unique_target) 
+    ##    Data: d_modRef_main_responseCat_noN2_critical (Number of observations: 1010) 
+    ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+    ##          total post-warmup samples = 6000
+    ## 
+    ## Group-Level Effects: 
+    ## ~submission_id (Number of levels: 293) 
+    ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                  2.94      0.36     2.31     3.74 1.00     1185
+    ## sd(syntax_dev1)                0.59      0.30     0.04     1.17 1.00      689
+    ## cor(Intercept,syntax_dev1)    -0.01      0.46    -0.86     0.85 1.00     3179
+    ##                            Tail_ESS
+    ## sd(Intercept)                  2816
+    ## sd(syntax_dev1)                1405
+    ## cor(Intercept,syntax_dev1)     2716
+    ## 
+    ## ~unique_target (Number of levels: 20) 
+    ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                  0.79      0.24     0.38     1.33 1.00     1830
+    ## sd(syntax_dev1)                0.27      0.17     0.02     0.67 1.00     1995
+    ## cor(Intercept,syntax_dev1)     0.38      0.49    -0.78     0.98 1.00     4344
+    ##                            Tail_ESS
+    ## sd(Intercept)                  3418
+    ## sd(syntax_dev1)                3001
+    ## cor(Intercept,syntax_dev1)     3601
+    ## 
+    ## Population-Level Effects: 
+    ##             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+    ## Intercept       1.33      0.31     0.73     1.98 1.00     2171     2724
+    ## syntax_dev1     0.31      0.17    -0.02     0.66 1.00     3813     3534
+    ## 
+    ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+    ## and Tail_ESS are effective sample size measures, and Rhat is the potential
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
+
+Compute the contrast of effect of syntax:
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+    ## # A tibble: 5 x 4
+    ##   key              mean   lower upper
+    ##   <chr>           <dbl>   <dbl> <dbl>
+    ## 1 b_Intercept     1.33   0.730  1.98 
+    ## 2 b_syntax_dev1   0.308 -0.0205 0.661
+    ## 3 critical_pred   1.02   0.414  1.70 
+    ## 4 critical_subj   1.64   0.933  2.44 
+    ## 5 syntax_critical 0.615 -0.0410 1.32
 
 ### Critical trials only
 
@@ -769,7 +759,7 @@ d_modRef_main_critical <- d_modRef_main_responseCat %>% filter(trial_type == "cr
 
 logistic_model_critical <- brm(
   response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + 
-    (1 + syntax_dev | target),
+    (1 + syntax_dev | unique_target),
   data = d_modRef_main_critical,
   family = "bernoulli",
   cores = 4,
@@ -805,36 +795,36 @@ summary(logistic_model_critical)
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + (1 + syntax_dev | target) 
-    ##    Data: d_modRef_main_critical (Number of observations: 1192) 
+    ## Formula: response_num ~ syntax_dev + (1 + syntax_dev | submission_id) + (1 + syntax_dev | unique_target) 
+    ##    Data: d_modRef_main_critical (Number of observations: 1197) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 300) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  2.59      0.28     2.10     3.21 1.00     1340
-    ## sd(syntax_dev1)                0.46      0.25     0.03     0.97 1.00      890
-    ## cor(Intercept,syntax_dev1)     0.26      0.44    -0.77     0.93 1.00     3536
+    ## sd(Intercept)                  2.60      0.28     2.12     3.21 1.00     1228
+    ## sd(syntax_dev1)                0.47      0.26     0.03     0.99 1.00      745
+    ## cor(Intercept,syntax_dev1)     0.26      0.44    -0.74     0.94 1.00     2836
     ##                            Tail_ESS
-    ## sd(Intercept)                  2549
-    ## sd(syntax_dev1)                1734
-    ## cor(Intercept,syntax_dev1)     2885
+    ## sd(Intercept)                  1830
+    ## sd(syntax_dev1)                1376
+    ## cor(Intercept,syntax_dev1)     2809
     ## 
-    ## ~target (Number of levels: 14) 
+    ## ~unique_target (Number of levels: 20) 
     ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                  0.63      0.24     0.22     1.17 1.00     1260
-    ## sd(syntax_dev1)                0.18      0.14     0.01     0.50 1.00     2594
-    ## cor(Intercept,syntax_dev1)     0.27      0.54    -0.90     0.98 1.00     4776
+    ## sd(Intercept)                  0.58      0.20     0.22     1.02 1.00     1464
+    ## sd(syntax_dev1)                0.18      0.13     0.01     0.48 1.00     2588
+    ## cor(Intercept,syntax_dev1)     0.23      0.55    -0.89     0.97 1.00     4373
     ##                            Tail_ESS
-    ## sd(Intercept)                  1393
-    ## sd(syntax_dev1)                3237
-    ## cor(Intercept,syntax_dev1)     3577
+    ## sd(Intercept)                  1730
+    ## sd(syntax_dev1)                2966
+    ## cor(Intercept,syntax_dev1)     3653
     ## 
     ## Population-Level Effects: 
     ##             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept       1.68      0.28     1.15     2.25 1.00     2096     3169
-    ## syntax_dev1     0.24      0.15    -0.04     0.57 1.00     3197     3627
+    ## Intercept       1.71      0.27     1.22     2.27 1.00     1527     1785
+    ## syntax_dev1     0.24      0.15    -0.05     0.56 1.00     2421     2262
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -845,7 +835,258 @@ Compute the probability of the effect of syntax being greater than 0:
     ## # A tibble: 1 x 1
     ##    prob
     ##   <dbl>
-    ## 1 0.958
+    ## 1 0.952
+
+### Exploratory models with FE of adjective
+
+Exploratory model on both trial types with a fixed effect of adjective
+(big vs. small):
+
+``` r
+logistic_model_adjectiveFE <- brm(
+  response_num ~ syntax_dev * trial_type_dev * adj_dev +
+    (1 + syntax_dev * trial_type_dev + adj_dev | submission_id) +   
+    (1 + syntax_dev * trial_type_dev | unique_target), 
+  data = d_modRef_main_responseCat,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4, 
+  control = list(adapt_delta = 0.9)
+)
+```
+
+    ## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+    ## clang -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -D_REENTRANT  -DBOOST_DISABLE_ASSERTS -DBOOST_PENDING_INTEGER_LOG2_HPP -include stan/math/prim/mat/fun/Eigen.hpp   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include  -fPIC  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -c foo.c -o foo.o
+    ## In file included from <built-in>:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:88:
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name 'namespace'
+    ## namespace Eigen {
+    ## ^
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected ';' after top level declarator
+    ## namespace Eigen {
+    ##                ^
+    ##                ;
+    ## In file included from <built-in>:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+    ## #include <complex>
+    ##          ^~~~~~~~~
+    ## 3 errors generated.
+    ## make: *** [foo.o] Error 1
+
+``` r
+summary(logistic_model_adjectiveFE)
+```
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: response_num ~ syntax_dev * trial_type_dev * adj_dev + (1 + syntax_dev * trial_type_dev + adj_dev | submission_id) + (1 + syntax_dev * trial_type_dev | unique_target) 
+    ##    Data: d_modRef_main_responseCat (Number of observations: 2386) 
+    ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+    ##          total post-warmup samples = 6000
+    ## 
+    ## Group-Level Effects: 
+    ## ~submission_id (Number of levels: 300) 
+    ##                                                  Estimate Est.Error l-95% CI
+    ## sd(Intercept)                                        2.69      0.24     2.26
+    ## sd(syntax_dev1)                                      0.36      0.18     0.03
+    ## sd(trial_type_dev1)                                  0.40      0.17     0.04
+    ## sd(adj_dev1)                                         0.21      0.13     0.01
+    ## sd(syntax_dev1:trial_type_dev1)                      0.47      0.17     0.10
+    ## cor(Intercept,syntax_dev1)                          -0.16      0.32    -0.74
+    ## cor(Intercept,trial_type_dev1)                      -0.24      0.30    -0.76
+    ## cor(syntax_dev1,trial_type_dev1)                     0.11      0.37    -0.64
+    ## cor(Intercept,adj_dev1)                             -0.10      0.37    -0.77
+    ## cor(syntax_dev1,adj_dev1)                           -0.11      0.38    -0.78
+    ## cor(trial_type_dev1,adj_dev1)                        0.09      0.38    -0.67
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.31      0.27    -0.76
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.08      0.35    -0.63
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.41      0.32    -0.35
+    ## cor(adj_dev1,syntax_dev1:trial_type_dev1)            0.26      0.38    -0.59
+    ##                                                  u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                                        3.19 1.00     1114
+    ## sd(syntax_dev1)                                      0.70 1.00      756
+    ## sd(trial_type_dev1)                                  0.71 1.00      899
+    ## sd(adj_dev1)                                         0.48 1.00     1064
+    ## sd(syntax_dev1:trial_type_dev1)                      0.78 1.00      872
+    ## cor(Intercept,syntax_dev1)                           0.51 1.00     3582
+    ## cor(Intercept,trial_type_dev1)                       0.40 1.00     3250
+    ## cor(syntax_dev1,trial_type_dev1)                     0.76 1.00     1418
+    ## cor(Intercept,adj_dev1)                              0.64 1.00     5790
+    ## cor(syntax_dev1,adj_dev1)                            0.66 1.00     3061
+    ## cor(trial_type_dev1,adj_dev1)                        0.77 1.00     2955
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.28 1.00     2795
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.73 1.00     1424
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.88 1.00     1221
+    ## cor(adj_dev1,syntax_dev1:trial_type_dev1)            0.85 1.00     1254
+    ##                                                  Tail_ESS
+    ## sd(Intercept)                                        2645
+    ## sd(syntax_dev1)                                      1243
+    ## sd(trial_type_dev1)                                  1254
+    ## sd(adj_dev1)                                         1807
+    ## sd(syntax_dev1:trial_type_dev1)                      1136
+    ## cor(Intercept,syntax_dev1)                           3743
+    ## cor(Intercept,trial_type_dev1)                       3573
+    ## cor(syntax_dev1,trial_type_dev1)                     2763
+    ## cor(Intercept,adj_dev1)                              4087
+    ## cor(syntax_dev1,adj_dev1)                            3249
+    ## cor(trial_type_dev1,adj_dev1)                        3798
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           3021
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         1962
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     2188
+    ## cor(adj_dev1,syntax_dev1:trial_type_dev1)            2523
+    ## 
+    ## ~unique_target (Number of levels: 20) 
+    ##                                                  Estimate Est.Error l-95% CI
+    ## sd(Intercept)                                        0.67      0.17     0.40
+    ## sd(syntax_dev1)                                      0.10      0.08     0.00
+    ## sd(trial_type_dev1)                                  0.32      0.16     0.03
+    ## sd(syntax_dev1:trial_type_dev1)                      0.15      0.11     0.01
+    ## cor(Intercept,syntax_dev1)                          -0.02      0.44    -0.82
+    ## cor(Intercept,trial_type_dev1)                       0.20      0.34    -0.51
+    ## cor(syntax_dev1,trial_type_dev1)                    -0.01      0.45    -0.81
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)          -0.00      0.42    -0.77
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.01      0.45    -0.82
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.08      0.44    -0.75
+    ##                                                  u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                                        1.06 1.00     1815
+    ## sd(syntax_dev1)                                      0.30 1.00     2859
+    ## sd(trial_type_dev1)                                  0.65 1.00     1475
+    ## sd(syntax_dev1:trial_type_dev1)                      0.40 1.00     1892
+    ## cor(Intercept,syntax_dev1)                           0.79 1.00     6761
+    ## cor(Intercept,trial_type_dev1)                       0.78 1.00     3644
+    ## cor(syntax_dev1,trial_type_dev1)                     0.80 1.01     1800
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           0.77 1.00     6175
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         0.82 1.00     3877
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     0.84 1.00     4746
+    ##                                                  Tail_ESS
+    ## sd(Intercept)                                        3664
+    ## sd(syntax_dev1)                                      2775
+    ## sd(trial_type_dev1)                                  1526
+    ## sd(syntax_dev1:trial_type_dev1)                      2885
+    ## cor(Intercept,syntax_dev1)                           4441
+    ## cor(Intercept,trial_type_dev1)                       4331
+    ## cor(syntax_dev1,trial_type_dev1)                     2943
+    ## cor(Intercept,syntax_dev1:trial_type_dev1)           4587
+    ## cor(syntax_dev1,syntax_dev1:trial_type_dev1)         4477
+    ## cor(trial_type_dev1,syntax_dev1:trial_type_dev1)     4501
+    ## 
+    ## Population-Level Effects: 
+    ##                                      Estimate Est.Error l-95% CI u-95% CI Rhat
+    ## Intercept                                1.91      0.27     1.41     2.46 1.00
+    ## syntax_dev1                              0.58      0.11     0.37     0.80 1.00
+    ## trial_type_dev1                          0.08      0.13    -0.18     0.33 1.00
+    ## adj_dev1                                 0.19      0.18    -0.16     0.54 1.00
+    ## syntax_dev1:trial_type_dev1              0.34      0.12     0.11     0.58 1.00
+    ## syntax_dev1:adj_dev1                     0.14      0.08    -0.01     0.29 1.00
+    ## trial_type_dev1:adj_dev1                 0.02      0.11    -0.19     0.23 1.00
+    ## syntax_dev1:trial_type_dev1:adj_dev1     0.03      0.08    -0.13     0.19 1.00
+    ##                                      Bulk_ESS Tail_ESS
+    ## Intercept                                1337     1754
+    ## syntax_dev1                              2376     3193
+    ## trial_type_dev1                          2907     3550
+    ## adj_dev1                                 2471     2978
+    ## syntax_dev1:trial_type_dev1              2537     3306
+    ## syntax_dev1:adj_dev1                     6633     4609
+    ## trial_type_dev1:adj_dev1                 4049     3581
+    ## syntax_dev1:trial_type_dev1:adj_dev1     4807     4151
+    ## 
+    ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+    ## and Tail_ESS are effective sample size measures, and Rhat is the potential
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
+
+Exploratory model with FE of adjective on critical trials only:
+
+``` r
+logistic_model_adjectiveFE_critical <- brm(
+  response_num ~ syntax_dev * adj_dev + (1 + syntax_dev + adj_dev | submission_id) + 
+    (1 + syntax_dev | unique_target),
+  data = d_modRef_main_critical,
+  family = "bernoulli",
+  cores = 4,
+  iter = 3000,
+  chains = 4 )
+```
+
+    ## Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+    ## clang -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/3.6/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -D_REENTRANT  -DBOOST_DISABLE_ASSERTS -DBOOST_PENDING_INTEGER_LOG2_HPP -include stan/math/prim/mat/fun/Eigen.hpp   -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I/usr/local/include  -fPIC  -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -c foo.c -o foo.o
+    ## In file included from <built-in>:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:88:
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:1: error: unknown type name 'namespace'
+    ## namespace Eigen {
+    ## ^
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:613:16: error: expected ';' after top level declarator
+    ## namespace Eigen {
+    ##                ^
+    ##                ;
+    ## In file included from <built-in>:1:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/StanHeaders/include/stan/math/prim/mat/fun/Eigen.hpp:13:
+    ## In file included from /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Dense:1:
+    ## /Library/Frameworks/R.framework/Versions/3.6/Resources/library/RcppEigen/include/Eigen/Core:96:10: fatal error: 'complex' file not found
+    ## #include <complex>
+    ##          ^~~~~~~~~
+    ## 3 errors generated.
+    ## make: *** [foo.o] Error 1
+
+``` r
+summary(logistic_model_adjectiveFE_critical)
+```
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: response_num ~ syntax_dev * adj_dev + (1 + syntax_dev + adj_dev | submission_id) + (1 + syntax_dev | unique_target) 
+    ##    Data: d_modRef_main_critical (Number of observations: 1197) 
+    ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+    ##          total post-warmup samples = 6000
+    ## 
+    ## Group-Level Effects: 
+    ## ~submission_id (Number of levels: 300) 
+    ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                  2.85      0.38     2.24     3.69 1.00      719
+    ## sd(syntax_dev1)                0.60      0.29     0.06     1.17 1.01      555
+    ## sd(adj_dev1)                   0.43      0.26     0.02     0.98 1.01      579
+    ## cor(Intercept,syntax_dev1)     0.25      0.36    -0.56     0.84 1.00     2498
+    ## cor(Intercept,adj_dev1)       -0.12      0.41    -0.86     0.71 1.00     3577
+    ## cor(syntax_dev1,adj_dev1)     -0.27      0.43    -0.91     0.71 1.00     1160
+    ##                            Tail_ESS
+    ## sd(Intercept)                  1586
+    ## sd(syntax_dev1)                1147
+    ## sd(adj_dev1)                   1546
+    ## cor(Intercept,syntax_dev1)     2305
+    ## cor(Intercept,adj_dev1)        3346
+    ## cor(syntax_dev1,adj_dev1)      1453
+    ## 
+    ## ~unique_target (Number of levels: 20) 
+    ##                            Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                  0.64      0.23     0.24     1.15 1.00     1568
+    ## sd(syntax_dev1)                0.17      0.14     0.01     0.51 1.00     1894
+    ## cor(Intercept,syntax_dev1)     0.16      0.55    -0.90     0.96 1.00     4143
+    ##                            Tail_ESS
+    ## sd(Intercept)                  1917
+    ## sd(syntax_dev1)                2585
+    ## cor(Intercept,syntax_dev1)     3808
+    ## 
+    ## Population-Level Effects: 
+    ##                      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## Intercept                1.85      0.32     1.29     2.55 1.00      913
+    ## syntax_dev1              0.27      0.16    -0.02     0.61 1.00     2015
+    ## adj_dev1                 0.16      0.21    -0.25     0.57 1.00     2341
+    ## syntax_dev1:adj_dev1     0.12      0.11    -0.09     0.33 1.00     4023
+    ##                      Tail_ESS
+    ## Intercept                1788
+    ## syntax_dev1              2853
+    ## adj_dev1                 3026
+    ## syntax_dev1:adj_dev1     4285
+    ## 
+    ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+    ## and Tail_ESS are effective sample size measures, and Rhat is the potential
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
 
 ### Multinomial regression
 
@@ -860,7 +1101,7 @@ d_modRef_main_responseCat_3way <- d_modRef_main_responseCat_3way %>%
 
 model_multinomial <- brm(
   response_cat ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev || submission_id) + 
-    (1 + syntax_dev * trial_type_dev || target),
+    (1 + syntax_dev * trial_type_dev || unique_target),
   data = d_modRef_main_responseCat_3way,
   family = "categorical",
   cores = 3,
@@ -885,7 +1126,7 @@ contrasts(d_modRef_main_3way_critical$syntax_dev) <- contr.sum(2)
 
 model_multinomial_critical <- brm(
   response_cat ~ syntax_dev + (1 + syntax_dev || submission_id) + 
-    (1 + syntax_dev || target),
+    (1 + syntax_dev || unique_target),
   data = d_modRef_main_3way_critical,
   family = "categorical",
   cores = 3,
@@ -922,47 +1163,47 @@ summary(model_multinomial_critical)
 
     ##  Family: categorical 
     ##   Links: muN2 = logit; musubordinate = logit 
-    ## Formula: response_cat ~ syntax_dev + (1 + syntax_dev || submission_id) + (1 + syntax_dev || target) 
-    ##    Data: d_modRef_main_3way_critical (Number of observations: 1192) 
+    ## Formula: response_cat ~ syntax_dev + (1 + syntax_dev || submission_id) + (1 + syntax_dev || unique_target) 
+    ##    Data: d_modRef_main_3way_critical (Number of observations: 1197) 
     ## Samples: 3 chains, each with iter = 2000; warmup = 1000; thin = 1;
     ##          total post-warmup samples = 3000
     ## 
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 300) 
     ##                               Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## sd(muN2_Intercept)                2.18      0.30     1.67     2.85 1.00
-    ## sd(muN2_syntax_dev1)              0.60      0.30     0.04     1.16 1.00
-    ## sd(musubordinate_Intercept)       2.71      0.30     2.16     3.33 1.01
-    ## sd(musubordinate_syntax_dev1)     0.50      0.24     0.05     0.95 1.01
+    ## sd(muN2_Intercept)                2.20      0.29     1.69     2.84 1.01
+    ## sd(muN2_syntax_dev1)              0.48      0.27     0.04     1.01 1.01
+    ## sd(musubordinate_Intercept)       2.71      0.30     2.18     3.36 1.01
+    ## sd(musubordinate_syntax_dev1)     0.52      0.25     0.05     1.00 1.01
     ##                               Bulk_ESS Tail_ESS
-    ## sd(muN2_Intercept)                 596     1182
-    ## sd(muN2_syntax_dev1)               337      425
-    ## sd(musubordinate_Intercept)        697     1122
-    ## sd(musubordinate_syntax_dev1)      390      417
+    ## sd(muN2_Intercept)                 568     1432
+    ## sd(muN2_syntax_dev1)               426      951
+    ## sd(musubordinate_Intercept)        673     1303
+    ## sd(musubordinate_syntax_dev1)      359      581
     ## 
-    ## ~target (Number of levels: 14) 
+    ## ~unique_target (Number of levels: 20) 
     ##                               Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## sd(muN2_Intercept)                0.81      0.26     0.41     1.41 1.00
-    ## sd(muN2_syntax_dev1)              0.38      0.22     0.02     0.87 1.01
-    ## sd(musubordinate_Intercept)       0.80      0.26     0.39     1.40 1.01
-    ## sd(musubordinate_syntax_dev1)     0.17      0.13     0.01     0.49 1.00
+    ## sd(muN2_Intercept)                0.81      0.23     0.43     1.33 1.00
+    ## sd(muN2_syntax_dev1)              0.34      0.22     0.02     0.86 1.01
+    ## sd(musubordinate_Intercept)       0.70      0.22     0.34     1.17 1.01
+    ## sd(musubordinate_syntax_dev1)     0.19      0.14     0.01     0.52 1.00
     ##                               Bulk_ESS Tail_ESS
-    ## sd(muN2_Intercept)                 781     1660
-    ## sd(muN2_syntax_dev1)               736      795
-    ## sd(musubordinate_Intercept)        865     1696
-    ## sd(musubordinate_syntax_dev1)     1243     1665
+    ## sd(muN2_Intercept)                1139     1666
+    ## sd(muN2_syntax_dev1)               562     1457
+    ## sd(musubordinate_Intercept)        882     1618
+    ## sd(musubordinate_syntax_dev1)      928      999
     ## 
     ## Population-Level Effects: 
     ##                           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## muN2_Intercept               -2.36      0.38    -3.24    -1.69 1.00      681
-    ## musubordinate_Intercept      -1.42      0.33    -2.07    -0.76 1.00      773
-    ## muN2_syntax_dev1             -0.30      0.18    -0.69     0.03 1.00     1858
-    ## musubordinate_syntax_dev1    -0.23      0.12    -0.47     0.00 1.00     2423
+    ## muN2_Intercept               -2.37      0.35    -3.11    -1.73 1.00      919
+    ## musubordinate_Intercept      -1.42      0.29    -1.99    -0.87 1.01      817
+    ## muN2_syntax_dev1             -0.28      0.16    -0.61     0.01 1.00     2004
+    ## musubordinate_syntax_dev1    -0.24      0.12    -0.48    -0.01 1.00     2221
     ##                           Tail_ESS
-    ## muN2_Intercept                 804
-    ## musubordinate_Intercept       1259
-    ## muN2_syntax_dev1              1910
-    ## musubordinate_syntax_dev1     2108
+    ## muN2_Intercept                1370
+    ## musubordinate_Intercept       1396
+    ## muN2_syntax_dev1              1799
+    ## musubordinate_syntax_dev1     2183
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -1005,17 +1246,17 @@ posteriors_multinomial_critical
 ```
 
     ## # A tibble: 9 x 4
-    ##   key             mean   lower  upper
-    ##   <chr>          <dbl>   <dbl>  <dbl>
-    ## 1 basic_pred    0.690   0.579  0.802 
-    ## 2 basic_subj    0.784   0.678  0.865 
-    ## 3 basic_syntax  0.0935  0.0155 0.176 
-    ## 4 N2_pred       0.0936  0.0315 0.157 
-    ## 5 N2_subj       0.0593  0.0200 0.107 
-    ## 6 N2_syntax    -0.0343 -0.0879 0.0133
-    ## 7 sub_pred      0.216   0.110  0.335 
-    ## 8 sub_subj      0.157   0.0777 0.256 
-    ## 9 sub_syntax   -0.0592 -0.137  0.0110
+    ##   key             mean   lower   upper
+    ##   <chr>          <dbl>   <dbl>   <dbl>
+    ## 1 basic_pred    0.690   0.586  0.782  
+    ## 2 basic_subj    0.786   0.703  0.869  
+    ## 3 basic_syntax  0.0958  0.0183 0.170  
+    ## 4 N2_pred       0.0902  0.0344 0.150  
+    ## 5 N2_subj       0.0592  0.0220 0.104  
+    ## 6 N2_syntax    -0.0310 -0.0753 0.0113 
+    ## 7 sub_pred      0.220   0.126  0.321  
+    ## 8 sub_subj      0.155   0.0824 0.240  
+    ## 9 sub_syntax   -0.0649 -0.137  0.00554
 
 Compute likelihood of a credible effect of syntax for the subordinate
 response category:
@@ -1023,7 +1264,7 @@ response category:
     ## # A tibble: 1 x 1
     ##    prob
     ##   <dbl>
-    ## 1 0.954
+    ## 1 0.967
 
 ## Detailed plots
 
@@ -1103,6 +1344,19 @@ d_modRef_main_responseCat_3way %>%
 
 ![](direct-modification-prereg-final_files/figure-gfm/counts-byN2-1.png)<!-- -->
 
+More count plots: response category counts by syntax (x-axis) and by
+unique target (N2 & target):
+
+``` r
+d_modRef_main_responseCat_3way %>%
+  filter(trial_type == "critical") %>%
+  ggplot(., aes(x = syntax, fill = response_cat)) +
+  geom_bar(alpha = 0.8, position = position_dodge(width = 1)) +
+  facet_wrap(ref_np~target, nrow=5) 
+```
+
+![](direct-modification-prereg-final_files/figure-gfm/counts-byN2-byTarget-1.png)<!-- -->
+
 ## Exploratory descriptive stats
 
 Look at the number of non-switchers (participants sticking to one type
@@ -1113,7 +1367,7 @@ of response throughout):
 d_modRef_main_responseCat %>% group_by(submission_id, response_cat) %>% count() %>% spread(response_cat, n) %>% filter((is.na(match) | is.na(nonmatch))) %>% nrow() 
 ```
 
-    ## [1] 125
+    ## [1] 124
 
 ``` r
 # proportion of non-switching participants under two-way response classification
@@ -1132,7 +1386,7 @@ d_modRef_main_responseCat_3way %>% group_by(submission_id, response_cat) %>% cou
   filter((basic == sum) | (N2 == sum) | (subordinate == sum)) %>% nrow()
 ```
 
-    ## [1] 76
+    ## [1] 74
 
 ``` r
 # proportion of non-switching participants under 3-way response classification 
@@ -1140,3 +1394,38 @@ d_modRef_main_responseCat_3way %>% group_by(submission_id, response_cat) %>% cou
 ```
 
     ## [1] 0.2533333
+
+Critical trials only:
+
+``` r
+d_modRef_main_responseCat_3way %>% filter(trial_type == "critical") %>% 
+  group_by(submission_id, response_cat) %>% count() %>% spread(response_cat, n) %>% 
+  mutate(basic = ifelse(is.na(basic), 0, basic),
+                                     N2 = ifelse(is.na(N2), 0, N2),
+                                     subordinate = ifelse(is.na(subordinate), 0, subordinate),
+                                     sum = basic + N2 + subordinate) %>%
+  filter((basic == sum) | (N2 == sum) | (subordinate == sum)) -> non_switchers_critical
+
+non_switchers_critical %>% nrow()
+```
+
+    ## [1] 111
+
+``` r
+113/300
+```
+
+    ## [1] 0.3766667
+
+``` r
+# which categories do subjects stick to?
+non_switchers_critical %>% pivot_longer(cols = c("basic", "N2", "subordinate"), names_to = "response_cat", values_to = "count") %>% filter(count != 0) %>% group_by(response_cat) %>% count()
+```
+
+    ## # A tibble: 3 x 2
+    ## # Groups:   response_cat [3]
+    ##   response_cat     n
+    ##   <chr>        <int>
+    ## 1 basic           75
+    ## 2 N2               7
+    ## 3 subordinate     29
