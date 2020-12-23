@@ -68,9 +68,16 @@ function create_view(items, target_size, contexts, num_trials, synt_adj0, filler
     const critical_size = synt_adj0[i].split("_")[2];
     // console.log(contexts[i]);
     var n2 = contexts[i].split("_")[1];
+    // if( n2 == "service") {
+    //   n2 = "service-animal"
+    // } else if (n2 == "prize") {
+    //   n2 = "prize-winner"
+    // } else {
+    //   n2 = n2
+    // }
     // console.log("N2:", n2);
     const item = contexts[i].split("_")[0];
-    // console.log("item:", item);
+    console.log("item:", item);
     const view = {
       trial_type: "critical",
       context: items[item][n2][critical_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
@@ -801,7 +808,7 @@ buildings: {
 }
 
 const main_trials = create_view(items, target_size, item_noun_pairs, num_trials, synt_adj0, filler_cond)
-
+console.log("main trials: ", main_trials);
 // shuffle sets of warmup trials and the corresponding big and small targets
  // x: warmup trial
  // y: big target
@@ -810,6 +817,9 @@ const main_trials = create_view(items, target_size, item_noun_pairs, num_trials,
 
 // item_noun_pairs[0].split("_")[0] - item; [1] - N2
 
+// x: labeling + N2 warmup
+// y: critical main trial
+// z: filler main trial
 const trials = [
   {x:warmup_trials[item_noun_pairs[0].split("_")[0]][item_noun_pairs[0].split("_")[1]], y:main_trials[0], z:main_trials[1]},
   {x:warmup_trials[item_noun_pairs[1].split("_")[0]][item_noun_pairs[1].split("_")[1]], y:main_trials[2], z:main_trials[3]},
@@ -826,16 +836,22 @@ const trials = [
 
        trials[0].y,
        trials[1].y,
-       trials[0].z,
-       trials[1].z
+
+       // uncomment for getting filler trials
+
+       // trials[0].z,
+       // trials[1].z
     ],
     // get items for the second block
     text_insertion_main2 :[
 
       trials[2].y,
       trials[3].y,
-      trials[2].z,
-      trials[3].z
+
+      // uncomment for getting filler trials
+      
+      // trials[2].z,
+      // trials[3].z
     ],
      text_insertion_warmup1: [
        // get the warmup trials corresponding to the main trials in the first main block

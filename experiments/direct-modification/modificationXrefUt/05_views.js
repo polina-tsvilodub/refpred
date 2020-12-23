@@ -10,7 +10,7 @@ const instructions = magpieViews.view_generator("instructions", {
             make sure you can concentrate on the task without disturbance.
             <br />
             <br />
-            The experiment consists of 2 sets of trials. Each set contains a few warm-up trials and 8 main trials.
+            The experiment consists of 2 sets of trials. Each set contains a few warm-up trials and 4 main trials.
             <br />
             <br />
             In the warm-up trials, you will be asked to <b>label the objects on the screen</b>.
@@ -118,7 +118,7 @@ const custom_main_text1 = custom_free_paraphrase({
   trials: trial_info.text_insertion_main1.length, // all trials are called
   // name should be identical to the variable name
   name: 'custom_main_text1',
-  data: reorder_trials(trial_info.text_insertion_main1),
+  data: _.shuffle(trial_info.text_insertion_main1) // reorder_trials(trial_info.text_insertion_main1),
 
 });
 
@@ -126,7 +126,7 @@ const custom_main_text1 = custom_free_paraphrase({
 const custom_main_text2 = custom_free_paraphrase({
   trials: trial_info.text_insertion_main2.length, // all trials are called
   name: 'custom_main_text2',
-  data: reorder_trials(trial_info.text_insertion_main2),
+  data: _.shuffle(trial_info.text_insertion_main2) // reorder_trials(trial_info.text_insertion_main2),
 });
 
 
