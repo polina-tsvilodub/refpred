@@ -1,4 +1,4 @@
-Direct Modification Results - Prereg Final
+Direct Modification Results - Critical Trials Only Pilot
 ================
 Polina Tsvilodub
 12/29/2020
@@ -158,6 +158,11 @@ d_modRef_main <- d_modRef_filter %>% filter((trial_name == "custom_main_text1") 
                                 (trial_name == "custom_main_text2")) %>%
   select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type, ref_np, unique_target )
 
+d_modRef_main <- d_modRef_main %>% group_by(submission_id) %>%
+  mutate(
+    block = c(1,1,2,2)
+) 
+
 d_modRef_main %>% distinct(response) %>% View()
 
 # exclude 14 answers with minimal exclusion criteria
@@ -231,7 +236,18 @@ Exp. 3).
 Here, counts of the three response categories (basic, N2, subordinate)
 in the critical direct-modification trials are plotted by-syntax.
 ![](direct-modification-prereg-criticalOnly-pilot_files/figure-gfm/plot2-1.png)<!-- -->
-\#\# Stats
+Here is an exploratory plot of the responses by response block (first
+two trials versus third and fourth trial):
+
+    ## Warning: `cols` is now required when using unnest().
+    ## Please use `cols = c(strap)`
+
+![](direct-modification-prereg-criticalOnly-pilot_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+Here is an exploratory plot of the 3-way response counts by response
+block (first two trials versus third and fourth trial):
+![](direct-modification-prereg-criticalOnly-pilot_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+## Stats
 
 In the following, the dataset where less strict exclusions were applied
 is used for analysis. The predictors are deviation-coded.
@@ -291,18 +307,18 @@ summary(logistic_model_critical)
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 36) 
     ##                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)       5.01      1.98     2.31     9.98 1.00     1286     1981
-    ## sd(syntax_dev1)     1.68      1.03     0.13     4.06 1.00     1359     2253
+    ## sd(Intercept)       4.91      1.90     2.26     9.42 1.00     1310     2131
+    ## sd(syntax_dev1)     1.62      1.02     0.11     3.99 1.00     1296     2209
     ## 
     ## ~unique_target (Number of levels: 18) 
     ##                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)       2.23      1.19     0.42     5.14 1.00     1184     1393
-    ## sd(syntax_dev1)     1.75      1.05     0.18     4.33 1.00     1228     1428
+    ## sd(Intercept)       2.14      1.18     0.36     4.93 1.00     1241     1671
+    ## sd(syntax_dev1)     1.74      1.03     0.20     4.23 1.00     1423     2024
     ## 
     ## Population-Level Effects: 
     ##             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept       4.06      1.77     1.53     8.33 1.00     1665     1590
-    ## syntax_dev1     0.75      0.87    -0.76     2.73 1.00     2953     2066
+    ## Intercept       3.96      1.65     1.56     7.89 1.00     1706     2126
+    ## syntax_dev1     0.73      0.83    -0.76     2.67 1.00     2457     2344
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -313,7 +329,7 @@ Compute the probability of the effect of syntax being greater than 0:
     ## # A tibble: 1 x 1
     ##    prob
     ##   <dbl>
-    ## 1 0.836
+    ## 1 0.839
 
 ### Basic and subordinate responses only
 
@@ -372,18 +388,18 @@ summary(logistic_model_noN2_critical)
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 36) 
     ##                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)       5.55      2.21     2.52    11.07 1.00     1496     2595
-    ## sd(syntax_dev1)     1.59      1.02     0.12     3.94 1.00     1581     2243
+    ## sd(Intercept)       5.47      2.18     2.59    10.95 1.00     1625     3058
+    ## sd(syntax_dev1)     1.53      1.00     0.10     3.90 1.00     1585     2153
     ## 
     ## ~unique_target (Number of levels: 18) 
     ##                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)       2.09      1.19     0.28     4.86 1.00     1437     1647
-    ## sd(syntax_dev1)     1.35      0.94     0.07     3.60 1.00     1768     2755
+    ## sd(Intercept)       2.06      1.19     0.29     4.94 1.00     1790     2586
+    ## sd(syntax_dev1)     1.33      0.94     0.07     3.58 1.00     2036     2878
     ## 
     ## Population-Level Effects: 
     ##             Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept       3.95      1.75     1.39     8.05 1.00     2230     2358
-    ## syntax_dev1     0.96      0.88    -0.44     3.12 1.00     3249     2557
+    ## Intercept       3.85      1.72     1.33     8.10 1.00     2487     2975
+    ## syntax_dev1     0.94      0.87    -0.46     2.96 1.00     3405     3041
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -396,7 +412,7 @@ Compute the contrast of effect of syntax:
     ## # A tibble: 1 x 2
     ##   key              prob
     ##   <chr>           <dbl>
-    ## 1 syntax_critical 0.902
+    ## 1 syntax_critical 0.906
 
 ### Exploratory models with FE of adjective
 
@@ -453,26 +469,26 @@ summary(logistic_model_adjectiveFE)
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 36) 
     ##                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)       8.16      3.47     3.52    16.88 1.00     1640     2488
-    ## sd(syntax_dev1)     3.08      1.64     0.62     7.13 1.00     1608     2163
-    ## sd(adj_dev1)        1.21      1.01     0.05     3.72 1.00     1900     2955
+    ## sd(Intercept)       8.17      3.47     3.58    17.01 1.00     1912     2302
+    ## sd(syntax_dev1)     3.08      1.67     0.49     7.17 1.00     1589     1721
+    ## sd(adj_dev1)        1.22      1.02     0.05     3.74 1.00     2306     3671
     ## 
     ## ~unique_target (Number of levels: 18) 
     ##                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## sd(Intercept)       2.42      1.66     0.15     6.43 1.00     1335     1544
-    ## sd(syntax_dev1)     1.87      1.42     0.08     5.30 1.00     1550     2181
+    ## sd(Intercept)       2.42      1.67     0.18     6.46 1.00     1823     2973
+    ## sd(syntax_dev1)     1.88      1.43     0.10     5.29 1.00     2139     3463
     ## 
     ## Population-Level Effects: 
     ##                      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                6.45      2.91     2.38    13.78 1.00     1873
-    ## syntax_dev1              0.61      1.26    -1.79     3.31 1.00     2727
-    ## adj_dev1                -2.51      1.46    -6.06    -0.34 1.00     2441
-    ## syntax_dev1:adj_dev1     1.96      1.22     0.01     4.84 1.00     2720
+    ## Intercept                6.33      2.91     2.42    13.57 1.00     2167
+    ## syntax_dev1              0.58      1.23    -1.74     3.29 1.00     3787
+    ## adj_dev1                -2.52      1.47    -6.22    -0.33 1.00     2851
+    ## syntax_dev1:adj_dev1     1.98      1.25     0.09     4.95 1.00     2511
     ##                      Tail_ESS
-    ## Intercept                2075
-    ## syntax_dev1              2915
-    ## adj_dev1                 1904
-    ## syntax_dev1:adj_dev1     2269
+    ## Intercept                2049
+    ## syntax_dev1              3224
+    ## adj_dev1                 2146
+    ## syntax_dev1:adj_dev1     2235
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -501,13 +517,13 @@ logistic_model_adjectiveFE %>% spread_draws(b_Intercept, b_syntax_dev1, b_adj_de
     ## # A tibble: 7 x 4
     ##   key               mean   lower upper
     ##   <chr>            <dbl>   <dbl> <dbl>
-    ## 1 b_Intercept      6.45    2.38  13.8 
-    ## 2 b_syntax_dev1    0.605  -1.79   3.31
-    ## 3 critical_pred    5.84    1.39  13.5 
-    ## 4 critical_subj    7.05    2.45  15.1 
-    ## 5 syntax_big       5.13   -0.204 13.2 
-    ## 6 syntax_critical  1.21   -3.57   6.61
-    ## 7 syntax_small    -2.71  -10.7    3.83
+    ## 1 b_Intercept      6.33    2.42  13.6 
+    ## 2 b_syntax_dev1    0.582  -1.74   3.29
+    ## 3 critical_pred    5.75    1.51  13.4 
+    ## 4 critical_subj    6.92    2.39  15.2 
+    ## 5 syntax_big       5.13   -0.376 13.5 
+    ## 6 syntax_critical  1.16   -3.49   6.59
+    ## 7 syntax_small    -2.81  -10.5    3.51
 
 ### Multinomial regression
 
@@ -570,39 +586,39 @@ summary(model_multinomial_critical)
     ## Group-Level Effects: 
     ## ~submission_id (Number of levels: 36) 
     ##                               Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## sd(muN2_Intercept)                2.16      1.79     0.07     6.54 1.00
-    ## sd(muN2_syntax_dev1)              2.60      2.18     0.12     8.35 1.00
-    ## sd(musubordinate_Intercept)       4.94      1.86     2.36     9.56 1.00
-    ## sd(musubordinate_syntax_dev1)     1.57      0.98     0.10     3.91 1.00
+    ## sd(muN2_Intercept)                2.28      1.87     0.10     7.30 1.00
+    ## sd(muN2_syntax_dev1)              2.50      2.27     0.10     8.18 1.00
+    ## sd(musubordinate_Intercept)       5.08      2.01     2.43    10.07 1.00
+    ## sd(musubordinate_syntax_dev1)     1.59      1.02     0.08     3.86 1.00
     ##                               Bulk_ESS Tail_ESS
-    ## sd(muN2_Intercept)                1072     1252
-    ## sd(muN2_syntax_dev1)               709     1046
-    ## sd(musubordinate_Intercept)        627     1064
-    ## sd(musubordinate_syntax_dev1)      564      746
+    ## sd(muN2_Intercept)                 908     1508
+    ## sd(muN2_syntax_dev1)               688      741
+    ## sd(musubordinate_Intercept)        474      956
+    ## sd(musubordinate_syntax_dev1)      582      924
     ## 
     ## ~unique_target (Number of levels: 18) 
     ##                               Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## sd(muN2_Intercept)                1.39      1.25     0.05     4.53 1.00
-    ## sd(muN2_syntax_dev1)              2.02      1.70     0.11     6.08 1.00
-    ## sd(musubordinate_Intercept)       2.10      1.19     0.24     5.01 1.00
-    ## sd(musubordinate_syntax_dev1)     1.64      1.03     0.10     4.21 1.00
+    ## sd(muN2_Intercept)                1.43      1.24     0.06     4.57 1.00
+    ## sd(muN2_syntax_dev1)              1.90      1.57     0.07     5.87 1.00
+    ## sd(musubordinate_Intercept)       2.16      1.24     0.28     5.15 1.00
+    ## sd(musubordinate_syntax_dev1)     1.65      1.08     0.12     4.23 1.00
     ##                               Bulk_ESS Tail_ESS
-    ## sd(muN2_Intercept)                1315     1299
-    ## sd(muN2_syntax_dev1)              1139     1557
-    ## sd(musubordinate_Intercept)        464      532
-    ## sd(musubordinate_syntax_dev1)      539      460
+    ## sd(muN2_Intercept)                1523     1672
+    ## sd(muN2_syntax_dev1)              1115     1220
+    ## sd(musubordinate_Intercept)        452      687
+    ## sd(musubordinate_syntax_dev1)      548      728
     ## 
     ## Population-Level Effects: 
     ##                           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## muN2_Intercept               -9.44      4.28   -20.71    -4.18 1.00     1059
-    ## musubordinate_Intercept      -3.85      1.61    -7.77    -1.42 1.00      748
-    ## muN2_syntax_dev1             -1.07      1.59    -4.56     1.58 1.00     1432
-    ## musubordinate_syntax_dev1    -0.76      0.85    -2.72     0.82 1.00     1206
+    ## muN2_Intercept               -9.40      4.54   -21.46    -4.24 1.00      893
+    ## musubordinate_Intercept      -3.92      1.75    -7.89    -1.37 1.00      720
+    ## muN2_syntax_dev1             -0.94      1.57    -4.35     1.80 1.00     1558
+    ## musubordinate_syntax_dev1    -0.81      0.87    -2.70     0.63 1.00     1159
     ##                           Tail_ESS
-    ## muN2_Intercept                 812
-    ## musubordinate_Intercept       1033
-    ## muN2_syntax_dev1               895
-    ## musubordinate_syntax_dev1     1035
+    ## muN2_Intercept                 674
+    ## musubordinate_Intercept       1067
+    ## muN2_syntax_dev1              1080
+    ## musubordinate_syntax_dev1     1162
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -647,15 +663,15 @@ posteriors_multinomial_critical
     ## # A tibble: 9 x 4
     ##   key              mean     lower   upper
     ##   <chr>           <dbl>     <dbl>   <dbl>
-    ## 1 basic_pred    0.905    6.89e- 1 1.00   
-    ## 2 basic_subj    0.968    8.79e- 1 1.00   
-    ## 3 basic_syntax  0.0633  -7.26e- 2 0.286  
-    ## 4 N2_pred       0.00403  1.27e-16 0.0200 
-    ## 5 N2_subj       0.00145  3.27e-19 0.00703
-    ## 6 N2_syntax    -0.00258 -2.21e- 2 0.00625
-    ## 7 sub_pred      0.0910   3.41e- 6 0.309  
-    ## 8 sub_subj      0.0302   1.82e- 7 0.118  
-    ## 9 sub_syntax   -0.0608  -2.92e- 1 0.0672
+    ## 1 basic_pred    0.902    6.73e- 1 1.00   
+    ## 2 basic_subj    0.970    8.89e- 1 1.00   
+    ## 3 basic_syntax  0.0678  -6.28e- 2 0.312  
+    ## 4 N2_pred       0.00394  1.06e-17 0.0210 
+    ## 5 N2_subj       0.00164  5.07e-21 0.00878
+    ## 6 N2_syntax    -0.00230 -2.26e- 2 0.00743
+    ## 7 sub_pred      0.0941   3.79e- 7 0.323  
+    ## 8 sub_subj      0.0285   2.52e-12 0.109  
+    ## 9 sub_syntax   -0.0655  -3.10e- 1 0.0661
 
 Compute likelihood of a credible effect of syntax for the subordinate
 response category:
@@ -663,7 +679,7 @@ response category:
     ## # A tibble: 1 x 1
     ##    prob
     ##   <dbl>
-    ## 1 0.843
+    ## 1 0.857
 
 ## Detailed plots
 

@@ -1,5 +1,5 @@
 ---
-title: "Direct Modification Results - Prereg Final"
+title: "Direct Modification Results - Critical Trials Only Pilot"
 author: "Polina Tsvilodub"
 date: "12/29/2020"
 output: github_document
@@ -96,6 +96,11 @@ d_modRef_main <- d_modRef_filter %>% filter((trial_name == "custom_main_text1") 
                                 (trial_name == "custom_main_text2")) %>%
   select(submission_id, trial_number, context_picture, response, target_size, adj, syntax, target, item, adj_cond, trial_type, ref_np, unique_target )
 
+d_modRef_main <- d_modRef_main %>% group_by(submission_id) %>%
+  mutate(
+    block = c(1,1,2,2)
+) 
+
 d_modRef_main %>% distinct(response) %>% View()
 
 # exclude 14 answers with minimal exclusion criteria
@@ -164,7 +169,7 @@ d_modRef_main_responseCat.bs %>%
                      breaks = c(0, 0.5, 1))+
   ylab("Proportion of non-matching responses") +
   #theme_bw() +
-  facet_grid(~trial_type)+
+ # facet_grid(~trial_type)+
   ggtitle("Proportion of non-matching responses")
 ```
 
@@ -178,6 +183,38 @@ d_modRef_main_responseCat_3way %>%
   facet_grid(~syntax) +
   ggtitle("Response category counts in critical trials")
 ```
+Here is an exploratory plot of the responses by response block (first two trials versus third and fourth trial):
+```{r, echo=F}
+d_modRef_main_responseCat %>%  
+  group_by(syntax, block) %>%
+  tidyboot_mean(column = response_num) -> d_modRef_main_responseCat.byBlock
+
+d_modRef_main_responseCat.byBlock %>%
+  ungroup() %>%
+  mutate(syntax = factor(syntax, levels = c("subj", "pred"), 
+                         labels = c("Subject NP", "Predicate NP"))) %>%
+  ggplot(., aes(x=syntax, y = mean, ymin = ci_lower, ymax = ci_upper, fill=syntax)) +
+  geom_col(position = position_dodge(bar.width), width = bar.width,
+           alpha = 0.5, color="black", size = 0.5) +
+  geom_linerange(position = position_dodge(bar.width), size = 0.5) +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = c(0, 0.5, 1))+
+  ylab("Proportion of non-matching responses") +
+  #theme_bw() +
+  facet_grid(~block)+
+  ggtitle("Proportion of non-matching responses by block")
+```
+Here is an exploratory plot of the 3-way response counts by response block (first two trials versus third and fourth trial):
+```{r, echo=F, fig.height=12, fig.width=5}
+d_modRef_main_responseCat_3way %>%
+  filter(trial_type == "critical") %>%
+  ggplot(., aes(x = response_cat, fill = response_cat)) +
+  geom_bar(alpha = 0.8) +
+  facet_wrap(block~syntax) +
+  ggtitle("Response category counts by block")
+
+```
+
 ## Stats
 
 In the following, the dataset where less strict exclusions were applied is used for analysis. 
