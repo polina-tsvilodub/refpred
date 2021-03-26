@@ -764,7 +764,7 @@ d_modRef_main_responseCat_3way %>%
 ```
 
 More count plots: response category counts by syntax (x-axis) and by unique target (N2 & target): 
-```{r counts-byN2-byTarget3, fig.height=15, fig.width=6}
+```{r counts-byN2-byTarget, fig.height=15, fig.width=6}
 d_modRef_main_responseCat_3way %>%
   filter(trial_type == "critical") %>%
   ggplot(., aes(x = syntax, fill = response_cat)) +
