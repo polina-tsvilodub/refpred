@@ -15,3 +15,4 @@ writing/paper/refpred_updated.pdf
 *.log
 *.synctex.gz
 experiments/direct-modification/modificationXrefUt/node_modules/
+experiments/direct-modification/double-modification-FC/node_modules/
