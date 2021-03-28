@@ -10,15 +10,12 @@ const instructions = magpieViews.view_generator("instructions", {
             make sure you can concentrate on the task without disturbance.
             <br />
             <br />
-            The experiment consists of 2 sets of trials. Each set contains a few warm-up trials and 4 main trials.
+            The experiment consists of 20 trials.
+            In the main trials, you will be asked to <b>rephrase what a speaker said</b> by <b>choosing one of two provided options</b>.
+            Before the main trials begin, there will be a practice round explaining the rephrasing.
             <br />
             <br />
-            In the warm-up trials, you will be asked to <b>label the objects on the screen</b>.
-            Then, in the main trials, you will be asked to <b>rephrase what a speaker said using some of the labels from the warm-ups</b>.
-            There will also be a practice round of rephrasing before the main trials.
-            <br />
-            <br />
-            By pressing the button 'Go to Trials' you begin the first round.
+            By pressing the button 'Go to Trials' you proceed to the practice trial.
             `,
   buttonText: 'go to trials'
 });
@@ -112,13 +109,21 @@ function reorder_trials(trials_list) {
   }
   return trials_list
 }
-
+// make sure the big and the small targets from the same items are not next to each other
+function shuffle_trials(trials_list) {
+  for (i = 0; i < trials_list.length - 1; i++){
+    while(trials_list[i].item_noun == trials_list[i+1].item_noun){
+      trials_list = _.shuffle(trials_list)
+    }
+  }
+  return trials_list
+}
 // first main trials block
 const custom_main_text1 = custom_forced_choice({
   trials: trial_info.text_insertion_main1.length, // all trials are called
   // name should be identical to the variable name
   name: 'custom_main_text1',
-  data: _.shuffle(trial_info.text_insertion_main1) // reorder_trials(trial_info.text_insertion_main1),
+  data: shuffle_trials(trial_info.text_insertion_main1) // reorder_trials(trial_info.text_insertion_main1),
 
 });
 
@@ -204,7 +209,7 @@ const context1 = magpieViews.view_generator("instructions",{
     Next, you will complete the main trials.
     <br/>
     <br/>
-    Please rephrase the sentence a person said.
+    Please rephrase the sentence a person said by choosing one of two provided options that you think fits best.
     <br />
     <br />
     Press the button 'Go to trials' to begin the main trials.

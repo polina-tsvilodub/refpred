@@ -16,11 +16,11 @@ $("document").ready(function() {
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
             custom_intro,
-            // botcaptcha,
-            // instructions,
+            botcaptcha,
+            instructions,
             // warmup1,
             // ref1,
-            // comp_class_warmup,
+            comp_class_warmup,
             context1,
             custom_main_text1,
             // context2,
@@ -32,7 +32,7 @@ $("document").ready(function() {
         ],
         // Here, you can specify all information for the deployment
         deploy: {
-            experimentID: "37",
+            experimentID: "39",
             serverAppURL: "https://pragmatics-ptb.herokuapp.com/api/submit_experiment/",
             // Possible deployment methods are:
             // "debug" and "directLink"

@@ -91,6 +91,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
       target_picture: items[item][n2][critical_size].target, // target picture, differs for bis and small target
       item: item,
+      item_noun: contexts[i],
       option1: items[item][n2][critical_size].options[0],
       option2:  items[item][n2][critical_size].options[1], // donts record this as list -- make mapper instead
       target: items[item][n2][critical_size].item,
@@ -162,6 +163,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
       text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
       target_picture: items[item][n2][second_size].target, // target picture, differs for bis and small target
       item: item,
+      item_noun: contexts[i],
       option1: items[item][n2][second_size].options[0],
       option2:  items[item][n2][second_size].options[1], // donts record this as list -- make mapper instead
       target: items[item][n2][second_size].item,
@@ -212,6 +214,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
     //   text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
     //   target_picture: items[item][n2][filler_size].target_filler, // target picture, differs for bis and small target
     //   item: item,
+    // item_noun: contexts[i],
     //   target: items[item][n2][filler_size].item,
     //   target_size: items[item][n2][filler_size].adj_congr,
     //   ref_np: items[item][n2][filler_size].reference
