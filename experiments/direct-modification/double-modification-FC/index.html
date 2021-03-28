@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+
+        <title>Direct Modification Experiment</title>
+
+        <!-- fonts from Google fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700|Noto+Serif:400,700|Playfair+Display:700" rel="stylesheet">
+
+        <!-- add magpie.css here if you are using magpie styles -->
+        <link type="text/css" href="node_modules/magpie-modules/magpie.css" rel="stylesheet" />
+
+        <!-- add js dependencies here -->
+        <!-- for example jQuery and csv-js if you are using magpie.js -->
+        <!-- <script src="node_modules/lodash/lodash.js"></script> -->
+
+        <!-- add magpie.full.js or magpie.js here -->
+        <script src="node_modules/magpie-modules/magpie.full.js"></script>
+         <!-- add script for using proliferate -->
+        <script src="https://proliferate.alps.science/static/js/proliferate.js" type="text/javascript"></script>
+
+        <script src="https://uniqueturker.myleott.com/lib.js" type="text/javascript"></script>
+
+        <!-- preloading images-->
+
+        <link rel="preload" href="warmup/apartment_landmark.png" as="image">
+        <link rel="preload" href="warmup/beagle-rescue.png" as="image">
+        <link rel="preload" href="warmup/bonsai1.png" as="image">
+        <link rel="preload" href="warmup/tree_landmark.png" as="image">
+        <link rel="preload" href="warmup/bonsai2.png" as="image">
+        <link rel="preload" href="warmup/chihuahua1.png" as="image">
+        <link rel="preload" href="warmup/chihuahua2.png" as="image">
+        <link rel="preload" href="warmup/beagle_service.png" as="image">
+        <link rel="preload" href="warmup/clownfish_rescue.png" as="image">
+        <link rel="preload" href="warmup/clownfish1.png" as="image">
+        <link rel="preload" href="warmup/clownfish2.png" as="image">
+        <link rel="preload" href="warmup/hummingbird1.png" as="image">
+        <link rel="preload" href="warmup/hummingbird2.png" as="image">
+        <link rel="preload" href="warmup/hummingbird_rescue.png" as="image">
+        <link rel="preload" href="warmup/dandelion1.png" as="image">
+        <link rel="preload" href="warmup/dandelion2.png" as="image">
+        <link rel="preload" href="warmup/dandelion_gift.png" as="image">
+        <link rel="preload" href="warmup/dandelion-landmark.png" as="image">
+        <link rel="preload" href="warmup/doberman1.png" as="image">
+        <link rel="preload" href="warmup/doberman2.png" as="image">
+        <link rel="preload" href="warmup/doberman_service.png" as="image">
+        <link rel="preload" href="warmup/doberman-rescue.png" as="image">
+        <link rel="preload" href="warmup/eagle1.png" as="image">
+        <link rel="preload" href="warmup/eagle2.png" as="image">
+        <link rel="preload" href="warmup/eagle_rescue.png" as="image">
+        <link rel="preload" href="warmup/great-dane1.png" as="image">
+        <link rel="preload" href="warmup/great-dane2.png" as="image">
+        <link rel="preload" href="warmup/great-dane_prize.png" as="image">
+        <link rel="preload" href="warmup/great-dane-gift.png" as="image">
+        <link rel="preload" href="warmup/pug1.png" as="image">
+        <link rel="preload" href="warmup/pug2.png" as="image">
+        <link rel="preload" href="warmup/pug_prize.png" as="image">
+        <link rel="preload" href="warmup/redwood1.png" as="image">
+        <link rel="preload" href="warmup/redwood2.png" as="image">
+        <link rel="preload" href="warmup/redwood_landmark.png" as="image">
+        <link rel="preload" href="warmup/skyscraper_landmark.png" as="image">
+        <link rel="preload" href="warmup/skyscraper1.png" as="image">
+        <link rel="preload" href="warmup/skyscraper2.png" as="image">
+        <link rel="preload" href="warmup/stripmall_landmark.png" as="image">
+        <link rel="preload" href="warmup/stripmall1.png" as="image">
+        <link rel="preload" href="warmup/stripmall2.png" as="image">
+        <link rel="preload" href="warmup/sunflower1.png" as="image">
+        <link rel="preload" href="warmup/sunflower2.png" as="image">
+        <link rel="preload" href="warmup/sunflower_gift.png" as="image">
+        <link rel="preload" href="warmup/sunflower-landmark.png" as="image">
+        <link rel="preload" href="warmup/tree_landmark.png" as="image">
+        <link rel="preload" href="warmup/tuna_rescue.png" as="image">
+        <link rel="preload" href="warmup/tuna1.png" as="image">
+        <link rel="preload" href="warmup/tuna2.png" as="image">
+
+        <link rel="preload" href="images/cpl.png" as="image">
+        <link rel="preload" href="images/bird-parade-basic.png" as="image">
+        <link rel="preload" href="images/dog-parade-basic.png" as="image">
+        <link rel="preload" href="images/dog-parade-basic2.png" as="image">
+        <link rel="preload" href="images/flower-parade-basic.png" as="image">
+        <link rel="preload" href="images/tree-parade-basic.png" as="image">
+        <link rel="preload" href="images/bird-parade-basic_filler.png" as="image">
+        <link rel="preload" href="images/dog-parade-basic_filler.png" as="image">
+        <link rel="preload" href="images/dog-parade-basic-rescue.png" as="image">
+        <link rel="preload" href="images/dog-parade-basic2-gift.png" as="image">
+        <link rel="preload" href="images/fish-parade-basic_filler.png" as="image">
+        <link rel="preload" href="images/fish-parade-basic.png" as="image">
+        <link rel="preload" href="images/flower-parade-basic-landmark.png" as="image">
+        <link rel="preload" href="images/dog-parade-basic2_filler.png" as="image">
+        <link rel="preload" href="images/flower-parade-basic_filler.png" as="image">
+        <link rel="preload" href="images/tree-parade-basic_filler.png" as="image">
+        <link rel="preload" href="images/buildings-parade-basic.png" as="image">
+        <link rel="preload" href="images/buildings-parade-basic_filler.png" as="image">
+
+        <link rel="preload" href="images/hummingbird.png" as="image">
+        <link rel="preload" href="images/eagle.png" as="image">
+        <link rel="preload" href="images/chihuahua.png" as="image">
+        <link rel="preload" href="images/chihuahua-rescue.png" as="image">
+        <link rel="preload" href="images/clownfish_filler.png" as="image">
+        <link rel="preload" href="images/clownfish_net.png" as="image">
+        <link rel="preload" href="images/dandelion-landmark.png" as="image">
+        <link rel="preload" href="images/doberman-rescue.png" as="image">
+        <link rel="preload" href="images/great-dane-gift.png" as="image">
+        <link rel="preload" href="images/skyscraper-landmark-filler.png" as="image">
+        <link rel="preload" href="images/pug-gift.png" as="image">
+        <link rel="preload" href="images/skyscraper-landmark.png" as="image">
+        <link rel="preload" href="images/stripmall-landmark.png" as="image">
+        <link rel="preload" href="images/stripmall-landmark-filler.png" as="image">
+        <link rel="preload" href="images/sunflower-landmark.png" as="image">
+        <link rel="preload" href="images/tuna_net.png" as="image">
+        <link rel="preload" href="images/tuna_filler.png" as="image">
+        <link rel="preload" href="images/doberman.png" as="image">
+        <link rel="preload" href="images/pug.png" as="image">
+        <link rel="preload" href="images/great-dane.png" as="image">
+        <link rel="preload" href="images/dandelion.png" as="image">
+        <link rel="preload" href="images/sunflower.png" as="image">
+        <link rel="preload" href="images/bonsai_stick.png" as="image">
+        <link rel="preload" href="images/redwood_sign.png" as="image">
+        <link rel="preload" href="images/hummingbird_filler.png" as="image">
+        <link rel="preload" href="images/eagle_filler.png" as="image">
+        <link rel="preload" href="images/chihuahua_filler.png" as="image">
+        <link rel="preload" href="images/doberman_filler.png" as="image">
+        <link rel="preload" href="images/pug_filler.png" as="image">
+        <link rel="preload" href="images/great-dane_filler.png" as="image">
+        <link rel="preload" href="images/dandelion_filler.png" as="image">
+        <link rel="preload" href="images/sunflower_filler.png" as="image">
+        <link rel="preload" href="images/bonsai_filler.png" as="image">
+        <link rel="preload" href="images/redwood_filler.png" as="image">
+
+
+        <!-- load local files -->
+        <link type="text/css" href="01_custom_styles.css" rel="stylesheet" />
+        <script src="02_custom_functions.js"></script>
+	      <script src="03_custom_views_templates.js"></script>
+        <script src="04_trials.js"></script>
+        <script src="05_views.js"></script>
+        <script src="06_main.js"></script>
+    </head>
+
+    <body>
+        <!-- display a message for the users that do not use JavaScript -->
+        <noscript>This task requires JavaScript. Please enable JavaScript in your browser and reload the page. For more information on how to do that, please refer to
+            <a href='https://enable-javascript.com' target='_blank'>enable-javascript.com</a>
+        </noscript>
+
+        <!-- views are inserted in main -->
+        <main id='main'>
+            Loading...
+        </main>
+
+    </body>
+</html>
