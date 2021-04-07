@@ -4,14 +4,14 @@
 // number of items used (up to 5 possible)
 // total number of main trials is then 2 x num_trials
 //   adjust if needed
-const num_trials = 10
+const num_trials = 6//10
 //////////////////////////
 
 const noun_item_list = {
   service: ["dogs1"],
   prize: ["dogs2"],
   landmark: ["trees", "buildings", "flowers"],
-  gift: ["flowers", "dogs2"],
+  present: ["flowers", "dogs2"],
   rescue: ["dogs1", "fish", "birds"]
 }
 
@@ -42,7 +42,7 @@ function get_items(noun_item_list, num_trials){
 
 // get item-noun pairs used for a participant
 // const item_noun_pairs = get_items(noun_item_list, num_trials);
-const item_noun_pairs = _.shuffle(["dogs1_service", "dogs2_prize", "trees_landmark", "buildings_landmark", "flowers_landmark", "flowers_gift", "dogs2_gift", "dogs1_rescue", "fish_rescue", "birds_rescue"]);
+const item_noun_pairs = _.shuffle(["dogs1_service", "dogs2_prize", "trees_landmark", "buildings_landmark", "flowers_landmark", "flowers_present", "dogs2_present", "dogs1_rescue", "fish_rescue", "birds_rescue"]);
 console.log("Item-noun pairs:", item_noun_pairs)
 console.log(item_noun_pairs.length)
 ////////////////////////
@@ -56,8 +56,8 @@ console.log(item_noun_pairs.length)
 // const contexts = _.shuffle(["dogs1", "dogs2", "birds", "flowers", "trees"]) // , "fish"
 // console.log(contexts)
 /////
-// for 5 items, the big target is in the subject condition, for the other 5 the small target is in the subject condition. the second item is in tpredicate condition, respectively
-const synt_adj0 = _.shuffle(["congr_subj_0", "congr_subj_0", "congr_subj_0", "congr_subj_0", "congr_subj_0", "congr_subj_1", "congr_subj_1", "congr_subj_1", "congr_subj_1", "congr_subj_1"]);
+// for 3 items, the big target is in the subject condition, for the other 3 the small target is in the subject condition. the second item is in predicate condition, respectively
+const synt_adj0 = _.shuffle(["congr_subj_0", "congr_subj_0", "congr_subj_0", "congr_subj_1", "congr_subj_1", "congr_subj_1"]); // "congr_subj_0", "congr_subj_0", , "congr_subj_1", "congr_subj_1"
 console.log(synt_adj0)
 // console.log(synt_adj)
 const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_subj", "congr_subj"]);
@@ -352,7 +352,7 @@ rescue: [
     reference: "prize-winner",
     options: _.shuffle(["dogs", "pugs"])
   }],
-  gift: [
+  present: [
     {
    item: "Great Dane",
    context_sent: "You and your friend are at a pet store ",
@@ -362,7 +362,7 @@ rescue: [
    adj_incongr: "small",
    target: "images/great-dane-gift.png",
    target_filler: "images/great-dane_filler.png",
-   reference: "gift",
+   reference: "present",
    options: _.shuffle(["dogs", "Great Danes"])
  },
  {
@@ -374,7 +374,7 @@ rescue: [
   adj_incongr: "big",
   target: "images/pug-gift.png",
   target_filler: "images/pug_filler.png",
-  reference: "gift",
+  reference: "present",
   options: _.shuffle(["dogs", "pugs"])
 }
   ]
@@ -435,7 +435,7 @@ rescue: [
    }]
   },
   flowers: {
-  gift: [
+  present: [
   {
    item: "sunflower",
    context_sent: "You and your friend are at a garden store ",
@@ -445,7 +445,7 @@ rescue: [
    adj_incongr: "small",
    target: "images/sunflower.png",
    target_filler: "images/sunflower_filler.png",
-   reference: "gift",
+   reference: "present",
    options: _.shuffle(["flowers", "sunflowers"])
  },
   {
@@ -457,7 +457,7 @@ rescue: [
    adj_incongr: "big",
    target: "images/dandelion.png",
    target_filler: "images/dandelion_filler.png",
-   reference: "gift",
+   reference: "present",
    options: _.shuffle(["flowers", "dandelions"])
  }],
  landmark: [
@@ -647,7 +647,7 @@ dogs2: {
         question:" <br>These dogs are prize-winners. Notice the bow on them."
       }
     },
-  gift: {
+  present: {
     train: {
         item: "dogs2",
         examples: _.shuffle([{picture:"warmup/pug1.png", question:"This is a pug."},
@@ -678,7 +678,7 @@ dogs2: {
       item: "dogs2",
       picture1: "warmup/pug-gift.png",
       picture2: "warmup/great-dane-gift.png",
-      question:" <br>You are at a pet store, and you see these dogs. These dogs are already sold and are being given as gifts. Notice the bows on them."
+      question:" <br>You are at a pet store, and you see these dogs. These dogs are already sold and are being given as presents. Notice the bows on them."
     }
   }
 },
@@ -719,7 +719,7 @@ birds: {
 }
 },
 flowers: {
-  gift: {
+  present: {
       train: {
         item: "flowers",
         examples: _.shuffle([{picture:"warmup/dandelion1.png", question:"This is a dandelion."},
@@ -750,7 +750,7 @@ flowers: {
         item: "flowers",
         picture1: "warmup/dandelion_gift.png",
         picture2: "warmup/sunflower_gift.png",
-        question: " <br>You are at a garden store, and you see these flowers. These flowers are already sold and are being given as gifts. Notice the bows on the pots."
+        question: " <br>You are at a garden store, and you see these flowers. These flowers are already sold and are being given as presents. Notice the bows on the pots."
       }
   },
   landmark: {

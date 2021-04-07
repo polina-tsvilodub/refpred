@@ -677,13 +677,13 @@ const custom_intro_view = function(config) {
 //unique turker check
           var bad_worker = false;
 
-          console.log("UNIQUE TURKER?");
-          (function(){
-              var ut_id = magpie.uniqueTurkerID;
-              if (UTWorkerLimitReached(ut_id)) {// {
-                  bad_worker = true;
-              }
-          })();
+          // console.log("UNIQUE TURKER?");
+          // (function(){
+          //     var ut_id = magpie.uniqueTurkerID;
+          //     if (UTWorkerLimitReached(ut_id)) {// {
+          //         bad_worker = true;
+          //     }
+          // })();
 
 // US IP address check
           console.log("ARE YOU FROM THE US???");
