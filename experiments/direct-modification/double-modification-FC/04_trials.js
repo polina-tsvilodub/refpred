@@ -901,7 +901,24 @@ buildings: {
 }
 
 const main_trials = create_view(items, item_noun_pairs, num_trials, synt_adj0, filler_cond)
-console.log("main trials: ", main_trials);
+console.log("main trials before reorder: ", main_trials);
+
+// shuffle main trials such that N2 isn't used back to back
+function shuffle_trials(main_trials) {
+  while(1) {
+    for (var i = 0; i < main_trials.length-1; i++) {
+			// console.log(i)
+      if (main_trials[i].item_noun == main_trials[i+1].item_noun) {
+        main_trials = _.shuffle(main_trials);
+        break;
+      }
+      // return once we have reached the end of the trials array without finding adjacent degrees
+      if (i == main_trials.length-2) { return main_trials; }
+    }
+  }
+}
+
+console.log("main trials after reorder:", shuffle_trials(main_trials));
 // shuffle sets of warmup trials and the corresponding big and small targets
  // x: warmup trial
  // y: big target
@@ -929,7 +946,7 @@ const trials = [
 
        // trials[0].y,
        // trials[1].y,
-       main_trials
+       shuffle_trials(main_trials)
        // uncomment for getting filler trials
 
        // trials[0].z,

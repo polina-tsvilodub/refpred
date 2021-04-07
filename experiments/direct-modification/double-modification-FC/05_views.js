@@ -10,7 +10,7 @@ const instructions = magpieViews.view_generator("instructions", {
             make sure you can concentrate on the task without disturbance.
             <br />
             <br />
-            The experiment consists of 20 trials.
+            The experiment consists of 12 trials.
             In the main trials, you will be asked to <b>rephrase what a speaker said</b> by <b>choosing one of two provided options</b>.
             Before the main trials begin, there will be a practice round explaining the rephrasing.
             <br />
@@ -110,20 +110,20 @@ function reorder_trials(trials_list) {
   return trials_list
 }
 // make sure the big and the small targets from the same items are not next to each other
-function shuffle_trials(trials_list) {
-  for (i = 0; i < trials_list.length - 1; i++){
-    while(trials_list[i].item_noun == trials_list[i+1].item_noun){
-      trials_list = _.shuffle(trials_list)
-    }
-  }
-  return trials_list
-}
+// function shuffle_trials(trials_list) {
+//   for (i = 0; i < trials_list.length - 1; i++){
+//     while(trials_list[i].item_noun == trials_list[i+1].item_noun){
+//       trials_list = _.shuffle(trials_list)
+//     }
+//   }
+//   return trials_list
+// }
 // first main trials block
 const custom_main_text1 = custom_forced_choice({
   trials: trial_info.text_insertion_main1.length, // all trials are called
   // name should be identical to the variable name
   name: 'custom_main_text1',
-  data: shuffle_trials(trial_info.text_insertion_main1) // reorder_trials(trial_info.text_insertion_main1),
+  data: trial_info.text_insertion_main1 // reorder_trials(trial_info.text_insertion_main1),
 
 });
 
