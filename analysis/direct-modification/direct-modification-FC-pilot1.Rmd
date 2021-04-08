@@ -1,0 +1,73 @@
+---
+title: "Direct Modification Forced Choice Pilot"
+author: "Polina Tsvilodub"
+date: "4/8/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(tidyboot)
+library(brms)
+```
+
+```{r}
+d <- read_csv("~/Documents/Research/refpred/data/direct-modification/results_39_double-mod-FC-pilot_N40.csv")
+# d %>% filter(prolific_id != "mhm") %>% select(-prolific_id) %>%  write_csv("~/Documents/Research/refpred/data/direct-modification/results_39_double-mod-FC-pilot_N40.csv")
+```
+
+```{r}
+# exclusions
+d %>% distinct(comments) %>% View()
+d %>% distinct(languages)
+d %>% distinct(submission_id) %>% count() %>% pull()
+d_native <- d %>% filter(grepl("en", languages, ignore.case = T))
+d_native %>% distinct(submission_id) %>% count() %>% pull()
+```
+
+```{r}
+d_main <- d_native %>% filter(!is.na(trial_type)) 
+
+d_main %>% count(item_noun, syntax)
+
+d_main %>% count(syntax, adj)
+```
+
+```{r}
+d_main_cat <- d_main %>%
+  rowwise() %>%
+  mutate(response_cat = case_when(grepl(target, response) ~ "subordinate",
+                                  (target == "doberman" & response == "dobermen") ~ "subordinate",
+                                  (target == "Great Dane" & response == "Great") ~ "subordinate",
+                                  TRUE ~ "basic"
+                                  ),
+         response_num = ifelse(response_cat == "basic", 1, 0))
+```
+
+```{r}
+d_main_cat_summary <- d_main_cat %>% group_by(syntax) %>%
+  tidyboot_mean(column = response_num)
+
+d_main_cat_summary %>%
+  ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
+  geom_col(alpha = 0.7, color = "black") +
+  geom_linerange() +
+  ylab("Proportion of basic-level responses") +
+  ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
+```
+
+```{r, results="hide"}
+d_main_cat <- d_main_cat %>% mutate(
+  unique_target = paste(target, ref_np, sep = "_")
+)
+model <- brm(response_num ~ syntax + (1 + syntax | submission_id) + 
+               (1 + syntax | unique_target ),
+             data = d_main_cat,
+             family = "bernoulli",
+             iter = 2000,
+             cores = 4)
+```
+
+```{r}
+summary(model)
+```
