@@ -2,7 +2,7 @@
 title: "Direct Modification Forced Choice Pilot"
 author: "Polina Tsvilodub"
 date: "4/8/2021"
-output: html_document
+output: github_document
 ---
 
 ```{r}
@@ -53,6 +53,31 @@ d_main_cat_summary %>%
   geom_col(alpha = 0.7, color = "black") +
   geom_linerange() +
   ylab("Proportion of basic-level responses") +
+  ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
+```
+
+```{r}
+d_main_cat_size_summary <- d_main_cat %>% group_by(syntax, adj) %>%
+  tidyboot_mean(column = response_num)
+
+d_main_cat_size_summary %>%
+  ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
+  geom_col(alpha = 0.7, color = "black") +
+  geom_linerange() +
+  ylab("Proportion of basic-level responses") +
+  facet_wrap(~adj) +
+  ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
+```
+```{r}
+d_main_cat_item_summary <- d_main_cat %>% group_by(syntax, item_noun) %>%
+  tidyboot_mean(column = response_num)
+
+d_main_cat_item_summary %>%
+  ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
+  geom_col(alpha = 0.7, color = "black") +
+  geom_linerange() +
+  ylab("Proportion of basic-level responses") +
+  facet_wrap(~item_noun) +
   ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
 ```
 
