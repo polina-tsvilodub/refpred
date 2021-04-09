@@ -903,7 +903,7 @@ buildings: {
 
 }
 
-const main_trials = create_view(items, item_noun_pairs, num_trials, synt_adj0, filler_cond)
+const main_trials = _.shuffle(create_view(items, item_noun_pairs, num_trials, synt_adj0, filler_cond))
 console.log("main trials before reorder: ", main_trials);
 
 // shuffle main trials such that N2 isn't used back to back
@@ -911,7 +911,8 @@ function shuffle_trials(main_trials) {
   while(1) {
     for (var i = 0; i < main_trials.length-1; i++) {
 			// console.log(i)
-      if (main_trials[i].item_noun == main_trials[i+1].item_noun) {
+      // if (main_trials[i].item_noun == main_trials[i+1].item_noun) {
+      if ((main_trials[i].syntax == main_trials[i+1].syntax) && (main_trials[i].trial_type == main_trials[i+1].trial_type)) {
         main_trials = _.shuffle(main_trials);
         break;
       }
