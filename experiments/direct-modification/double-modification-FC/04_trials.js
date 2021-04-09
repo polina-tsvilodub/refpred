@@ -4,7 +4,7 @@
 // number of items used (up to 5 possible)
 // total number of main trials is then 2 x num_trials
 //   adjust if needed
-const num_trials = 6//10
+const num_trials = 8//10
 //////////////////////////
 
 const noun_item_list = {
@@ -57,10 +57,10 @@ console.log(item_noun_pairs.length)
 // console.log(contexts)
 /////
 // for 3 items, the big target is in the subject condition, for the other 3 the small target is in the subject condition. the second item is in predicate condition, respectively
-const synt_adj0 = _.shuffle(["congr_subj_0", "congr_subj_0", "congr_subj_0", "congr_subj_1", "congr_subj_1", "congr_subj_1"]); // "congr_subj_0", "congr_subj_0", , "congr_subj_1", "congr_subj_1"
+const synt_adj0 = _.shuffle(["congr_subj_0", "congr_subj_0", "congr_pred_0", "congr_pred_0", "congr_subj_1", "congr_subj_1", "congr_pred_1", "congr_pred_1"]); // "congr_subj_0", "congr_subj_0", , "congr_subj_1", "congr_subj_1"
 console.log(synt_adj0)
 // console.log(synt_adj)
-const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_subj", "congr_subj"]);
+const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_pred", "congr_pred", "congr_subj", "congr_subj", "congr_subj", "congr_subj"]);
 // console.log("Filler conditions:", filler_cond)
 
 // creating views with all the necessary information
@@ -151,109 +151,112 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
     }
 
     const filler_size = check_size(critical_size);
+    // const filler_condition = check_condition(first_condition);
     const second_size = check_size(critical_size);
     const second_condition = check_condition(first_condition);
     const second_item = "congr".concat("_", second_condition.concat("_", second_size) );
     console.log("second item constructed:", second_item);
 
-    const second_view = {
-      trial_type: "critical",
-      context: items[item][n2][second_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
-      context_picture: items[item][n2][second_size].context_picture, // context picture is chose (it is the same for both big and small targets)
-      text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
-      target_picture: items[item][n2][second_size].target, // target picture, differs for bis and small target
-      item: item,
-      item_noun: contexts[i],
-      option1: items[item][n2][second_size].options[0],
-      option2:  items[item][n2][second_size].options[1], // donts record this as list -- make mapper instead
-      target: items[item][n2][second_size].item,
-      target_size: items[item][n2][second_size].adj_congr,
-      ref_np: items[item][n2][second_size].reference
-    }
-    // modify utterance etc depending on specific condition
-    if (synt_adj0[i].split("_")[0] == "congr") {
-
-      second_view.adj = items[item][n2][second_size].adj_congr;
-      second_view.adj_cond = "congruent";
-
-      if (second_item.split("_")[1] == "subj") {
-        second_view.syntax = "subj";
-        second_view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][second_size].adj_congr + " " + items[item][n2][second_size].item + " is a " + items[item][n2][second_size].reference + ".</b>";
-        second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_congr + " relative to?";
-        second_view.paraphrase = "It is " + items[item][n2][second_size].adj_congr + " relative to other " ;// paraphrase template
-      } else { // predicative condition
-        second_view.syntax = "pred";
-        second_view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][second_size].reference + " is a "  + items[item][n2][second_size].adj_congr + " " + items[item][n2][second_size].item + ".</b>";
-        second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_congr + " relative to?";
-        second_view.paraphrase = "It is " + items[item][n2][second_size].adj_congr + " relative to other " ;// paraphrase template
-      }
-
-    } else { // incongruent condition
-      second_view.adj = items[item][n2][second_size].adj_incongr;
-      second_view.adj_cond = "incongruent";
-      if (second_item.split("_")[1] == "subj") {
-        second_view.syntax = "subj";
-        second_view.utterance = "Your friend says: <br/><b>" +"That " + items[item][n2][second_size].adj_incongr + " " + items[item][n2][second_size].item + " is a " + items[item][n2][second_size].reference + ".</b>";
-        second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_incongr + " relative to?";
-        second_view.paraphrase = "It is " + items[item][n2][second_size].adj_incongr + " relative to other " ;// paraphrase template
-      } else { // predicative condition
-        second_view.syntax = "pred";
-        second_view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][second_size].reference + " is a "  + items[item][n2][second_size].adj_incongr + " " + items[item][n2][second_size].item + ".</b>";
-        second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_incongr + " relative to?";
-        second_view.paraphrase = "It is " + items[item][n2][second_size].adj_incongr + " relative to other " ;// paraphrase template
-      }
-    }
-    // add second trial
-    expt_views.push(second_view);
-
-
-    // const filler = {
-    //   trial_type: "filler",
-    //   context: "You and your friend see the following:", // target_size indicates if the target is big or small within the given context
-    //   context_picture: items[item][n2][filler_size].context_picture_filler, // context picture is chose (it is the same for both big and small targets)
+    // const second_view = {
+    //   trial_type: "critical",
+    //   context: items[item][n2][second_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
+    //   context_picture: items[item][n2][second_size].context_picture, // context picture is chose (it is the same for both big and small targets)
     //   text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
-    //   target_picture: items[item][n2][filler_size].target_filler, // target picture, differs for bis and small target
+    //   target_picture: items[item][n2][second_size].target, // target picture, differs for bis and small target
     //   item: item,
-    // item_noun: contexts[i],
-    //   target: items[item][n2][filler_size].item,
-    //   target_size: items[item][n2][filler_size].adj_congr,
-    //   ref_np: items[item][n2][filler_size].reference
+    //   item_noun: contexts[i],
+    //   option1: items[item][n2][second_size].options[0],
+    //   option2:  items[item][n2][second_size].options[1], // donts record this as list -- make mapper instead
+    //   target: items[item][n2][second_size].item,
+    //   target_size: items[item][n2][second_size].adj_congr,
+    //   ref_np: items[item][n2][second_size].reference
     // }
+    // // modify utterance etc depending on specific condition
+    // if (synt_adj0[i].split("_")[0] == "congr") {
     //
-    // if (filler_cond[i].split("_")[0] == "congr") {
+    //   second_view.adj = items[item][n2][second_size].adj_congr;
+    //   second_view.adj_cond = "congruent";
     //
-    //   filler.adj = items[item][n2][filler_size].adj_congr;
-    //   filler.adj_cond = "congruent";
-    //
-    //   if (synt_adj0[i].split("_")[1] == "pred") { // if critical trials is predicate N, do subject N filler
-    //     filler.syntax = "subj";
-    //     filler.utterance = "Your friend says: <br/><b>" + "That "  + items[item][n2][filler_size].item + " is " + items[item][n2][filler_size].adj_congr + ".</b>";
-    //     filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_congr + " relative to?";
-    //     filler.paraphrase = "It is " + items[item][n2][filler_size].adj_congr + " relative to other " ;// paraphrase template
+    //   if (second_item.split("_")[1] == "subj") {
+    //     second_view.syntax = "subj";
+    //     second_view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][second_size].adj_congr + " " + items[item][n2][second_size].item + " is a " + items[item][n2][second_size].reference + ".</b>";
+    //     second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_congr + " relative to?";
+    //     second_view.paraphrase = "It is " + items[item][n2][second_size].adj_congr + " relative to other " ;// paraphrase template
     //   } else { // predicative condition
-    //     filler.syntax = "pred";
-    //     filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[item][n2][filler_size].adj_congr + " " + items[item][n2][filler_size].item + ".</b>";
-    //     filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_congr + " relative to?";
-    //     filler.paraphrase = "It is " + items[item][n2][filler_size].adj_congr + " relative to other " ;// paraphrase template
+    //     second_view.syntax = "pred";
+    //     second_view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][second_size].reference + " is a "  + items[item][n2][second_size].adj_congr + " " + items[item][n2][second_size].item + ".</b>";
+    //     second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_congr + " relative to?";
+    //     second_view.paraphrase = "It is " + items[item][n2][second_size].adj_congr + " relative to other " ;// paraphrase template
     //   }
     //
     // } else { // incongruent condition
-    //   filler.adj = items[item][n2][filler_size].adj_incongr;
-    //   filler.adj_cond = "incongruent";
-    //   if (synt_adj0[i].split("_")[1] == "pred") {
-    //     filler.syntax = "subj";
-    //     filler.utterance = "Your friend says: <br/><b>" +"That " + items[item][n2][filler_size].item + " is " + items[item][n2][filler_size].adj_incongr + ".</b>";
-    //     filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_incongr + " relative to?";
-    //     filler.paraphrase = "It is " + items[item][n2][filler_size].adj_incongr + " relative to other " ;// paraphrase template
+    //   second_view.adj = items[item][n2][second_size].adj_incongr;
+    //   second_view.adj_cond = "incongruent";
+    //   if (second_item.split("_")[1] == "subj") {
+    //     second_view.syntax = "subj";
+    //     second_view.utterance = "Your friend says: <br/><b>" +"That " + items[item][n2][second_size].adj_incongr + " " + items[item][n2][second_size].item + " is a " + items[item][n2][second_size].reference + ".</b>";
+    //     second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_incongr + " relative to?";
+    //     second_view.paraphrase = "It is " + items[item][n2][second_size].adj_incongr + " relative to other " ;// paraphrase template
     //   } else { // predicative condition
-    //     filler.syntax = "pred";
-    //     filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[item][n2][filler_size].adj_incongr + " " + items[item][n2][filler_size].item + ".</b>";
-    //     filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_incongr + " relative to?";
-    //     filler.paraphrase = "It is " + items[item][n2][filler_size].adj_incongr + " relative to other " ;// paraphrase template
+    //     second_view.syntax = "pred";
+    //     second_view.utterance = "Your friend says: <br/><b>" + "That " + items[item][n2][second_size].reference + " is a "  + items[item][n2][second_size].adj_incongr + " " + items[item][n2][second_size].item + ".</b>";
+    //     second_view.question = "What do you think your friend is saying it is " + items[item][n2][second_size].adj_incongr + " relative to?";
+    //     second_view.paraphrase = "It is " + items[item][n2][second_size].adj_incongr + " relative to other " ;// paraphrase template
     //   }
     // }
-    // // end filler creation
-    // expt_views.push(filler);
+    // // add second trial
+    // expt_views.push(second_view);
+
+
+    const filler = {
+      trial_type: "filler",
+      context: "You and your friend see the following:", // target_size indicates if the target is big or small within the given context
+      context_picture: items[item][n2][filler_size].context_picture_filler, // context picture is chose (it is the same for both big and small targets)
+      text: "Your friend goes ahead of you. You see your friend in the distance:", // text appearing above the target picture
+      target_picture: items[item][n2][filler_size].target_filler, // target picture, differs for bis and small target
+      item: item,
+      item_noun: contexts[i],
+      option1: items[item][n2][filler_size].options[0],
+      option2:  items[item][n2][filler_size].options[1],
+      target: items[item][n2][filler_size].item,
+      target_size: items[item][n2][filler_size].adj_congr,
+      ref_np: items[item][n2][filler_size].reference
+    }
+
+    if (filler_cond[i].split("_")[0] == "congr") {
+
+      filler.adj = items[item][n2][filler_size].adj_congr;
+      filler.adj_cond = "congruent";
+
+      if (synt_adj0[i].split("_")[1] == "pred") { // if critical trials is predicate N, do subject N filler
+        filler.syntax = "subj";
+        filler.utterance = "Your friend says: <br/><b>" + "That "  + items[item][n2][filler_size].item + " is " + items[item][n2][filler_size].adj_congr + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_congr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_congr + " relative to other " ;// paraphrase template
+      } else { // predicative condition
+        filler.syntax = "pred";
+        filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[item][n2][filler_size].adj_congr + " " + items[item][n2][filler_size].item + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_congr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_congr + " relative to other " ;// paraphrase template
+      }
+
+    } else { // incongruent condition
+      filler.adj = items[item][n2][filler_size].adj_incongr;
+      filler.adj_cond = "incongruent";
+      if (synt_adj0[i].split("_")[1] == "pred") {
+        filler.syntax = "subj";
+        filler.utterance = "Your friend says: <br/><b>" +"That " + items[item][n2][filler_size].item + " is " + items[item][n2][filler_size].adj_incongr + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_incongr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_incongr + " relative to other " ;// paraphrase template
+      } else { // predicative condition
+        filler.syntax = "pred";
+        filler.utterance = "Your friend says: <br/><b>" + "That's a "  + items[item][n2][filler_size].adj_incongr + " " + items[item][n2][filler_size].item + ".</b>";
+        filler.question = "What do you think your friend is saying it is " + items[item][n2][filler_size].adj_incongr + " relative to?";
+        filler.paraphrase = "It is " + items[item][n2][filler_size].adj_incongr + " relative to other " ;// paraphrase template
+      }
+    }
+    // end filler creation
+    expt_views.push(filler);
 
   }  // end for
 

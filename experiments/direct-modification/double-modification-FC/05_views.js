@@ -10,7 +10,7 @@ const instructions = magpieViews.view_generator("instructions", {
             make sure you can concentrate on the task without disturbance.
             <br />
             <br />
-            The experiment consists of 12 trials.
+            The experiment consists of 16 trials.
             In the main trials, you will be asked to <b>rephrase what a speaker said</b> by <b>choosing one of two provided options</b>.
             Before the main trials begin, there will be a practice round explaining the rephrasing.
             <br />
