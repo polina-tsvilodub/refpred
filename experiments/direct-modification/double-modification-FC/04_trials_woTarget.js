@@ -88,7 +88,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
       trial_type: "critical",
       context: items[item][n2][critical_size].context_sent + "and you see the following:", // target_size indicates if the target is big or small within the given context
       context_picture: items[item][n2][critical_size].context_picture, // context picture is chose (it is the same for both big and small targets)
-      text: "Your friend goes ahead of you and sees something in the distance.", // text appearing above the target picture
+      text: "Your friend points to something else in the distance.", // text appearing above the target picture
       target_picture: items[item][n2][critical_size].target, // target picture, differs for bis and small target
       item: item,
       item_noun: contexts[i],
@@ -212,7 +212,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
       trial_type: "filler",
       context: "You and your friend see the following:", // target_size indicates if the target is big or small within the given context
       context_picture: items[item][n2][filler_size].context_picture_filler, // context picture is chose (it is the same for both big and small targets)
-      text: "Your friend goes ahead of you and sees something in the distance.", // text appearing above the target picture
+      text: "Your friend points to something else in the distance.", // text appearing above the target picture
       target_picture: items[item][n2][filler_size].target_filler, // target picture, differs for bis and small target
       item: item,
       item_noun: contexts[i],
