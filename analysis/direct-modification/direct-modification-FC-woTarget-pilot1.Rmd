@@ -96,16 +96,18 @@ d_main_cat_item_summary %>%
 d_main_cat <- d_main_cat %>% mutate(
   unique_target = ifelse(trial_type == "critical", paste(target, ref_np, sep = "_"), target),
   syntax = factor(syntax, levels = c("subj", "pred")),
-  trial_type = factor(trial_type)
+  trial_type = factor(trial_type),
+  adj = factor(adj, levels = c("big", "small"))
 )
 # critical 1, filler -1
 contrasts(d_main_cat$trial_type) <- contr.sum(2)
 # subj 1, -1 pred
 contrasts(d_main_cat$syntax) <- contr.sum(2)
 model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type || unique_target ),
+               (1 + syntax*trial_type || item), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
+             control = list(adapt_delta = 0.9),
              iter = 3000,
              cores = 4)
 ```
@@ -119,10 +121,55 @@ Get critical effect of syntax in the critical condition:
 model %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, `b_syntax1:trial_type1`) %>%
   mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1,
          critical_pred = b_Intercept - b_syntax1 + b_trial_type1,
-         syntax_critical = critical_subj - critical_pred # subject vs predicate 
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1,
+         syntax_filler = filler_subj - filler_pred
          ) %>% 
-  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical) %>%
+  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler) %>%
   gather(key, val) %>%
   group_by(key) %>%
- filter(key == "syntax_critical") %>% summarize(prob = mean(val > 0))
+ filter(key == "syntax_filler" | key == "syntax_critical") %>% summarize(prob = mean(val > 0))
+```
+
+Exploratory model with main effect of size:
+```{r, results="hide"}
+# big 1, small -1
+contrasts(d_main_cat$adj) <- contr.sum(2)
+
+model_size <- brm(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj || submission_id) + 
+               (1 + syntax*trial_type*adj || item), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_cat,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.96),
+             iter = 3000,
+             cores = 4)
+```
+
+```{r}
+summary(model_size)
+```
+
+Get effects of syntax and effects of size by trial-type:
+```{r}
+model_size %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_adj1, `b_syntax1:adj1`, `b_trial_type1:adj1`,
+                                       `b_syntax1:trial_type1`, `b_syntax1:trial_type1:adj1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1,
+         syntax_filler = filler_subj - filler_pred,
+         critical_big = b_Intercept + b_trial_type1 + b_adj1,
+         critical_small = b_Intercept + b_trial_type1 - b_adj1,
+         critical_size = critical_big - critical_small,
+         filler_big = b_Intercept - b_trial_type1 + b_adj1,
+         filler_small =  b_Intercept - b_trial_type1 - b_adj1,
+         filler_size = filler_big - filler_small
+         ) %>% 
+  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+ filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "critical_size") %>% 
+  summarize(prob = mean(val > 0))
 ```
