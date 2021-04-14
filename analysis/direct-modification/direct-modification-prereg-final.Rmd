@@ -24,6 +24,8 @@ library(tidybayes)
 
 ```{r, message=F, warning=F, include=F}
 data <- read_csv("../../data/direct-modification/results_prolific_final.csv")
+d_modRef_filter300 <- read_csv("../../prolific/double-mod-pilot-2/double-mod-pilot-2-trials.csv") %>%
+  rename(submission_id = workerid)
 
 ```
 # Analysis
@@ -395,8 +397,12 @@ d_modRef_main_responseCat %>%
          adj_dev = factor(adj, levels = c("big", "small"))) -> d_modRef_main_responseCat
 
 contrasts(d_modRef_main_responseCat$syntax_dev) <- contr.sum(2)
+contrasts(d_modRef_main_responseCat$syntax_dev)
 contrasts(d_modRef_main_responseCat$trial_type_dev) <- contr.sum(2)
+
+contrasts(d_modRef_main_responseCat$trial_type_dev)
 contrasts(d_modRef_main_responseCat$adj_dev) <- contr.sum(2)
+contrasts(d_modRef_main_responseCat$adj_dev) 
 
 # same for 3-way classified data
 d_modRef_main_responseCat_3way %>% 
@@ -408,9 +414,11 @@ contrasts(d_modRef_main_responseCat_3way$syntax_dev) <- contr.sum(2)
 contrasts(d_modRef_main_responseCat_3way$trial_type_dev) <- contr.sum(2)
 contrasts(d_modRef_main_responseCat$adj_dev) <- contr.sum(2)
 ```
+
 First, the preregistered Bayesian logistic regression is run. Maximal RE structure is included:
+
 ```{r model, warning=FALSE, message=FALSE}
-model <- brm(
+brm_prereg_model <- brm(
   response_num ~ syntax_dev * trial_type_dev + (1 + syntax_dev * trial_type_dev | submission_id) + 
     (1 + syntax_dev * trial_type_dev | unique_target), 
   data = d_modRef_main_responseCat,
@@ -425,6 +433,29 @@ model <- brm(
 ```{r}
 summary(model)
 ```
+
+
+Get other contrasts from brm model fit
+
+```{r}
+critical_subj <- c(critical_subj = "Intercept - trial_type_dev1 + syntax_dev1 - syntax_dev1:trial_type_dev1= 0")
+critical_pred <- c(critical_pred = "Intercept - trial_type_dev1 - syntax_dev1 + syntax_dev1:trial_type_dev1 = 0")
+
+filler_subj <- c(filler_subj = "Intercept + trial_type_dev1 + syntax_dev1 + syntax_dev1:trial_type_dev1= 0")
+filler_pred <- c(filler_pred = "Intercept + trial_type_dev1 - syntax_dev1 - syntax_dev1:trial_type_dev1 = 0")
+
+syntax_critical <- c(syntax_critical = "2 * syntax_dev1 - 2 * syntax_dev1:trial_type_dev1 = 0")
+syntax_filler <- c(syntax_filler = "2 * syntax_dev1 + 2 * syntax_dev1:trial_type_dev1 = 0")
+
+subj_critical_filler <- c(subj_critical_filler = "-2*trial_type_dev1 - 2 * syntax_dev1:trial_type_dev1 = 0" )
+pred_critical_filler <- c(pred_critical_filler = "-2*trial_type_dev1 + 2 * syntax_dev1:trial_type_dev1 = 0" )
+
+brm_prereg_model_contrast_answers <- hypothesis(brm_prereg_model, c(critical_subj, critical_pred, syntax_critical,
+                                 filler_subj, filler_pred, syntax_filler,
+                                 subj_critical_filler, pred_critical_filler))
+brm_prereg_model_contrast_answers
+```
+
 
 The contrast of interest is the effect of syntax in the critical condition. 
 ``` {r contrasts}

@@ -12,7 +12,8 @@ library(brms)
 ```
 
 ```{r}
-d <- read_csv("~/Documents/Research/refpred/data/direct-modification/results_39_double-mod-FC-pilot_N40.csv")
+# d <- read_csv("~/Documents/Research/refpred/data/direct-modification/results_39_double-mod-FC-pilot_N40.csv")
+d <- read_csv("~/projects/refpred/data/direct-modification/results_39_double-mod-FC-pilot_N40.csv")
 # d %>% filter(prolific_id != "mhm") %>% select(-prolific_id) %>%  write_csv("~/Documents/Research/refpred/data/direct-modification/results_39_double-mod-FC-pilot_N40.csv")
 ```
 
@@ -85,6 +86,8 @@ d_main_cat_item_summary %>%
 d_main_cat <- d_main_cat %>% mutate(
   unique_target = paste(target, ref_np, sep = "_")
 )
+contrasts(factor(d_main_cat$syntax))
+
 model <- brm(response_num ~ syntax + (1 + syntax | submission_id) + 
                (1 + syntax | unique_target ),
              data = d_main_cat,
