@@ -37,7 +37,7 @@ library(brms)
     ##     ar
 
 ``` r
-d <- read_csv("~/Documents/Research/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
+d <- read_csv("./../../data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
 ```
 
     ## Parsed with column specification:
@@ -58,6 +58,7 @@ d <- read_csv("~/Documents/Research/refpred/data/direct-modification/results_41_
     ## See spec(...) for full column specifications.
 
 ``` r
+#d <- read_csv("~/projects/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
 #d %>% select(-prolific_id) %>% write_csv("~/Documents/Research/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
 ```
 
@@ -271,13 +272,15 @@ d_main_cat <- d_main_cat %>% mutate(
 )
 # critical 1, filler -1
 contrasts(d_main_cat$trial_type) <- contr.sum(2)
+contrasts(d_main_cat$trial_type)
 # subj 1, -1 pred
 contrasts(d_main_cat$syntax) <- contr.sum(2)
+contrasts(d_main_cat$syntax) 
 model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
                (1 + syntax*trial_type || item), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.9),
+             control = list(adapt_delta = 0.96),
              iter = 3000,
              cores = 4)
 ```
@@ -288,9 +291,18 @@ model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submis
 
     ## Start sampling
 
+    ## Warning: There were 5 divergent transitions after warmup. Increasing adapt_delta above 0.96 may help. See
+    ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+
+    ## Warning: Examine the pairs() plot to diagnose sampling problems
+
 ``` r
 summary(model)
 ```
+
+    ## Warning: There were 5 divergent transitions after warmup. Increasing adapt_delta
+    ## above 0.96 may help. See http://mc-stan.org/misc/warnings.html#divergent-
+    ## transitions-after-warmup
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
@@ -302,48 +314,96 @@ summary(model)
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
     ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               0.34      0.22     0.03     0.88 1.00     1812
-    ## sd(syntax1)                 0.15      0.13     0.01     0.50 1.00     2946
-    ## sd(trial_type1)             0.14      0.13     0.01     0.47 1.00     2993
-    ## sd(syntax1:trial_type1)     0.17      0.15     0.01     0.53 1.00     2752
+    ## sd(Intercept)               0.35      0.22     0.03     0.89 1.00     1483
+    ## sd(syntax1)                 0.16      0.16     0.01     0.54 1.00     2405
+    ## sd(trial_type1)             0.15      0.15     0.01     0.49 1.00     2842
+    ## sd(syntax1:trial_type1)     0.18      0.15     0.01     0.57 1.00     2142
     ##                         Tail_ESS
-    ## sd(Intercept)               1913
-    ## sd(syntax1)                 3322
-    ## sd(trial_type1)             3624
-    ## sd(syntax1:trial_type1)     3555
+    ## sd(Intercept)               1248
+    ## sd(syntax1)                 2652
+    ## sd(trial_type1)             3044
+    ## sd(syntax1:trial_type1)     2647
     ## 
     ## ~submission_id (Number of levels: 46) 
     ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               1.22      0.19     0.90     1.64 1.00     2524
-    ## sd(syntax1)                 0.26      0.16     0.01     0.58 1.00     1767
-    ## sd(trial_type1)             0.74      0.16     0.45     1.06 1.00     2308
-    ## sd(syntax1:trial_type1)     0.18      0.12     0.01     0.45 1.00     2675
+    ## sd(Intercept)               1.22      0.20     0.88     1.65 1.00     1945
+    ## sd(syntax1)                 0.27      0.16     0.01     0.59 1.00     1453
+    ## sd(trial_type1)             0.74      0.15     0.46     1.05 1.00     2220
+    ## sd(syntax1:trial_type1)     0.18      0.12     0.01     0.46 1.00     2106
     ##                         Tail_ESS
-    ## sd(Intercept)               3998
-    ## sd(syntax1)                 2356
-    ## sd(trial_type1)             3087
-    ## sd(syntax1:trial_type1)     2929
+    ## sd(Intercept)               3594
+    ## sd(syntax1)                 2331
+    ## sd(trial_type1)             2930
+    ## sd(syntax1:trial_type1)     2668
     ## 
     ## Population-Level Effects: 
     ##                     Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept               0.04      0.25    -0.45     0.54 1.00     2923     4112
-    ## syntax1                 0.54      0.13     0.29     0.80 1.00     6502     4221
-    ## trial_type1             0.14      0.16    -0.18     0.45 1.00     4592     4547
-    ## syntax1:trial_type1    -0.17      0.12    -0.43     0.07 1.00     6583     4027
+    ## Intercept               0.04      0.26    -0.47     0.54 1.00     1321     2528
+    ## syntax1                 0.54      0.14     0.28     0.82 1.00     3533     2335
+    ## trial_type1             0.14      0.16    -0.18     0.46 1.00     2994     4087
+    ## syntax1:trial_type1    -0.17      0.13    -0.43     0.09 1.00     3763     3111
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
     ## scale reduction factor on split chains (at convergence, Rhat = 1).
 
-Get critical effect of syntax in the critical condition:
+Get other contrasts from brm model fit
+
+``` r
+critical_subj <- c(critical_subj = "Intercept + trial_type1 + syntax1 + syntax1:trial_type1= 0")
+critical_pred <- c(critical_pred = "Intercept + trial_type1 - syntax1 - syntax1:trial_type1 = 0")
+
+filler_subj <- c(filler_subj = "Intercept - trial_type1 + syntax1 - syntax1:trial_type1= 0")
+filler_pred <- c(filler_pred = "Intercept - trial_type1 - syntax1 + syntax1:trial_type1 = 0")
+# our syntax hypotheses are actually directional: we expect more basic responses in the subject than predicate conditions, 
+# and therefore this contrast being larger than 0
+syntax_critical <- c(syntax_critical = "2 * syntax1 + 2 * syntax1:trial_type1 > 0")
+syntax_filler <- c(syntax_filler = "2 * syntax1 - 2 * syntax1:trial_type1 > 0")
+
+subj_critical_filler <- c(subj_critical_filler = "2*trial_type1 + 2 * syntax1:trial_type1 = 0" )
+pred_critical_filler <- c(pred_critical_filler = "2*trial_type1 - 2 * syntax1:trial_type1 = 0" )
+
+contrast_answers <- hypothesis(model, c(critical_subj, critical_pred, syntax_critical,
+                                 filler_subj, filler_pred, syntax_filler,
+                                 subj_critical_filler, pred_critical_filler))
+contrast_answers
+```
+
+    ## Hypothesis Tests for class b:
+    ##             Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
+    ## 1        critical_subj     0.56      0.36    -0.16     1.27         NA
+    ## 2        critical_pred    -0.19      0.35    -0.90     0.48         NA
+    ## 3      syntax_critical     0.75      0.38     0.18     1.36      49.85
+    ## 4          filler_subj     0.62      0.37    -0.08     1.36         NA
+    ## 5          filler_pred    -0.81      0.36    -1.53    -0.10         NA
+    ## 6        syntax_filler     1.42      0.40     0.81     2.05    5999.00
+    ## 7 subj_critical_filler    -0.06      0.42    -0.90     0.78         NA
+    ## 8 pred_critical_filler     0.61      0.41    -0.21     1.42         NA
+    ##   Post.Prob Star
+    ## 1        NA     
+    ## 2        NA     
+    ## 3      0.98    *
+    ## 4        NA     
+    ## 5        NA    *
+    ## 6      1.00    *
+    ## 7        NA     
+    ## 8        NA     
+    ## ---
+    ## 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
+    ## '*': For one-sided hypotheses, the posterior probability exceeds 95%;
+    ## for two-sided hypotheses, the value tested against lies outside the 95%-CI.
+    ## Posterior probabilities of point hypotheses assume equal prior probabilities.
+
+\*\* REDO BELOW \*\* Get critical effect of syntax in the critical
+condition:
 
 ``` r
 model %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, `b_syntax1:trial_type1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1,
-         critical_pred = b_Intercept - b_syntax1 + b_trial_type1,
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
          syntax_critical = critical_subj - critical_pred, # subject vs predicate 
-         filler_subj = b_Intercept + b_syntax1 - b_trial_type1,
-         filler_pred = b_Intercept - b_syntax1 - b_trial_type1,
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
          syntax_filler = filler_subj - filler_pred
          ) %>% 
   select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler) %>%
@@ -357,8 +417,8 @@ model %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, `b_synt
     ## # A tibble: 2 x 2
     ##   key              prob
     ##   <chr>           <dbl>
-    ## 1 syntax_critical 0.999
-    ## 2 syntax_filler   0.999
+    ## 1 syntax_critical 0.980
+    ## 2 syntax_filler   1.00
 
 Exploratory model with main effect of size:
 
@@ -395,63 +455,63 @@ summary(model_size)
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
     ##                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                    0.42      0.25     0.06     1.03 1.00     1501
-    ## sd(syntax1)                      0.16      0.15     0.01     0.53 1.00     2794
-    ## sd(trial_type1)                  0.15      0.14     0.01     0.50 1.00     2922
-    ## sd(adj1)                         0.46      0.29     0.04     1.15 1.00     1090
-    ## sd(syntax1:trial_type1)          0.20      0.17     0.01     0.62 1.00     2177
-    ## sd(syntax1:adj1)                 0.18      0.16     0.01     0.56 1.00     2311
-    ## sd(trial_type1:adj1)             0.15      0.13     0.01     0.49 1.00     2830
-    ## sd(syntax1:trial_type1:adj1)     0.22      0.18     0.01     0.68 1.00     2152
+    ## sd(Intercept)                    0.42      0.26     0.05     1.05 1.01     1904
+    ## sd(syntax1)                      0.17      0.16     0.01     0.57 1.00     2651
+    ## sd(trial_type1)                  0.16      0.14     0.01     0.51 1.00     3158
+    ## sd(adj1)                         0.46      0.29     0.05     1.16 1.00     1685
+    ## sd(syntax1:trial_type1)          0.20      0.18     0.01     0.65 1.00     2304
+    ## sd(syntax1:adj1)                 0.17      0.15     0.01     0.56 1.00     2611
+    ## sd(trial_type1:adj1)             0.15      0.14     0.01     0.52 1.00     2772
+    ## sd(syntax1:trial_type1:adj1)     0.22      0.18     0.01     0.68 1.00     1807
     ##                              Tail_ESS
-    ## sd(Intercept)                    1488
-    ## sd(syntax1)                      3443
-    ## sd(trial_type1)                  2580
-    ## sd(adj1)                         1006
-    ## sd(syntax1:trial_type1)          2141
-    ## sd(syntax1:adj1)                 3058
-    ## sd(trial_type1:adj1)             3337
-    ## sd(syntax1:trial_type1:adj1)     2868
+    ## sd(Intercept)                    2310
+    ## sd(syntax1)                      3877
+    ## sd(trial_type1)                  3813
+    ## sd(adj1)                         2334
+    ## sd(syntax1:trial_type1)          2542
+    ## sd(syntax1:adj1)                 2540
+    ## sd(trial_type1:adj1)             3614
+    ## sd(syntax1:trial_type1:adj1)     2692
     ## 
     ## ~submission_id (Number of levels: 46) 
     ##                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                    1.42      0.23     1.02     1.93 1.00     1780
-    ## sd(syntax1)                      0.29      0.17     0.02     0.65 1.00     1355
-    ## sd(trial_type1)                  0.87      0.18     0.56     1.27 1.00     1930
-    ## sd(adj1)                         0.34      0.18     0.02     0.70 1.00     1116
-    ## sd(syntax1:trial_type1)          0.22      0.15     0.01     0.55 1.00     1715
-    ## sd(syntax1:adj1)                 0.21      0.14     0.01     0.52 1.00     1754
-    ## sd(trial_type1:adj1)             0.21      0.14     0.01     0.54 1.00     1836
-    ## sd(syntax1:trial_type1:adj1)     0.42      0.18     0.06     0.78 1.00     1119
+    ## sd(Intercept)                    1.42      0.23     1.03     1.92 1.00     2114
+    ## sd(syntax1)                      0.30      0.18     0.02     0.67 1.00     1500
+    ## sd(trial_type1)                  0.87      0.17     0.56     1.24 1.00     2132
+    ## sd(adj1)                         0.35      0.18     0.03     0.70 1.00     1607
+    ## sd(syntax1:trial_type1)          0.22      0.15     0.01     0.55 1.00     2227
+    ## sd(syntax1:adj1)                 0.20      0.14     0.01     0.51 1.00     2534
+    ## sd(trial_type1:adj1)             0.22      0.15     0.01     0.54 1.00     2167
+    ## sd(syntax1:trial_type1:adj1)     0.44      0.18     0.07     0.79 1.00     1371
     ##                              Tail_ESS
-    ## sd(Intercept)                    3144
-    ## sd(syntax1)                      1942
-    ## sd(trial_type1)                  3451
-    ## sd(adj1)                         1916
-    ## sd(syntax1:trial_type1)          2420
-    ## sd(syntax1:adj1)                 2475
-    ## sd(trial_type1:adj1)             2230
-    ## sd(syntax1:trial_type1:adj1)     1223
+    ## sd(Intercept)                    4055
+    ## sd(syntax1)                      3024
+    ## sd(trial_type1)                  3531
+    ## sd(adj1)                         2713
+    ## sd(syntax1:trial_type1)          3324
+    ## sd(syntax1:adj1)                 3250
+    ## sd(trial_type1:adj1)             3041
+    ## sd(syntax1:trial_type1:adj1)     1998
     ## 
     ## Population-Level Effects: 
     ##                          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                    0.06      0.29    -0.53     0.63 1.00     1787
-    ## syntax1                      0.62      0.14     0.34     0.90 1.00     4008
-    ## trial_type1                  0.15      0.18    -0.22     0.52 1.00     2779
-    ## adj1                        -0.02      0.23    -0.49     0.45 1.00     2946
-    ## syntax1:trial_type1         -0.20      0.15    -0.49     0.09 1.00     4011
-    ## syntax1:adj1                 0.09      0.14    -0.18     0.36 1.00     4842
-    ## trial_type1:adj1            -0.13      0.13    -0.38     0.14 1.00     5155
-    ## syntax1:trial_type1:adj1     0.21      0.17    -0.10     0.55 1.00     3524
+    ## Intercept                    0.06      0.31    -0.54     0.65 1.00     3415
+    ## syntax1                      0.62      0.15     0.34     0.92 1.00     5941
+    ## trial_type1                  0.15      0.18    -0.22     0.50 1.00     4880
+    ## adj1                        -0.01      0.23    -0.48     0.44 1.00     5474
+    ## syntax1:trial_type1         -0.20      0.15    -0.50     0.11 1.00     4577
+    ## syntax1:adj1                 0.09      0.13    -0.18     0.35 1.00     6947
+    ## trial_type1:adj1            -0.14      0.14    -0.40     0.13 1.00     6465
+    ## syntax1:trial_type1:adj1     0.21      0.16    -0.10     0.55 1.00     5257
     ##                          Tail_ESS
-    ## Intercept                    2795
-    ## syntax1                      3902
-    ## trial_type1                  3612
-    ## adj1                         2996
-    ## syntax1:trial_type1          3648
-    ## syntax1:adj1                 3595
-    ## trial_type1:adj1             3408
-    ## syntax1:trial_type1:adj1     3488
+    ## Intercept                    3658
+    ## syntax1                      4198
+    ## trial_type1                  4783
+    ## adj1                         4032
+    ## syntax1:trial_type1          2568
+    ## syntax1:adj1                 4280
+    ## trial_type1:adj1             3693
+    ## syntax1:trial_type1:adj1     3474
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -462,31 +522,87 @@ Get effects of syntax and effects of size by trial-type:
 ``` r
 model_size %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_adj1, `b_syntax1:adj1`, `b_trial_type1:adj1`,
                                        `b_syntax1:trial_type1`, `b_syntax1:trial_type1:adj1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1,
-         critical_pred = b_Intercept - b_syntax1 + b_trial_type1,
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
          syntax_critical = critical_subj - critical_pred, # subject vs predicate 
-         filler_subj = b_Intercept + b_syntax1 - b_trial_type1,
-         filler_pred = b_Intercept - b_syntax1 - b_trial_type1,
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
          syntax_filler = filler_subj - filler_pred,
-         critical_big = b_Intercept + b_trial_type1 + b_adj1,
-         critical_small = b_Intercept + b_trial_type1 - b_adj1,
+         critical_big = b_Intercept + b_trial_type1 + b_adj1 + `b_trial_type1:adj1`,
+         critical_small = b_Intercept + b_trial_type1 - b_adj1 - `b_trial_type1:adj1`,
          critical_size = critical_big - critical_small,
-         filler_big = b_Intercept - b_trial_type1 + b_adj1,
-         filler_small =  b_Intercept - b_trial_type1 - b_adj1,
+         filler_big = b_Intercept - b_trial_type1 + b_adj1 - `b_trial_type1:adj1`,
+         filler_small =  b_Intercept - b_trial_type1 - b_adj1 + `b_trial_type1:adj1`,
          filler_size = filler_big - filler_small
          ) %>% 
   select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
   gather(key, val) %>%
   group_by(key) %>%
- filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "critical_size") %>% 
+ filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "filler_size") %>% 
   summarize(prob = mean(val > 0))
 ```
 
     ## `summarise()` ungrouping output (override with `.groups` argument)
 
-    ## # A tibble: 3 x 2
+    ## # A tibble: 4 x 2
     ##   key              prob
     ##   <chr>           <dbl>
-    ## 1 critical_size   0.463
-    ## 2 syntax_critical 1.00 
-    ## 3 syntax_filler   1.00
+    ## 1 critical_size   0.273
+    ## 2 filler_size     0.708
+    ## 3 syntax_critical 0.978
+    ## 4 syntax_filler   1.00
+
+Check how many participants stuck to the same option (e.g., always the
+left one):
+
+``` r
+d_main_cat %>% mutate(leftOption = option1,
+                      rightOption = option2,
+                      optionChosen = case_when(
+                        (response == "Great") & (leftOption == "Great Danes") ~ "left", 
+                        (response == "Great") & (rightOption == "Great Danes") ~ "right", 
+                        response == leftOption ~ "left",
+                        response == rightOption ~ "right")
+                      ) %>% 
+  group_by(submission_id, optionChosen) %>% count() -> d_main_option_counts
+
+d_main_option_counts  
+```
+
+    ## # A tibble: 92 x 3
+    ## # Groups:   submission_id, optionChosen [92]
+    ##    submission_id optionChosen     n
+    ##            <dbl> <chr>        <int>
+    ##  1          2821 left            12
+    ##  2          2821 right            4
+    ##  3          2822 left             8
+    ##  4          2822 right            8
+    ##  5          2823 left             7
+    ##  6          2823 right            9
+    ##  7          2824 left             9
+    ##  8          2824 right            7
+    ##  9          2825 left            11
+    ## 10          2825 right            5
+    ## # … with 82 more rows
+
+``` r
+# no participants stuck to one option only
+d_main_option_counts %>% filter(n == 16)
+```
+
+    ## # A tibble: 0 x 3
+    ## # Groups:   submission_id, optionChosen [0]
+    ## # … with 3 variables: submission_id <dbl>, optionChosen <chr>, n <int>
+
+``` r
+# check tendency towards one of the sides -- there seem to be no preferences
+d_main_option_counts %>% group_by(optionChosen) %>% summarise(mean_choices = mean(n))
+```
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+    ## # A tibble: 2 x 2
+    ##   optionChosen mean_choices
+    ##   <chr>               <dbl>
+    ## 1 left                 8.04
+    ## 2 right                7.96
