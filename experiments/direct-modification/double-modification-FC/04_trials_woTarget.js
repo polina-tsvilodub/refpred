@@ -16,8 +16,9 @@ const noun_item_list = {
   service: ["dogs1"],
   prize: ["dogs2"],
   landmark: ["trees", "buildings", "flowers"],
-  present: ["flowers", "dogs2"],
-  rescue: ["dogs1", "fish", "birds"]
+  present: ["flowers"], // , "dogs2"
+  rescue: ["dogs1", "fish", "birds"],
+  stray: ["dogs2"]
 }
 
 // sample four our of five critical nouns with corresponding items, and make sure items are used =< 1 time
@@ -47,7 +48,7 @@ function get_items(noun_item_list, num_trials){
 
 // get item-noun pairs used for a participant
 // const item_noun_pairs = get_items(noun_item_list, num_trials);
-const item_noun_pairs = _.shuffle(["dogs1_service", "dogs2_prize", "trees_landmark", "buildings_landmark", "flowers_landmark", "flowers_present", "dogs2_present", "dogs1_rescue", "fish_rescue", "birds_rescue"]);
+const item_noun_pairs = _.shuffle(["dogs1_service", "dogs2_prize", "trees_landmark", "buildings_landmark", "flowers_landmark", "flowers_present", "dogs2_stray", "dogs1_rescue", "fish_rescue", "birds_rescue"]);
 console.log("Item-noun pairs:", item_noun_pairs)
 console.log(item_noun_pairs.length)
 ////////////////////////
@@ -385,7 +386,33 @@ rescue: [
   reference: "present",
   options: ["dogs", "pugs"]
 }
-  ]
+],
+stray: [
+      {
+     item: "Great Dane",
+     context_sent: "You and your friend take a walk in the city park ",
+     context_picture: "images/dog-parade-basic2_stray_wLeash.png",
+     context_picture_filler: "images/dog-parade-basic2_filler2.png",
+     adj_congr: "big",
+     adj_incongr: "small",
+     target: "images/great-dane-gift.png",
+     target_filler: "images/great-dane_filler.png",
+     reference: "stray",
+     options: ["dogs", "Great Danes"]
+    },
+    {
+    item: "pug",
+    context_sent: "You and your friend take a walk in the city park ",
+    context_picture: "images/dog-parade-basic2_stray_wLeash.png",
+    context_picture_filler: "images/dog-parade-basic2_filler2.png",
+    adj_congr: "small",
+    adj_incongr: "big",
+    target: "images/pug-gift.png",
+    target_filler: "images/pug_filler.png",
+    reference: "stray",
+    options: ["dogs", "pugs"]
+    }
+]
   },
   birds: {
     rescue:[
