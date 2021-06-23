@@ -7,6 +7,11 @@
 const num_trials = 8//10
 //////////////////////////
 
+// order of forced-choice options that is shuffled between-subjects
+// 0 is basic label, 1 is subordinate label; whatever comes first in the list appears as the left option
+const fc = _.shuffle([0,1]);
+console.log("FC order:", fc);
+
 const noun_item_list = {
   service: ["dogs1"],
   prize: ["dogs2"],
@@ -64,7 +69,7 @@ const filler_cond = _.shuffle(["congr_pred", "congr_pred", "congr_pred", "congr_
 // console.log("Filler conditions:", filler_cond)
 
 // creating views with all the necessary information
-function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
+function create_view(items, contexts, num_trials, synt_adj0, filler_cond, fc ) {
   const expt_views = []
   // the iterator iterates over all the contexts and takes one target per context (either big or small)
   for ( i = 0; i < num_trials; i ++) {
@@ -92,8 +97,8 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
       target_picture: items[item][n2][critical_size].target, // target picture, differs for bis and small target
       item: item,
       item_noun: contexts[i],
-      option1: items[item][n2][critical_size].options[0],
-      option2:  items[item][n2][critical_size].options[1], // donts record this as list -- make mapper instead
+      option1: items[item][n2][critical_size].options[fc[0]], // grab left and right FC options according to order for the specific subject determined in fc
+      option2: items[item][n2][critical_size].options[fc[1]],
       target: items[item][n2][critical_size].item,
       target_size: items[item][n2][critical_size].adj_congr,
       ref_np: items[item][n2][critical_size].reference
@@ -216,8 +221,8 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond ) {
       target_picture: items[item][n2][filler_size].target_filler, // target picture, differs for bis and small target
       item: item,
       item_noun: contexts[i],
-      option1: items[item][n2][filler_size].options[0],
-      option2:  items[item][n2][filler_size].options[1],
+      option1: items[item][n2][filler_size].options[fc[0]],
+      option2:  items[item][n2][filler_size].options[fc[1]],
       target: items[item][n2][filler_size].item,
       target_size: items[item][n2][filler_size].adj_congr,
       ref_np: items[item][n2][filler_size].reference
@@ -280,8 +285,8 @@ const items = {
      target: "images/doberman.png",
      target_filler: "images/doberman_filler.png",
      // first array is subject  , second is predicate
-     reference: "service-animal", // critical utterances
-     options: _.shuffle(["dogs", "dobermen"])
+     reference: "service animal", // critical utterances
+     options: ["dogs", "dobermans"]
    },
    // second set contains the subordinate context
    {
@@ -294,8 +299,8 @@ const items = {
     target: "images/chihuahua.png",
     target_filler: "images/chihuahua_filler.png",
     // first array are utterances in predicate, second is subject utterances
-    reference: "service-animal",
-    options: _.shuffle(["dogs", "chihuahuas"])
+    reference: "service animal",
+    options: ["dogs", "chihuahuas"]
   }
 ],
 rescue: [
@@ -310,7 +315,7 @@ rescue: [
    target_filler: "images/doberman_filler.png",
    // first array is subject  , second is predicate
    reference: "rescue", // critical utterances
-   options: _.shuffle(["dogs", "dobermen"])
+   options: ["dogs", "dobermans"]
  },
  // second set contains the subordinate context
  {
@@ -324,7 +329,7 @@ rescue: [
   target_filler: "images/chihuahua_filler.png",
   // first array are utterances in predicate, second is subject utterances
   reference: "rescue",
-  options: _.shuffle(["dogs", "chihuahuas"])
+  options: ["dogs", "chihuahuas"]
 }
 ]
   },
@@ -341,7 +346,7 @@ rescue: [
      target: "images/great-dane.png",
      target_filler: "images/great-dane_filler.png",
      reference: "prize-winner",
-     options: _.shuffle(["dogs", "Great Danes"])
+     options: ["dogs", "Great Danes"]
    },
    {
     item: "pug",
@@ -353,7 +358,7 @@ rescue: [
     target: "images/pug.png",
     target_filler: "images/pug_filler.png",
     reference: "prize-winner",
-    options: _.shuffle(["dogs", "pugs"])
+    options: ["dogs", "pugs"]
   }],
   present: [
     {
@@ -366,7 +371,7 @@ rescue: [
    target: "images/great-dane-gift.png",
    target_filler: "images/great-dane_filler.png",
    reference: "present",
-   options: _.shuffle(["dogs", "Great Danes"])
+   options: ["dogs", "Great Danes"]
  },
  {
   item: "pug",
@@ -378,7 +383,7 @@ rescue: [
   target: "images/pug-gift.png",
   target_filler: "images/pug_filler.png",
   reference: "present",
-  options: _.shuffle(["dogs", "pugs"])
+  options: ["dogs", "pugs"]
 }
   ]
   },
@@ -394,7 +399,7 @@ rescue: [
      target: "images/eagle.png",
      target_filler: "images/eagle_filler.png",
      reference: "rescue",
-     options: _.shuffle(["birds", "eagles"])
+     options: ["birds", "eagles"]
    },
    {
     item: "hummingbird",
@@ -406,7 +411,7 @@ rescue: [
     target: "images/hummingbird.png",
     target_filler: "images/hummingbird_filler.png",
     reference: "rescue",
-    options: _.shuffle(["birds", "hummingbirds"])
+    options: ["birds", "hummingbirds"]
    }
    ]
   },
@@ -422,7 +427,7 @@ rescue: [
      target: "images/tuna_net.png",
      target_filler: "images/tuna_filler.png",
      reference: "rescue",
-     options: _.shuffle(["fish", "tunas"])
+     options: ["fish", "tunas"]
    },
    {
     item: "clownfish",
@@ -434,7 +439,7 @@ rescue: [
     target: "images/clownfish_net.png",
     target_filler: "images/clownfish_filler.png",
     reference: "rescue",
-    options: _.shuffle(["fish", "clownfish"])
+    options: ["fish", "clownfish"]
    }]
   },
   flowers: {
@@ -449,7 +454,7 @@ rescue: [
    target: "images/sunflower.png",
    target_filler: "images/sunflower_filler.png",
    reference: "present",
-   options: _.shuffle(["flowers", "sunflowers"])
+   options: ["flowers", "sunflowers"]
  },
   {
    item: "dandelion",
@@ -461,7 +466,7 @@ rescue: [
    target: "images/dandelion.png",
    target_filler: "images/dandelion_filler.png",
    reference: "present",
-   options: _.shuffle(["flowers", "dandelions"])
+   options: ["flowers", "dandelions"]
  }],
  landmark: [
    {
@@ -474,7 +479,7 @@ rescue: [
     target: "images/sunflower-landmark.png",
     target_filler: "images/sunflower_filler.png",
     reference: "landmark",
-    options: _.shuffle(["flowers", "sunflowers"])
+    options: ["flowers", "sunflowers"]
   },
    {
     item: "dandelion",
@@ -486,7 +491,7 @@ rescue: [
     target: "images/dandelion-landmark.png",
     target_filler: "images/dandelion_filler.png",
     reference: "landmark",
-    options: _.shuffle(["flowers", "dandelions"])
+    options: ["flowers", "dandelions"]
   }
  ]
  },
@@ -501,7 +506,7 @@ rescue: [
      target: "images/redwood_sign.png",
      target_filler: "images/redwood_filler.png",
      reference: "landmark",
-     options: _.shuffle(["trees", "redwoods"])
+     options: ["trees", "redwoods"]
    },
   {
    item: "bonsai",
@@ -513,7 +518,7 @@ rescue: [
    target: "images/bonsai_stick.png",
    target_filler: "images/bonsai_filler.png",
    reference: "landmark",
-   options: _.shuffle(["trees", "bonsais"])
+   options: ["trees", "bonsais"]
  }]
 },
 buildings: {
@@ -528,10 +533,10 @@ buildings: {
      target: "images/skyscraper-landmark.png",
      target_filler: "images/skyscraper-landmark-filler.png",
      reference: "landmark",
-     options: _.shuffle(["buildings", "skyscrapers"])
+     options: ["buildings", "skyscrapers"]
    },
   {
-   item: "stripmall",
+   item: "strip mall",
    context_sent:  "You visit your friend who lives in another city. You take a walk ",
    context_picture: "images/buildings-parade-basic.png",
    context_picture_filler: "images/buildings-parade-basic_filler.png",
@@ -540,7 +545,7 @@ buildings: {
    target: "images/stripmall-landmark.png",
    target_filler: "images/stripmall-landmark-filler.png",
    reference: "landmark",
-   options: _.shuffle(["buildings", "stripmalls"])
+   options: ["buildings", "strip malls"]
  }
   ]
 }
@@ -579,7 +584,7 @@ const warmup_trials = {
         item: "dogs1",
         picture1: "warmup/beagle_service.png",
         picture2: "warmup/doberman_service.png",
-        question: " <br> These dogs are service-animals. Notice the leash on them."
+        question: " <br> These dogs are service animals. Notice the leash on them."
       }
     },
   rescue: {
@@ -869,19 +874,19 @@ buildings: {
     train: {
       item: "buildings",
       examples: _.shuffle([{picture:"warmup/skyscraper1.png", question:"This is a skyscraper."},
-                           {picture: "warmup/stripmall1.png", question: "This is a stripmall."}]),
+                           {picture: "warmup/stripmall1.png", question: "This is a strip mall."}]),
       picture1: "warmup/skyscraper1.png",
       picture2: "warmup/stripmall1.png",
       default1: ["skyscraper"],
-      default2: ["stripmall"],
+      default2: ["strip mall"],
       text: "Please look at the objects below.",
       question1: "This is a skyscraper.",
-      question3: "This is a stripmall."
+      question3: "This is a strip mall."
     },
     label: {
       item: "buildings",
       examples: _.shuffle([{picture: "warmup/skyscraper2.png", question: "This is a ", correct: "skyscraper"},
-                           {picture: "warmup/stripmall2.png",question: "This is a ", correct: ["stripmall"]}]),
+                           {picture: "warmup/stripmall2.png",question: "This is a ", correct: ["strip mall"]}]),
       // picture1: "warmup/redwood2.png",
       // picture2: "warmup/bonsai2.png",
       // correct1: "redwood or sequoia (choose one)",
@@ -903,7 +908,7 @@ buildings: {
 
 }
 
-const main_trials = _.shuffle(create_view(items, item_noun_pairs, num_trials, synt_adj0, filler_cond))
+const main_trials = _.shuffle(create_view(items, item_noun_pairs, num_trials, synt_adj0, filler_cond, fc))
 console.log("main trials before reorder: ", main_trials);
 
 // shuffle main trials such that N2 isn't used back to back
