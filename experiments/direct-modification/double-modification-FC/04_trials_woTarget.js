@@ -100,6 +100,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond, fc ) {
       item_noun: contexts[i],
       option1: items[item][n2][critical_size].options[fc[0]], // grab left and right FC options according to order for the specific subject determined in fc
       option2: items[item][n2][critical_size].options[fc[1]],
+      optionLeft: fc[0],
       target: items[item][n2][critical_size].item,
       target_size: items[item][n2][critical_size].adj_congr,
       ref_np: items[item][n2][critical_size].reference
@@ -224,6 +225,7 @@ function create_view(items, contexts, num_trials, synt_adj0, filler_cond, fc ) {
       item_noun: contexts[i],
       option1: items[item][n2][filler_size].options[fc[0]],
       option2:  items[item][n2][filler_size].options[fc[1]],
+      optionLeft: fc[0],
       target: items[item][n2][filler_size].item,
       target_size: items[item][n2][filler_size].adj_congr,
       ref_np: items[item][n2][filler_size].reference

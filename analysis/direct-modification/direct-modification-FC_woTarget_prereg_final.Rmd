@@ -1,0 +1,257 @@
+---
+title: "Direct Modification Forced Choice Prereg Final"
+author: "Polina Tsvilodub"
+date: "6/23/2021"
+output: github_document
+---
+
+```{r}
+# load libraries
+library(tidyverse)
+library(tidyboot)
+library(brms)
+```
+
+```{r}
+# read data
+d <- read_csv("./../../data/direct-modification/results_41_double-mod-FC-wFilers-noTarget_prereg_final.csv")
+```
+
+```{r}
+# exclusions
+
+# check comments for any issues
+d %>% distinct(comments) 
+# check if bugs were reported
+d %>% distinct(problems) 
+# exclude non-native speakers
+d %>% distinct(languages)
+d %>% distinct(submission_id) %>% count() %>% pull()
+d_native <- d %>% filter(grepl("en", languages, ignore.case = T))
+# check the number of participants after exclusions
+d_native %>% distinct(submission_id) %>% count() %>% pull()
+```
+
+```{r}
+# only accept workers who get the paraphrase warm-up trial with max. 3 attempts
+d_warmup_catch <- d_native %>% filter(trial_name == "comp_class_warmup") %>% group_by(submission_id) %>% filter(attempts > 3)
+d_clean <- anti_join(d_native, d_warmup_catch, by = "submission_id")
+
+# number of subjects excluded based on the paraphrase warmup trial
+d_clean %>% distinct(submission_id) %>% count() %>% pull()
+
+# get main trials
+d_main <- d_clean %>% filter(!is.na(trial_type)) 
+# check trial counts
+d_main %>% count(trial_type, item_noun, syntax)
+d_main %>% count(trial_type, syntax, adj)
+```
+
+```{r}
+# classify responses into basic vs subordinate responses
+d_main_cat <- d_main %>%
+  rowwise() %>%
+  mutate(response_cat = case_when(grepl(target, response) ~ "subordinate",
+                                  (target == "doberman" & response == "dobermen") ~ "subordinate",
+                                  (target == "Great Dane" & response == "Great") ~ "subordinate",
+                                  TRUE ~ "basic"
+                                  ),
+         response_num = ifelse(response_cat == "basic", 1, 0))
+```
+
+```{r}
+# get 95% bootstrapped CIs
+d_main_cat_summary <- d_main_cat %>% group_by(syntax, trial_type) %>%
+  tidyboot_mean(column = response_num)
+# plot by syntax
+d_main_cat_summary %>%
+  ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
+  geom_col(alpha = 0.7, color = "black") +
+  geom_linerange() +
+  facet_wrap(~trial_type) +
+  ylab("Proportion of basic-level responses") +
+  ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
+```
+
+```{r}
+d_main_cat_size_summary <- d_main_cat %>% group_by(syntax, adj, trial_type) %>%
+  tidyboot_mean(column = response_num)
+# plot syntax by-trial-type by-adjectives
+d_main_cat_size_summary %>%
+  ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
+  geom_col(alpha = 0.7, color = "black") +
+  geom_linerange() +
+  ylab("Proportion of basic-level responses") +
+  facet_wrap(trial_type~adj) +
+  ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
+```
+
+```{r, fig.height=20, fig.width=8}
+d_main_cat_item_summary <- d_main_cat %>% group_by(syntax, item_noun, trial_type) %>%
+  tidyboot_mean(column = response_num)
+# plot syntax by-item by-trial_type
+d_main_cat_item_summary %>%
+  ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
+  geom_col(alpha = 0.7, color = "black") +
+  geom_linerange() +
+  ylab("Proportion of basic-level responses") +
+  facet_wrap(item_noun~trial_type, ncol = 2) +
+  ggtitle("Proportion of basic-level responses by-syntax.\n Error bars indicate 95% bootstrapped CIs")
+```
+
+```{r, results="hide"}
+# reorder factors
+d_main_cat <- d_main_cat %>% mutate(
+  unique_target = ifelse(trial_type == "critical", paste(target, ref_np, sep = "_"), target),
+  syntax = factor(syntax, levels = c("subj", "pred")),
+  trial_type = factor(trial_type),
+  adj = factor(adj, levels = c("big", "small")),
+  optionLeft = factor(optionLeft, levels = c(0, 1), labels = c("basic", "sub"))
+)
+# critical 1, filler -1
+contrasts(d_main_cat$trial_type) <- contr.sum(2)
+contrasts(d_main_cat$trial_type)
+# subj 1, -1 pred
+contrasts(d_main_cat$syntax) <- contr.sum(2)
+contrasts(d_main_cat$syntax) 
+# fit logistic regression
+model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
+               (1 + syntax*trial_type || item), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_cat,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.96),
+             iter = 3000,
+             cores = 4)
+```
+
+```{r}
+summary(model)
+```
+
+Get contrasts (esp. effect of syntax in the critical condition) from brm model fit w `hypothesis`:
+```{r}
+critical_subj <- c(critical_subj = "Intercept + trial_type1 + syntax1 + syntax1:trial_type1= 0")
+critical_pred <- c(critical_pred = "Intercept + trial_type1 - syntax1 - syntax1:trial_type1 = 0")
+
+filler_subj <- c(filler_subj = "Intercept - trial_type1 + syntax1 - syntax1:trial_type1= 0")
+filler_pred <- c(filler_pred = "Intercept - trial_type1 - syntax1 + syntax1:trial_type1 = 0")
+
+# our syntax hypotheses are actually directional: we expect more basic responses in the subject than predicate conditions, 
+# and therefore this contrast being larger than 0
+syntax_critical <- c(syntax_critical = "2 * syntax1 + 2 * syntax1:trial_type1 > 0")
+syntax_filler <- c(syntax_filler = "2 * syntax1 - 2 * syntax1:trial_type1 > 0")
+
+subj_critical_filler <- c(subj_critical_filler = "2*trial_type1 + 2 * syntax1:trial_type1 = 0" )
+pred_critical_filler <- c(pred_critical_filler = "2*trial_type1 - 2 * syntax1:trial_type1 = 0" )
+
+contrast_answers <- hypothesis(model, c(critical_subj, critical_pred, syntax_critical,
+                                 filler_subj, filler_pred, syntax_filler,
+                                 subj_critical_filler, pred_critical_filler))
+contrast_answers
+```
+
+Exploratory model with main effect of size:
+```{r, results="hide"}
+# big 1, small -1
+contrasts(d_main_cat$adj) <- contr.sum(2)
+
+model_size <- brm(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj || submission_id) + 
+               (1 + syntax*trial_type*adj || item), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_cat,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.96),
+             iter = 3000,
+             cores = 4)
+```
+
+```{r}
+summary(model_size)
+```
+
+Get effects of syntax and effects of size by trial-type:
+```{r}
+model_size %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_adj1, `b_syntax1:adj1`, `b_trial_type1:adj1`,
+                                       `b_syntax1:trial_type1`, `b_syntax1:trial_type1:adj1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
+         syntax_filler = filler_subj - filler_pred,
+         critical_big = b_Intercept + b_trial_type1 + b_adj1 + `b_trial_type1:adj1`,
+         critical_small = b_Intercept + b_trial_type1 - b_adj1 - `b_trial_type1:adj1`,
+         critical_size = critical_big - critical_small,
+         filler_big = b_Intercept - b_trial_type1 + b_adj1 - `b_trial_type1:adj1`,
+         filler_small =  b_Intercept - b_trial_type1 - b_adj1 + `b_trial_type1:adj1`,
+         filler_size = filler_big - filler_small
+         ) %>% 
+  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+ filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "filler_size") %>% 
+  summarize(prob = mean(val > 0))
+```
+
+Check how many participants stuck to the same option (e.g., always the left one):
+```{r}
+d_main_cat %>% mutate(leftOption = option1,
+                      rightOption = option2,
+                      optionChosen = case_when(
+                        (response == "Great") & (leftOption == "Great Danes") ~ "left", 
+                        (response == "Great") & (rightOption == "Great Danes") ~ "right", 
+                        response == leftOption ~ "left",
+                        response == rightOption ~ "right")
+                      ) %>% 
+  group_by(submission_id, optionChosen) %>% count() -> d_main_option_counts
+
+d_main_option_counts  
+# no participants stuck to one option only
+d_main_option_counts %>% filter(n == 16)
+# check tendency towards one of the sides -- there seem to be no preferences
+d_main_option_counts %>% group_by(optionChosen) %>% summarise(mean_choices = mean(n))
+```
+
+Explore the between-subjects effect of the order of response options:
+
+```{r, results="hide"}
+# basic is the left option 1, sub is the left option -1
+contrasts(d_main_cat$optionLeft) <- contr.sum(2)
+
+model_option <- brm(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type || submission_id) + 
+               (1 + syntax*trial_type*optionLeft || item), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_cat,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.96),
+             iter = 3000,
+             cores = 4)
+```
+
+```{r}
+summary(model_option)
+```
+
+Get by-syntax by-trial type contrasts of the options:
+```{r}
+model_option %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_optionLeft1, `b_syntax1:trial_type1`) %>%
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
+         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
+         syntax_filler = filler_subj - filler_pred,
+         critical_basicLeft = b_Intercept + b_trial_type1 + b_optionLeft1,
+         critical_basicRight = b_Intercept + b_trial_type1 - b_optionLeft1,
+         critical_size = critical_basicLeft - critical_basicRight,
+         filler_basicLeft = b_Intercept - b_trial_type1 + b_optionLeft1,
+         filler_basicRight =  b_Intercept - b_trial_type1 - b_optionRight1,
+         filler_size = filler_big - filler_small,
+         subj_basicLeft = b_Intercept + b_syntax1 + b_optionLeft1,
+         subj_basicRight = b_Intercept + b_syntax1 - b_optionLeft1,
+         pred_
+         ) %>% 
+  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
+  gather(key, val) %>%
+  group_by(key) %>%
+ filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "filler_size") %>% 
+  summarize(prob = mean(val > 0))
+```
