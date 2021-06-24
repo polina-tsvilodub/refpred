@@ -14,7 +14,8 @@ library(brms)
 
 ```{r}
 # read data
-d <- read_csv("./../../data/direct-modification/results_41_double-mod-FC-wFilers-noTarget_prereg_final.csv")
+#data/direct-modification
+d <- read_csv("./../../data/direct-modification/results_42_double-mod-FC-wFilers-noTarget_prereg_final.csv")
 ```
 
 ```{r}
@@ -37,7 +38,7 @@ d_native %>% distinct(submission_id) %>% count() %>% pull()
 d_warmup_catch <- d_native %>% filter(trial_name == "comp_class_warmup") %>% group_by(submission_id) %>% filter(attempts > 3)
 d_clean <- anti_join(d_native, d_warmup_catch, by = "submission_id")
 
-# number of subjects excluded based on the paraphrase warmup trial
+# number of subjects left after exclusions based on the paraphrase warmup trial
 d_clean %>% distinct(submission_id) %>% count() %>% pull()
 
 # get main trials
@@ -52,7 +53,7 @@ d_main %>% count(trial_type, syntax, adj)
 d_main_cat <- d_main %>%
   rowwise() %>%
   mutate(response_cat = case_when(grepl(target, response) ~ "subordinate",
-                                  (target == "doberman" & response == "dobermen") ~ "subordinate",
+                                  (target == "strip mall" & response == "strip") ~ "subordinate",
                                   (target == "Great Dane" & response == "Great") ~ "subordinate",
                                   TRUE ~ "basic"
                                   ),
@@ -168,28 +169,43 @@ model_size <- brm(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*
 summary(model_size)
 ```
 
-Get effects of syntax and effects of size by trial-type:
+Get exploratory effects of target size by syntax and trial-type using `hypothesis`:
+
 ```{r}
-model_size %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_adj1, `b_syntax1:adj1`, `b_trial_type1:adj1`,
-                                       `b_syntax1:trial_type1`, `b_syntax1:trial_type1:adj1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
-         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
-         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
-         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
-         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
-         syntax_filler = filler_subj - filler_pred,
-         critical_big = b_Intercept + b_trial_type1 + b_adj1 + `b_trial_type1:adj1`,
-         critical_small = b_Intercept + b_trial_type1 - b_adj1 - `b_trial_type1:adj1`,
-         critical_size = critical_big - critical_small,
-         filler_big = b_Intercept - b_trial_type1 + b_adj1 - `b_trial_type1:adj1`,
-         filler_small =  b_Intercept - b_trial_type1 - b_adj1 + `b_trial_type1:adj1`,
-         filler_size = filler_big - filler_small
-         ) %>% 
-  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
-  gather(key, val) %>%
-  group_by(key) %>%
- filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "filler_size") %>% 
-  summarize(prob = mean(val > 0))
+critical_subj <- c(critical_subj = "Intercept + trial_type1 + syntax1 + syntax1:trial_type1= 0")
+critical_pred <- c(critical_pred = "Intercept + trial_type1 - syntax1 - syntax1:trial_type1 = 0")
+
+filler_subj <- c(filler_subj = "Intercept - trial_type1 + syntax1 - syntax1:trial_type1= 0")
+filler_pred <- c(filler_pred = "Intercept - trial_type1 - syntax1 + syntax1:trial_type1 = 0")
+
+critical_big <- c(critical_big = "Intercept + trial_type1 + adj1 + trial_type1:adj1 = 0")
+critical_small <- c(critical_small = "Intercept + trial_type1 - adj1 - trial_type1:adj1 = 0")
+
+filler_big <- c(filler_big = "Intercept - trial_type1 + adj1 - trial_type1:adj1 = 0")
+filler_small <- c(filler_small = "Intercept - trial_type1 - adj1 + trial_type1:adj1 = 0")
+
+# our syntax hypotheses are actually directional: we expect more basic responses in the subject than predicate conditions, 
+# and therefore this contrast being larger than 0
+syntax_critical <- c(syntax_critical = "2 * syntax1 + 2 * syntax1:trial_type1 > 0") # subj - pred
+syntax_filler <- c(syntax_filler = "2 * syntax1 - 2 * syntax1:trial_type1 > 0") # subj - pred
+
+# exploratory check if there is an effect of size by trial type and by syntactic condition
+size_critical <- c(size_critical = "2 * adj1 + 2 * trial_type1:adj1 = 0") # big - small 
+size_filler <- c(size_filler = "2 * adj1 - 2 * trial_type1:adj1 = 0") # big - small
+size_subj <- c(size_subj = "2 * adj1 + 2 * syntax1:adj1 = 0") # big - small
+size_pred <- c(size_pred = "2 * adj1 - 2 * syntax1:adj1 = 0") # big - small
+
+# effect of trial type by syntactic condition
+subj_critical_filler <- c(subj_critical_filler = "2*trial_type1 + 2 * syntax1:trial_type1 = 0" )
+pred_critical_filler <- c(pred_critical_filler = "2*trial_type1 - 2 * syntax1:trial_type1 = 0" )
+
+contrast_answers_size <- hypothesis(model_size, c(critical_subj, critical_pred, syntax_critical,
+                                 filler_subj, filler_pred, syntax_filler,
+                                 subj_critical_filler, pred_critical_filler,
+                                 critical_big, critical_small, size_critical, 
+                                 filler_big, filler_small, size_filler,
+                                 size_subj, size_pred))
+contrast_answers_size
 ```
 
 Check how many participants stuck to the same option (e.g., always the left one):
@@ -198,7 +214,9 @@ d_main_cat %>% mutate(leftOption = option1,
                       rightOption = option2,
                       optionChosen = case_when(
                         (response == "Great") & (leftOption == "Great Danes") ~ "left", 
-                        (response == "Great") & (rightOption == "Great Danes") ~ "right", 
+                        (response == "Great") & (rightOption == "Great Danes") ~ "right",
+                        (response == "strip") & (leftOption == "strip malls") ~ "left", 
+                        (response == "strip") & (rightOption == "strip malls") ~ "right",
                         response == leftOption ~ "left",
                         response == rightOption ~ "right")
                       ) %>% 
@@ -209,6 +227,11 @@ d_main_option_counts
 d_main_option_counts %>% filter(n == 16)
 # check tendency towards one of the sides -- there seem to be no preferences
 d_main_option_counts %>% group_by(optionChosen) %>% summarise(mean_choices = mean(n))
+```
+
+Count the different FC orders:
+```{r}
+d_main_cat %>% count(optionLeft)
 ```
 
 Explore the between-subjects effect of the order of response options:
@@ -229,29 +252,29 @@ model_option <- brm(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*tr
 ```{r}
 summary(model_option)
 ```
-
-Get by-syntax by-trial type contrasts of the options:
+Get exploratory effects of the FC options order by-syntax / by-trial type:
 ```{r}
-model_option %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_optionLeft1, `b_syntax1:trial_type1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
-         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
-         syntax_critical = critical_subj - critical_pred, # subject vs predicate 
-         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
-         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
-         syntax_filler = filler_subj - filler_pred,
-         critical_basicLeft = b_Intercept + b_trial_type1 + b_optionLeft1,
-         critical_basicRight = b_Intercept + b_trial_type1 - b_optionLeft1,
-         critical_size = critical_basicLeft - critical_basicRight,
-         filler_basicLeft = b_Intercept - b_trial_type1 + b_optionLeft1,
-         filler_basicRight =  b_Intercept - b_trial_type1 - b_optionRight1,
-         filler_size = filler_big - filler_small,
-         subj_basicLeft = b_Intercept + b_syntax1 + b_optionLeft1,
-         subj_basicRight = b_Intercept + b_syntax1 - b_optionLeft1,
-         pred_
-         ) %>% 
-  select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
-  gather(key, val) %>%
-  group_by(key) %>%
- filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "filler_size") %>% 
-  summarize(prob = mean(val > 0))
+critical_optionBasic <- c(critical_optionBasic = "Intercept + trial_type1 + optionLeft1 + trial_type1:optionLeft1 = 0")
+critical_optionSub <- c(critical_optionSub = "Intercept + trial_type1 - optionLeft1 - trial_type1:optionLeft1 = 0")
+
+filler_optionBasic <- c(filler_optionBasic = "Intercept - trial_type1 + optionLeft1 - trial_type1:optionLeft1 = 0")
+filler_optionSub <- c(filler_optionSub = "Intercept - trial_type1 - optionLeft1 + trial_type1:optionLeft1 = 0")
+# explore effect of options order by trial type
+option_critical <- c(option_critical = "2 * optionLeft1 + 2 * trial_type1:optionLeft1 = 0") # basic - sub is left
+option_filler <- c(option_critical = "2 * optionLeft1 - 2 * trial_type1:optionLeft1 = 0") # basic - sub is left
+# explore effect of options order by syntax
+option_subj <- c(option_subj = "2 * optionLeft1 + 2 * syntax1:optionLeft1 = 0") # basic - sub is left
+option_pred <- c(option_pred = "2 * optionLeft1 - 2 * syntax1:optionLeft1 = 0")# basic - sub is left
+
+# explore effect of options order in the single syntactic conditions of critical trials
+# in subject condition
+option_subj_critical <- c(option_subj_critical = "2 * optionLeft1 + 2 * syntax1:optionLeft1 + 2 * trial_type1:optionLeft1 + 2 * syntax1:trial_type1:optionLeft1 = 0")
+# in predicate condition
+option_pred_critical <- c(option_pred_critical = "2 * optionLeft1 - 2 * syntax1:optionLeft1 + 2 * trial_type1:optionLeft1 - 2 * syntax1:trial_type1:optionLeft1 = 0")
+
+contrast_answers_option <- hypothesis(model_option, c(critical_optionBasic, critical_optionSub, option_critical,
+                                 filler_optionBasic, filler_optionSub, option_filler,
+                                 option_subj, option_pred,
+                                 option_subj_critical, option_pred_critical))
+contrast_answers_option
 ```
