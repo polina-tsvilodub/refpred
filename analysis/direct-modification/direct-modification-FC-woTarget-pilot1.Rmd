@@ -139,6 +139,59 @@ contrast_answers <- hypothesis(model, c(critical_subj, critical_pred, syntax_cri
                                  subj_critical_filler, pred_critical_filler))
 contrast_answers
 ```
+## Critical trials only
+
+
+```{r, results="hide"}
+d_main_crit <- d_main_cat %>% 
+  filter(trial_type == "critical") %>% 
+  mutate(
+    syntax = factor(syntax, levels = c("subj", "pred")),
+    adj = factor(adj, levels = c("big", "small"))
+)
+
+# subj 1, -1 pred
+contrasts(d_main_crit$syntax) <- contr.sum(2)
+contrasts(d_main_crit$syntax) 
+model_crit <- brm(response_num ~ syntax + (1 + syntax || submission_id) + 
+               (1 + syntax || item), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_crit,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.9),
+             iter = 3000,
+             cores = 4)
+
+model_crit
+```
+
+
+# Power analysis with simr
+
+```{r}
+library(lme4)
+library(simr)
+# subj 1, -1 pred
+contrasts(d_main_crit$syntax) <- contr.sum(2)
+contrasts(d_main_crit$syntax) 
+model.lm <- glmer(response_num ~ syntax + (1 + syntax  || submission_id) + 
+               (1 + syntax || item), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_crit,
+             family = "binomial")
+summary(model.lm)
+
+sim_treat <- powerSim(model.lm, nsim=100, test = fcompare(response_num ~ 1))
+```
+```{r}
+model_ext_subj <- extend(model.lm, along="submission_id", n=100)
+sim_treat_150 <- powerSim(model_ext_subj, nsim=125, test = fcompare(response_num ~ 1))
+
+# p_curve_treat <- powerCurve(model_ext_subj, test=fcompare(response_num ~ 1), 
+#                             within="syntax + submission_id", breaks=c(100, 150, 200, 250))
+# plot(p_curve_treat)
+```
+
+
+
 
 ** REDO BELOW **
 Get critical effect of syntax in the critical condition:
