@@ -12,8 +12,8 @@ library(brms)
 ```
 
 ```{r}
-#d <- read_csv("~/Documents/Research/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
-d <- read_csv("~/projects/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
+d <- read_csv("./../../data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
+#d <- read_csv("~/projects/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
 #d %>% select(-prolific_id) %>% write_csv("~/Documents/Research/refpred/data/direct-modification/results_41_double-mod-FC-wFilers-noTarget-pilot_N50.csv")
 ```
 
@@ -110,7 +110,7 @@ model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submis
                (1 + syntax*trial_type || item), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.9),
+             control = list(adapt_delta = 0.96),
              iter = 3000,
              cores = 4)
 ```
@@ -127,9 +127,10 @@ critical_pred <- c(critical_pred = "Intercept + trial_type1 - syntax1 - syntax1:
 
 filler_subj <- c(filler_subj = "Intercept - trial_type1 + syntax1 - syntax1:trial_type1= 0")
 filler_pred <- c(filler_pred = "Intercept - trial_type1 - syntax1 + syntax1:trial_type1 = 0")
-
-syntax_critical <- c(syntax_critical = "2 * syntax1 + 2 * syntax1:trial_type1 = 0")
-syntax_filler <- c(syntax_filler = "2 * syntax1 - 2 * syntax1:trial_type1 = 0")
+# our syntax hypotheses are actually directional: we expect more basic responses in the subject than predicate conditions, 
+# and therefore this contrast being larger than 0
+syntax_critical <- c(syntax_critical = "2 * syntax1 + 2 * syntax1:trial_type1 > 0")
+syntax_filler <- c(syntax_filler = "2 * syntax1 - 2 * syntax1:trial_type1 > 0")
 
 subj_critical_filler <- c(subj_critical_filler = "2*trial_type1 + 2 * syntax1:trial_type1 = 0" )
 pred_critical_filler <- c(pred_critical_filler = "2*trial_type1 - 2 * syntax1:trial_type1 = 0" )
@@ -198,11 +199,11 @@ Get critical effect of syntax in the critical condition:
 
 ```{r}
 model %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, `b_syntax1:trial_type1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1,
-         critical_pred = b_Intercept - b_syntax1 + b_trial_type1,
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
          syntax_critical = critical_subj - critical_pred, # subject vs predicate 
-         filler_subj = b_Intercept + b_syntax1 - b_trial_type1,
-         filler_pred = b_Intercept - b_syntax1 - b_trial_type1,
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
          syntax_filler = filler_subj - filler_pred
          ) %>% 
   select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler) %>%
@@ -233,22 +234,41 @@ Get effects of syntax and effects of size by trial-type:
 ```{r}
 model_size %>% tidybayes::spread_draws(b_Intercept, b_syntax1, b_trial_type1, b_adj1, `b_syntax1:adj1`, `b_trial_type1:adj1`,
                                        `b_syntax1:trial_type1`, `b_syntax1:trial_type1:adj1`) %>%
-  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1,
-         critical_pred = b_Intercept - b_syntax1 + b_trial_type1,
+  mutate(critical_subj = b_Intercept + b_syntax1 + b_trial_type1 + `b_syntax1:trial_type1`,
+         critical_pred = b_Intercept - b_syntax1 + b_trial_type1 - `b_syntax1:trial_type1`,
          syntax_critical = critical_subj - critical_pred, # subject vs predicate 
-         filler_subj = b_Intercept + b_syntax1 - b_trial_type1,
-         filler_pred = b_Intercept - b_syntax1 - b_trial_type1,
+         filler_subj = b_Intercept + b_syntax1 - b_trial_type1 - `b_syntax1:trial_type1`,
+         filler_pred = b_Intercept - b_syntax1 - b_trial_type1 + `b_syntax1:trial_type1`,
          syntax_filler = filler_subj - filler_pred,
-         critical_big = b_Intercept + b_trial_type1 + b_adj1,
-         critical_small = b_Intercept + b_trial_type1 - b_adj1,
+         critical_big = b_Intercept + b_trial_type1 + b_adj1 + `b_trial_type1:adj1`,
+         critical_small = b_Intercept + b_trial_type1 - b_adj1 - `b_trial_type1:adj1`,
          critical_size = critical_big - critical_small,
-         filler_big = b_Intercept - b_trial_type1 + b_adj1,
-         filler_small =  b_Intercept - b_trial_type1 - b_adj1,
+         filler_big = b_Intercept - b_trial_type1 + b_adj1 - `b_trial_type1:adj1`,
+         filler_small =  b_Intercept - b_trial_type1 - b_adj1 + `b_trial_type1:adj1`,
          filler_size = filler_big - filler_small
          ) %>% 
   select(b_Intercept, b_syntax1, critical_subj, critical_pred, syntax_critical, syntax_filler, critical_size, filler_size) %>%
   gather(key, val) %>%
   group_by(key) %>%
- filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "critical_size") %>% 
+ filter(key == "syntax_filler" | key == "syntax_critical" | key == "critical_size" | key == "filler_size") %>% 
   summarize(prob = mean(val > 0))
+```
+
+Check how many participants stuck to the same option (e.g., always the left one):
+```{r}
+d_main_cat %>% mutate(leftOption = option1,
+                      rightOption = option2,
+                      optionChosen = case_when(
+                        (response == "Great") & (leftOption == "Great Danes") ~ "left", 
+                        (response == "Great") & (rightOption == "Great Danes") ~ "right", 
+                        response == leftOption ~ "left",
+                        response == rightOption ~ "right")
+                      ) %>% 
+  group_by(submission_id, optionChosen) %>% count() -> d_main_option_counts
+
+d_main_option_counts  
+# no participants stuck to one option only
+d_main_option_counts %>% filter(n == 16)
+# check tendency towards one of the sides -- there seem to be no preferences
+d_main_option_counts %>% group_by(optionChosen) %>% summarise(mean_choices = mean(n))
 ```
