@@ -8,14 +8,14 @@ Polina Tsvilodub
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ──────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ ggplot2 3.3.1     ✓ purrr   0.3.4
     ## ✓ tibble  3.0.1     ✓ dplyr   1.0.0
     ## ✓ tidyr   1.1.0     ✓ stringr 1.4.0
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ─────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -66,7 +66,7 @@ d <- read_csv("./../../data/direct-modification/results_42_double-mod-FC-wFilers
 d %>% distinct(comments) 
 ```
 
-    ## # A tibble: 20 x 1
+    ## # A tibble: 21 x 1
     ##    comments                                                                     
     ##    <chr>                                                                        
     ##  1 <NA>                                                                         
@@ -77,25 +77,16 @@ d %>% distinct(comments)
     ##  6 It was interesting to see the difference in which a sentence would mean to m…
     ##  7 N/A                                                                          
     ##  8 For the fair compensation question, no units are specified. That confused me…
-    ##  9 None                                                                         
-    ## 10 I feel as though I understood the experiment, however several of the answers…
-    ## 11 No                                                                           
-    ## 12 I have nothing else to say.                                                  
-    ## 13 I am really enjoying this experiment                                         
-    ## 14 I loved the illustrations.                                                   
-    ## 15 I can tell that my answers are inconsistent but I answered honestly, based o…
-    ## 16 I do not have any comments.                                                  
-    ## 17 The instructions were clear but was unsure what the significance was of spec…
-    ## 18 Thank you for giving me the survey. I am very pleased to work with you.      
-    ## 19 I think its possible that the study is looking for differences in region or …
-    ## 20 I thought this was a very interesting experiment and would like to read more…
+    ##  9 nonw                                                                         
+    ## 10 None                                                                         
+    ## # … with 11 more rows
 
 ``` r
 # check if bugs were reported
 d %>% distinct(problems) 
 ```
 
-    ## # A tibble: 23 x 1
+    ## # A tibble: 24 x 1
     ##    problems                                 
     ##    <chr>                                    
     ##  1 No                                       
@@ -108,14 +99,14 @@ d %>% distinct(problems)
     ##  8 Nope                                     
     ##  9 Nope! :)                                 
     ## 10 No it went smooth!                       
-    ## # … with 13 more rows
+    ## # … with 14 more rows
 
 ``` r
 # exclude non-native speakers
 d %>% distinct(languages)
 ```
 
-    ## # A tibble: 10 x 1
+    ## # A tibble: 11 x 1
     ##    languages                      
     ##    <chr>                          
     ##  1 English                        
@@ -123,17 +114,18 @@ d %>% distinct(languages)
     ##  3 English, American Sign Language
     ##  4 englidh                        
     ##  5 English and Vietnamese         
-    ##  6 English, Malay                 
-    ##  7 English, Spanish               
-    ##  8 hmong                          
-    ##  9 English, German                
-    ## 10 Chinese, English
+    ##  6 english, tamil                 
+    ##  7 English, Malay                 
+    ##  8 English, Spanish               
+    ##  9 hmong                          
+    ## 10 English, German                
+    ## 11 Chinese, English
 
 ``` r
 d %>% distinct(submission_id) %>% count() %>% pull()
 ```
 
-    ## [1] 149
+    ## [1] 152
 
 ``` r
 d_native <- d %>% filter(grepl("en", languages, ignore.case = T))
@@ -141,7 +133,7 @@ d_native <- d %>% filter(grepl("en", languages, ignore.case = T))
 d_native %>% distinct(submission_id) %>% count() %>% pull()
 ```
 
-    ## [1] 148
+    ## [1] 151
 
 ``` r
 # only accept workers who get the paraphrase warm-up trial with max. 3 attempts
@@ -152,7 +144,7 @@ d_clean <- anti_join(d_native, d_warmup_catch, by = "submission_id")
 d_clean %>% distinct(submission_id) %>% count() %>% pull()
 ```
 
-    ## [1] 147
+    ## [1] 150
 
 ``` r
 # get main trials
@@ -164,16 +156,16 @@ d_main %>% count(trial_type, item_noun, syntax)
     ## # A tibble: 40 x 4
     ##    trial_type item_noun          syntax     n
     ##    <chr>      <chr>              <chr>  <int>
-    ##  1 critical   birds_rescue       pred      56
-    ##  2 critical   birds_rescue       subj      65
+    ##  1 critical   birds_rescue       pred      57
+    ##  2 critical   birds_rescue       subj      67
     ##  3 critical   buildings_landmark pred      64
-    ##  4 critical   buildings_landmark subj      51
-    ##  5 critical   dogs1_rescue       pred      62
+    ##  4 critical   buildings_landmark subj      54
+    ##  5 critical   dogs1_rescue       pred      63
     ##  6 critical   dogs1_rescue       subj      58
-    ##  7 critical   dogs1_service      pred      62
-    ##  8 critical   dogs1_service      subj      64
-    ##  9 critical   dogs2_prize        pred      61
-    ## 10 critical   dogs2_prize        subj      51
+    ##  7 critical   dogs1_service      pred      64
+    ##  8 critical   dogs1_service      subj      65
+    ##  9 critical   dogs2_prize        pred      62
+    ## 10 critical   dogs2_prize        subj      53
     ## # … with 30 more rows
 
 ``` r
@@ -183,14 +175,14 @@ d_main %>% count(trial_type, syntax, adj)
     ## # A tibble: 8 x 4
     ##   trial_type syntax adj       n
     ##   <chr>      <chr>  <chr> <int>
-    ## 1 critical   pred   big     294
-    ## 2 critical   pred   small   294
-    ## 3 critical   subj   big     294
-    ## 4 critical   subj   small   294
-    ## 5 filler     pred   big     294
-    ## 6 filler     pred   small   294
-    ## 7 filler     subj   big     294
-    ## 8 filler     subj   small   294
+    ## 1 critical   pred   big     300
+    ## 2 critical   pred   small   300
+    ## 3 critical   subj   big     300
+    ## 4 critical   subj   small   300
+    ## 5 filler     pred   big     300
+    ## 6 filler     pred   small   300
+    ## 7 filler     subj   big     300
+    ## 8 filler     subj   small   300
 
 ``` r
 # classify responses into basic vs subordinate responses
@@ -206,7 +198,8 @@ d_main_cat <- d_main %>%
 
 ``` r
 # get 95% bootstrapped CIs
-d_main_cat_summary <- d_main_cat %>% group_by(syntax, trial_type) %>%
+d_main_cat_summary <- d_main_cat %>% mutate(syntax = factor(syntax, levels = c('subj', 'pred'))) %>%
+  group_by(syntax, trial_type) %>%
   tidyboot_mean(column = response_num)
 ```
 
@@ -223,7 +216,8 @@ d_main_cat_summary <- d_main_cat %>% group_by(syntax, trial_type) %>%
 # plot by syntax
 d_main_cat_summary %>%
   ggplot(., aes(x = syntax, y = mean, fill = syntax, ymin = ci_lower, ymax = ci_upper,)) +
-  geom_col(alpha = 0.7, color = "black") +
+  geom_col(alpha = 0.7, color = "black", ) +
+  ylim(0, 1) +
   geom_linerange() +
   facet_wrap(~trial_type) +
   ylab("Proportion of basic-level responses") +
@@ -234,6 +228,7 @@ d_main_cat_summary %>%
 
 ``` r
 d_main_cat_size_summary <- d_main_cat %>% group_by(syntax, adj, trial_type) %>%
+  mutate(syntax = factor(syntax, levels = c('subj', 'pred'))) %>%
   tidyboot_mean(column = response_num)
 ```
 
@@ -254,7 +249,9 @@ d_main_cat_size_summary %>%
 ![](direct-modification-FC_woTarget_prereg_final_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-d_main_cat_item_summary <- d_main_cat %>% group_by(syntax, item_noun, trial_type) %>%
+d_main_cat_item_summary <- d_main_cat %>% 
+  mutate(syntax = factor(syntax, levels = c('subj', 'pred'))) %>%
+  group_by(syntax, item_noun, trial_type) %>%
   tidyboot_mean(column = response_num)
 ```
 
@@ -290,8 +287,9 @@ contrasts(d_main_cat$trial_type)
 contrasts(d_main_cat$syntax) <- contr.sum(2)
 contrasts(d_main_cat$syntax) 
 # fit logistic regression
-model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type || item), # random effects by-item (flowers, dogs, buildings etc) 
+model <- brm(bf(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
+               (1 + syntax*trial_type || item),
+               decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
              control = list(adapt_delta = 0.96),
@@ -305,57 +303,48 @@ model <- brm(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submis
 
     ## Start sampling
 
-    ## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.96 may help. See
-    ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-
-    ## Warning: Examine the pairs() plot to diagnose sampling problems
-
 ``` r
 summary(model)
 ```
 
-    ## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta
-    ## above 0.96 may help. See http://mc-stan.org/misc/warnings.html#divergent-
-    ## transitions-after-warmup
-
     ##  Family: bernoulli 
     ##   Links: mu = logit 
     ## Formula: response_num ~ syntax * trial_type + (1 + syntax * trial_type || submission_id) + (1 + syntax * trial_type || item) 
-    ##    Data: d_main_cat (Number of observations: 2352) 
+    ##    Data: d_main_cat (Number of observations: 2400) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
     ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               0.24      0.14     0.04     0.57 1.00     1504
-    ## sd(syntax1)                 0.08      0.07     0.00     0.26 1.00     2709
-    ## sd(trial_type1)             0.31      0.17     0.08     0.74 1.00     1333
-    ## sd(syntax1:trial_type1)     0.14      0.11     0.01     0.40 1.00     1434
+    ## sd(Intercept)               0.23      0.14     0.03     0.57 1.00     1558
+    ## sd(syntax1)                 0.07      0.06     0.00     0.24 1.00     3512
+    ## sd(trial_type1)             0.29      0.16     0.07     0.69 1.00     1570
+    ## sd(syntax1:trial_type1)     0.12      0.10     0.01     0.36 1.00     1836
     ##                         Tail_ESS
-    ## sd(Intercept)               1338
-    ## sd(syntax1)                 2485
-    ## sd(trial_type1)             1282
-    ## sd(syntax1:trial_type1)     1401
+    ## sd(Intercept)               1748
+    ## sd(syntax1)                 2831
+    ## sd(trial_type1)             1564
+    ## sd(syntax1:trial_type1)     1979
     ## 
-    ## ~submission_id (Number of levels: 147) 
+    ## ~submission_id (Number of levels: 150) 
     ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               1.30      0.11     1.09     1.55 1.00     1827
-    ## sd(syntax1)                 0.47      0.09     0.29     0.64 1.00     1960
-    ## sd(trial_type1)             0.66      0.08     0.51     0.84 1.00     2491
-    ## sd(syntax1:trial_type1)     0.36      0.10     0.14     0.54 1.01     1045
+    ## sd(Intercept)               1.29      0.12     1.08     1.54 1.00     1853
+    ## sd(syntax1)                 0.45      0.09     0.28     0.63 1.00     1628
+    ## sd(trial_type1)             0.65      0.08     0.50     0.81 1.00     2315
+    ## sd(syntax1:trial_type1)     0.34      0.10     0.12     0.53 1.00     1364
     ##                         Tail_ESS
-    ## sd(Intercept)               2932
-    ## sd(syntax1)                 2427
-    ## sd(trial_type1)             3336
-    ## sd(syntax1:trial_type1)      629
+    ## sd(Intercept)               3224
+    ## sd(syntax1)                 2595
+    ## sd(trial_type1)             3943
+    ## sd(syntax1:trial_type1)     1403
     ## 
     ## Population-Level Effects: 
     ##                     Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept               0.02      0.16    -0.29     0.34 1.00     1404     2467
-    ## syntax1                 0.61      0.08     0.45     0.76 1.00     3059     3935
-    ## trial_type1            -0.07      0.16    -0.37     0.24 1.00     1588     1729
-    ## syntax1:trial_type1     0.26      0.09     0.09     0.44 1.00     2590     3142
+    ## Intercept               0.05      0.16    -0.27     0.36 1.00     1623     2729
+    ## syntax1                 0.59      0.08     0.44     0.74 1.00     3648     3698
+    ## trial_type1            -0.09      0.14    -0.38     0.20 1.00     1958     2807
+    ## syntax1:trial_type1     0.26      0.08     0.09     0.43 1.00     3438     3284
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -387,14 +376,14 @@ contrast_answers
 
     ## Hypothesis Tests for class b:
     ##             Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-    ## 1        critical_subj     0.82      0.26     0.32     1.36         NA
-    ## 2        critical_pred    -0.92      0.26    -1.42    -0.40         NA
-    ## 3      syntax_critical     1.74      0.25     1.35     2.14        Inf
-    ## 4          filler_subj     0.44      0.25    -0.06     0.93         NA
-    ## 5          filler_pred    -0.25      0.25    -0.74     0.24         NA
-    ## 6        syntax_filler     0.69      0.24     0.31     1.08     259.87
-    ## 7 subj_critical_filler     0.38      0.37    -0.32     1.14         NA
-    ## 8 pred_critical_filler    -0.67      0.36    -1.38     0.05         NA
+    ## 1        critical_subj     0.80      0.24     0.33     1.29         NA
+    ## 2        critical_pred    -0.89      0.25    -1.37    -0.42         NA
+    ## 3      syntax_critical     1.69      0.23     1.31     2.08        Inf
+    ## 4          filler_subj     0.46      0.24    -0.01     0.94         NA
+    ## 5          filler_pred    -0.20      0.24    -0.69     0.28         NA
+    ## 6        syntax_filler     0.66      0.22     0.31     1.02        399
+    ## 7 subj_critical_filler     0.34      0.33    -0.33     1.00         NA
+    ## 8 pred_critical_filler    -0.69      0.33    -1.35    -0.03         NA
     ##   Post.Prob Star
     ## 1        NA    *
     ## 2        NA    *
@@ -403,7 +392,7 @@ contrast_answers
     ## 5        NA     
     ## 6         1    *
     ## 7        NA     
-    ## 8        NA     
+    ## 8        NA    *
     ## ---
     ## 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
     ## '*': For one-sided hypotheses, the posterior probability exceeds 95%;
@@ -416,8 +405,9 @@ Exploratory model with main effect of size:
 # big 1, small -1
 contrasts(d_main_cat$adj) <- contr.sum(2)
 
-model_size <- brm(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj || submission_id) + 
-               (1 + syntax*trial_type*adj || item), # random effects by-item (flowers, dogs, buildings etc) 
+model_size <- brm(bf(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj || submission_id) + 
+               (1 + syntax*trial_type*adj || item),
+               decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
              control = list(adapt_delta = 0.96),
@@ -438,70 +428,70 @@ summary(model_size)
     ##  Family: bernoulli 
     ##   Links: mu = logit 
     ## Formula: response_num ~ syntax * trial_type * adj + (1 + syntax * trial_type * adj || submission_id) + (1 + syntax * trial_type * adj || item) 
-    ##    Data: d_main_cat (Number of observations: 2352) 
+    ##    Data: d_main_cat (Number of observations: 2400) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
     ##                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                    0.27      0.15     0.04     0.65 1.00     2082
-    ## sd(syntax1)                      0.08      0.07     0.00     0.27 1.00     4172
-    ## sd(trial_type1)                  0.38      0.20     0.13     0.87 1.00     2019
-    ## sd(adj1)                         0.35      0.19     0.09     0.82 1.00     1698
-    ## sd(syntax1:trial_type1)          0.18      0.13     0.01     0.50 1.00     1618
-    ## sd(syntax1:adj1)                 0.10      0.09     0.00     0.32 1.00     2667
-    ## sd(trial_type1:adj1)             0.19      0.14     0.01     0.52 1.00     1689
-    ## sd(syntax1:trial_type1:adj1)     0.08      0.08     0.00     0.28 1.00     3000
+    ## sd(Intercept)                    0.24      0.15     0.03     0.60 1.00     1564
+    ## sd(syntax1)                      0.08      0.07     0.00     0.25 1.00     3354
+    ## sd(trial_type1)                  0.36      0.19     0.12     0.84 1.00     1904
+    ## sd(adj1)                         0.36      0.18     0.11     0.82 1.00     1854
+    ## sd(syntax1:trial_type1)          0.15      0.11     0.01     0.41 1.00     1988
+    ## sd(syntax1:adj1)                 0.11      0.10     0.00     0.35 1.00     2186
+    ## sd(trial_type1:adj1)             0.20      0.15     0.01     0.56 1.00     1308
+    ## sd(syntax1:trial_type1:adj1)     0.08      0.08     0.00     0.28 1.00     3088
     ##                              Tail_ESS
-    ## sd(Intercept)                    2527
-    ## sd(syntax1)                      3716
-    ## sd(trial_type1)                  2920
-    ## sd(adj1)                         2101
-    ## sd(syntax1:trial_type1)          2252
-    ## sd(syntax1:adj1)                 3285
-    ## sd(trial_type1:adj1)             2623
-    ## sd(syntax1:trial_type1:adj1)     3041
+    ## sd(Intercept)                    1781
+    ## sd(syntax1)                      3771
+    ## sd(trial_type1)                  2802
+    ## sd(adj1)                         2249
+    ## sd(syntax1:trial_type1)          2563
+    ## sd(syntax1:adj1)                 3526
+    ## sd(trial_type1:adj1)             2537
+    ## sd(syntax1:trial_type1:adj1)     3405
     ## 
-    ## ~submission_id (Number of levels: 147) 
+    ## ~submission_id (Number of levels: 150) 
     ##                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                    1.50      0.13     1.26     1.79 1.00     1677
-    ## sd(syntax1)                      0.58      0.09     0.40     0.77 1.00     1913
-    ## sd(trial_type1)                  0.78      0.09     0.61     0.98 1.00     2579
-    ## sd(adj1)                         0.50      0.09     0.31     0.68 1.00     2268
-    ## sd(syntax1:trial_type1)          0.48      0.10     0.28     0.67 1.00     1980
-    ## sd(syntax1:adj1)                 0.20      0.11     0.01     0.43 1.00     1322
-    ## sd(trial_type1:adj1)             0.35      0.12     0.09     0.56 1.00     1138
-    ## sd(syntax1:trial_type1:adj1)     0.21      0.12     0.01     0.44 1.00     1405
+    ## sd(Intercept)                    1.47      0.13     1.22     1.73 1.00     2046
+    ## sd(syntax1)                      0.56      0.09     0.39     0.75 1.00     1309
+    ## sd(trial_type1)                  0.75      0.09     0.58     0.95 1.00     2112
+    ## sd(adj1)                         0.48      0.09     0.29     0.66 1.00     1717
+    ## sd(syntax1:trial_type1)          0.45      0.10     0.25     0.64 1.00     2007
+    ## sd(syntax1:adj1)                 0.19      0.11     0.01     0.41 1.00     1511
+    ## sd(trial_type1:adj1)             0.33      0.11     0.08     0.54 1.00     1297
+    ## sd(syntax1:trial_type1:adj1)     0.20      0.11     0.01     0.42 1.00     1290
     ##                              Tail_ESS
-    ## sd(Intercept)                    3341
-    ## sd(syntax1)                      3451
-    ## sd(trial_type1)                  3737
-    ## sd(adj1)                         2766
-    ## sd(syntax1:trial_type1)          2846
-    ## sd(syntax1:adj1)                 1719
-    ## sd(trial_type1:adj1)             1113
-    ## sd(syntax1:trial_type1:adj1)     2680
+    ## sd(Intercept)                    3272
+    ## sd(syntax1)                      2825
+    ## sd(trial_type1)                  3856
+    ## sd(adj1)                         2604
+    ## sd(syntax1:trial_type1)          2755
+    ## sd(syntax1:adj1)                 2807
+    ## sd(trial_type1:adj1)             1539
+    ## sd(syntax1:trial_type1:adj1)     2385
     ## 
     ## Population-Level Effects: 
     ##                          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                    0.02      0.18    -0.33     0.39 1.00     2514
-    ## syntax1                      0.68      0.09     0.51     0.87 1.00     4840
-    ## trial_type1                 -0.10      0.19    -0.46     0.29 1.00     2769
-    ## adj1                         0.01      0.17    -0.31     0.37 1.00     3218
-    ## syntax1:trial_type1          0.30      0.11     0.08     0.53 1.00     4171
-    ## syntax1:adj1                -0.03      0.08    -0.19     0.12 1.00     6130
-    ## trial_type1:adj1             0.10      0.11    -0.10     0.34 1.00     3961
-    ## syntax1:trial_type1:adj1     0.05      0.07    -0.10     0.20 1.00     7222
+    ## Intercept                    0.04      0.17    -0.29     0.38 1.00     2229
+    ## syntax1                      0.65      0.09     0.48     0.82 1.00     4479
+    ## trial_type1                 -0.11      0.17    -0.45     0.24 1.00     2956
+    ## adj1                         0.01      0.17    -0.31     0.36 1.00     3298
+    ## syntax1:trial_type1          0.29      0.10     0.10     0.48 1.00     4506
+    ## syntax1:adj1                -0.04      0.08    -0.20     0.12 1.00     5191
+    ## trial_type1:adj1             0.11      0.11    -0.10     0.34 1.00     4386
+    ## syntax1:trial_type1:adj1     0.05      0.07    -0.09     0.20 1.00     6310
     ##                          Tail_ESS
-    ## Intercept                    3329
-    ## syntax1                      5006
-    ## trial_type1                  3092
-    ## adj1                         2683
-    ## syntax1:trial_type1          3712
-    ## syntax1:adj1                 4276
-    ## trial_type1:adj1             2628
-    ## syntax1:trial_type1:adj1     4382
+    ## Intercept                    3289
+    ## syntax1                      4355
+    ## trial_type1                  3694
+    ## adj1                         3244
+    ## syntax1:trial_type1          3301
+    ## syntax1:adj1                 3064
+    ## trial_type1:adj1             3259
+    ## syntax1:trial_type1:adj1     4384
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -549,31 +539,31 @@ contrast_answers_size
 
     ## Hypothesis Tests for class b:
     ##              Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-    ## 1         critical_subj     0.91      0.30     0.33     1.52         NA
-    ## 2         critical_pred    -1.05      0.30    -1.65    -0.46         NA
-    ## 3       syntax_critical     1.97      0.29     1.51     2.45        Inf
-    ## 4           filler_subj     0.50      0.30    -0.08     1.09         NA
-    ## 5           filler_pred    -0.26      0.29    -0.84     0.32         NA
-    ## 6         syntax_filler     0.76      0.28     0.32     1.21        149
-    ## 7  subj_critical_filler     0.41      0.45    -0.47     1.29         NA
-    ## 8  pred_critical_filler    -0.79      0.44    -1.65     0.09         NA
-    ## 9          critical_big     0.05      0.33    -0.58     0.74         NA
-    ## 10       critical_small    -0.19      0.34    -0.85     0.47         NA
-    ## 11        size_critical     0.23      0.41    -0.55     1.09         NA
-    ## 12           filler_big     0.03      0.33    -0.61     0.69         NA
-    ## 13         filler_small     0.21      0.33    -0.42     0.85         NA
-    ## 14          size_filler    -0.18      0.40    -0.97     0.63         NA
-    ## 15            size_subj    -0.04      0.37    -0.75     0.74         NA
-    ## 16            size_pred     0.09      0.37    -0.60     0.84         NA
+    ## 1         critical_subj     0.88      0.27     0.34     1.41         NA
+    ## 2         critical_pred    -1.01      0.28    -1.56    -0.47         NA
+    ## 3       syntax_critical     1.89      0.26     1.47     2.32        Inf
+    ## 4           filler_subj     0.51      0.27    -0.03     1.07         NA
+    ## 5           filler_pred    -0.21      0.27    -0.74     0.32         NA
+    ## 6         syntax_filler     0.72      0.25     0.33     1.12     351.94
+    ## 7  subj_critical_filler     0.37      0.40    -0.43     1.17         NA
+    ## 8  pred_critical_filler    -0.80      0.40    -1.57    -0.03         NA
+    ## 9          critical_big     0.06      0.32    -0.55     0.68         NA
+    ## 10       critical_small    -0.19      0.32    -0.81     0.43         NA
+    ## 11        size_critical     0.25      0.40    -0.54     1.08         NA
+    ## 12           filler_big     0.05      0.31    -0.58     0.68         NA
+    ## 13         filler_small     0.25      0.32    -0.38     0.89         NA
+    ## 14          size_filler    -0.20      0.40    -0.97     0.62         NA
+    ## 15            size_subj    -0.06      0.37    -0.77     0.70         NA
+    ## 16            size_pred     0.11      0.38    -0.61     0.89         NA
     ##    Post.Prob Star
     ## 1         NA    *
     ## 2         NA    *
-    ## 3       1.00    *
+    ## 3          1    *
     ## 4         NA     
     ## 5         NA     
-    ## 6       0.99    *
+    ## 6          1    *
     ## 7         NA     
-    ## 8         NA     
+    ## 8         NA    *
     ## 9         NA     
     ## 10        NA     
     ## 11        NA     
@@ -607,8 +597,8 @@ d_main_cat %>% mutate(leftOption = option1,
 d_main_option_counts  
 ```
 
-    ## # A tibble: 285 x 3
-    ## # Groups:   submission_id, optionChosen [285]
+    ## # A tibble: 291 x 3
+    ## # Groups:   submission_id, optionChosen [291]
     ##    submission_id optionChosen     n
     ##            <dbl> <chr>        <int>
     ##  1          2875 left            10
@@ -621,7 +611,7 @@ d_main_option_counts
     ##  8          2878 right            9
     ##  9          2879 left             3
     ## 10          2879 right           13
-    ## # … with 275 more rows
+    ## # … with 281 more rows
 
 ``` r
 # no participants stuck to one option only
@@ -652,8 +642,8 @@ d_main_option_counts %>% group_by(optionChosen) %>% summarise(mean_choices = mea
     ## # A tibble: 2 x 2
     ##   optionChosen mean_choices
     ##   <chr>               <dbl>
-    ## 1 left                 7.90
-    ## 2 right                8.62
+    ## 1 left                 7.95
+    ## 2 right                8.55
 
 Count the different FC orders:
 
@@ -665,8 +655,8 @@ d_main_cat %>% count(optionLeft)
     ## # Rowwise: 
     ##   optionLeft     n
     ##   <fct>      <int>
-    ## 1 basic       1088
-    ## 2 sub         1264
+    ## 1 basic       1120
+    ## 2 sub         1280
 
 Explore the between-subjects effect of the order of response options:
 
@@ -674,8 +664,9 @@ Explore the between-subjects effect of the order of response options:
 # basic is the left option 1, sub is the left option -1
 contrasts(d_main_cat$optionLeft) <- contr.sum(2)
 
-model_option <- brm(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type*optionLeft || item), # random effects by-item (flowers, dogs, buildings etc) 
+model_option <- brm(bf(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type || submission_id) + 
+               (1 + syntax*trial_type*optionLeft || item),
+               decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
              control = list(adapt_delta = 0.96),
@@ -689,69 +680,78 @@ model_option <- brm(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*tr
 
     ## Start sampling
 
+    ## Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta above 0.96 may help. See
+    ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
+
+    ## Warning: Examine the pairs() plot to diagnose sampling problems
+
 ``` r
 summary(model_option)
 ```
 
+    ## Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta
+    ## above 0.96 may help. See http://mc-stan.org/misc/warnings.html#divergent-
+    ## transitions-after-warmup
+
     ##  Family: bernoulli 
     ##   Links: mu = logit 
     ## Formula: response_num ~ syntax * trial_type * optionLeft + (1 + syntax * trial_type || submission_id) + (1 + syntax * trial_type * optionLeft || item) 
-    ##    Data: d_main_cat (Number of observations: 2352) 
+    ##    Data: d_main_cat (Number of observations: 2400) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
     ##                                     Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## sd(Intercept)                           0.25      0.14     0.05     0.59 1.00
-    ## sd(syntax1)                             0.08      0.07     0.00     0.26 1.00
-    ## sd(trial_type1)                         0.31      0.17     0.08     0.73 1.00
+    ## sd(Intercept)                           0.23      0.14     0.03     0.57 1.00
+    ## sd(syntax1)                             0.07      0.07     0.00     0.23 1.00
+    ## sd(trial_type1)                         0.29      0.16     0.08     0.67 1.00
     ## sd(optionLeft1)                         0.10      0.09     0.00     0.32 1.00
-    ## sd(syntax1:trial_type1)                 0.15      0.11     0.01     0.42 1.00
-    ## sd(syntax1:optionLeft1)                 0.08      0.07     0.00     0.25 1.00
-    ## sd(trial_type1:optionLeft1)             0.10      0.08     0.00     0.30 1.00
-    ## sd(syntax1:trial_type1:optionLeft1)     0.17      0.13     0.01     0.47 1.00
+    ## sd(syntax1:trial_type1)                 0.12      0.10     0.01     0.36 1.00
+    ## sd(syntax1:optionLeft1)                 0.08      0.07     0.00     0.26 1.00
+    ## sd(trial_type1:optionLeft1)             0.10      0.08     0.00     0.31 1.00
+    ## sd(syntax1:trial_type1:optionLeft1)     0.15      0.12     0.01     0.46 1.00
     ##                                     Bulk_ESS Tail_ESS
-    ## sd(Intercept)                           1733     1754
-    ## sd(syntax1)                             2745     3139
-    ## sd(trial_type1)                         1603     2044
-    ## sd(optionLeft1)                         2578     3527
-    ## sd(syntax1:trial_type1)                 1715     2253
-    ## sd(syntax1:optionLeft1)                 3179     3001
-    ## sd(trial_type1:optionLeft1)             2258     2647
-    ## sd(syntax1:trial_type1:optionLeft1)     1469     2030
+    ## sd(Intercept)                           1633     1750
+    ## sd(syntax1)                             3083     2876
+    ## sd(trial_type1)                         1721     2223
+    ## sd(optionLeft1)                         2653     3463
+    ## sd(syntax1:trial_type1)                 1782     2998
+    ## sd(syntax1:optionLeft1)                 2808     3535
+    ## sd(trial_type1:optionLeft1)             2495     2432
+    ## sd(syntax1:trial_type1:optionLeft1)     1529     2208
     ## 
-    ## ~submission_id (Number of levels: 147) 
+    ## ~submission_id (Number of levels: 150) 
     ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               1.34      0.12     1.12     1.58 1.00     1727
-    ## sd(syntax1)                 0.47      0.09     0.30     0.64 1.00     2365
-    ## sd(trial_type1)             0.67      0.08     0.51     0.84 1.00     2473
-    ## sd(syntax1:trial_type1)     0.38      0.10     0.14     0.56 1.00     1151
+    ## sd(Intercept)               1.32      0.12     1.10     1.57 1.00     1876
+    ## sd(syntax1)                 0.46      0.09     0.28     0.62 1.00     1963
+    ## sd(trial_type1)             0.65      0.08     0.50     0.82 1.00     2223
+    ## sd(syntax1:trial_type1)     0.36      0.10     0.13     0.54 1.01     1093
     ##                         Tail_ESS
-    ## sd(Intercept)               3341
-    ## sd(syntax1)                 2973
-    ## sd(trial_type1)             3634
-    ## sd(syntax1:trial_type1)      865
+    ## sd(Intercept)               3325
+    ## sd(syntax1)                 2216
+    ## sd(trial_type1)             2564
+    ## sd(syntax1:trial_type1)      940
     ## 
     ## Population-Level Effects: 
     ##                                 Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## Intercept                           0.03      0.16    -0.29     0.35 1.00
-    ## syntax1                             0.61      0.08     0.46     0.77 1.00
-    ## trial_type1                        -0.08      0.16    -0.38     0.23 1.00
-    ## optionLeft1                        -0.09      0.14    -0.37     0.17 1.00
-    ## syntax1:trial_type1                 0.27      0.09     0.08     0.45 1.00
-    ## syntax1:optionLeft1                -0.08      0.08    -0.23     0.07 1.00
-    ## trial_type1:optionLeft1             0.13      0.09    -0.06     0.31 1.00
-    ## syntax1:trial_type1:optionLeft1     0.02      0.10    -0.18     0.22 1.00
+    ## Intercept                           0.04      0.16    -0.27     0.36 1.01
+    ## syntax1                             0.59      0.08     0.44     0.74 1.00
+    ## trial_type1                        -0.08      0.15    -0.37     0.21 1.00
+    ## optionLeft1                        -0.07      0.13    -0.32     0.19 1.00
+    ## syntax1:trial_type1                 0.26      0.09     0.10     0.43 1.00
+    ## syntax1:optionLeft1                -0.09      0.08    -0.24     0.07 1.00
+    ## trial_type1:optionLeft1             0.13      0.09    -0.05     0.31 1.00
+    ## syntax1:trial_type1:optionLeft1     0.02      0.10    -0.17     0.22 1.00
     ##                                 Bulk_ESS Tail_ESS
-    ## Intercept                           2052     2467
-    ## syntax1                             4498     4128
-    ## trial_type1                         2491     2804
-    ## optionLeft1                         2158     2974
-    ## syntax1:trial_type1                 4045     3561
-    ## syntax1:optionLeft1                 5117     4007
-    ## trial_type1:optionLeft1             4360     3966
-    ## syntax1:trial_type1:optionLeft1     4154     3310
+    ## Intercept                           2025     2242
+    ## syntax1                             3945     3952
+    ## trial_type1                         1989     2380
+    ## optionLeft1                         1897     2788
+    ## syntax1:trial_type1                 3995     3787
+    ## syntax1:optionLeft1                 4457     3996
+    ## trial_type1:optionLeft1             3689     3875
+    ## syntax1:trial_type1:optionLeft1     2949     2923
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -768,7 +768,7 @@ filler_optionBasic <- c(filler_optionBasic = "Intercept - trial_type1 + optionLe
 filler_optionSub <- c(filler_optionSub = "Intercept - trial_type1 - optionLeft1 + trial_type1:optionLeft1 = 0")
 # explore effect of options order by trial type
 option_critical <- c(option_critical = "2 * optionLeft1 + 2 * trial_type1:optionLeft1 = 0") # basic - sub is left
-option_filler <- c(option_critical = "2 * optionLeft1 - 2 * trial_type1:optionLeft1 = 0") # basic - sub is left
+option_filler <- c(option_filler = "2 * optionLeft1 - 2 * trial_type1:optionLeft1 = 0") # basic - sub is left
 # explore effect of options order by syntax
 option_subj <- c(option_subj = "2 * optionLeft1 + 2 * syntax1:optionLeft1 = 0") # basic - sub is left
 option_pred <- c(option_pred = "2 * optionLeft1 - 2 * syntax1:optionLeft1 = 0")# basic - sub is left
@@ -788,16 +788,16 @@ contrast_answers_option
 
     ## Hypothesis Tests for class b:
     ##              Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-    ## 1  critical_optionBasic    -0.01      0.29    -0.58     0.56         NA
-    ## 2    critical_optionSub    -0.08      0.28    -0.63     0.47         NA
-    ## 3       option_critical     0.07      0.34    -0.61     0.71         NA
-    ## 4    filler_optionBasic    -0.12      0.28    -0.66     0.42         NA
-    ## 5      filler_optionSub     0.32      0.27    -0.22     0.87         NA
-    ## 6       option_critical    -0.44      0.32    -1.09     0.21         NA
-    ## 7           option_subj    -0.34      0.31    -0.94     0.25         NA
-    ## 8           option_pred    -0.02      0.31    -0.63     0.60         NA
-    ## 9  option_subj_critical    -0.05      0.42    -0.88     0.75         NA
-    ## 10 option_pred_critical     0.19      0.42    -0.65     1.01         NA
+    ## 1  critical_optionBasic     0.02      0.28    -0.52     0.58         NA
+    ## 2    critical_optionSub    -0.10      0.27    -0.63     0.42         NA
+    ## 3       option_critical     0.11      0.32    -0.51     0.73         NA
+    ## 4    filler_optionBasic    -0.08      0.27    -0.65     0.47         NA
+    ## 5      filler_optionSub     0.32      0.27    -0.21     0.85         NA
+    ## 6         option_filler    -0.40      0.31    -1.01     0.23         NA
+    ## 7           option_subj    -0.32      0.30    -0.91     0.28         NA
+    ## 8           option_pred     0.03      0.30    -0.56     0.64         NA
+    ## 9  option_subj_critical    -0.03      0.41    -0.83     0.78         NA
+    ## 10 option_pred_critical     0.25      0.41    -0.56     1.10         NA
     ##    Post.Prob Star
     ## 1         NA     
     ## 2         NA     
