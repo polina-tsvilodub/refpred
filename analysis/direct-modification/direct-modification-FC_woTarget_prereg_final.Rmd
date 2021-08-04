@@ -14,7 +14,6 @@ library(brms)
 
 ```{r}
 # read data
-#data/direct-modification
 d <- read_csv("./../../data/direct-modification/results_42_double-mod-FC-wFilers-noTarget_prereg_final.csv")
 ```
 
