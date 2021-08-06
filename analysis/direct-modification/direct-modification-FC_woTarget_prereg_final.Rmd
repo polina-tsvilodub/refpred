@@ -5,14 +5,14 @@ date: "6/23/2021"
 output: github_document
 ---
 
-```{r}
+```{r, echo=FALSE}
 # load libraries
 library(tidyverse)
 library(tidyboot)
 library(brms)
 ```
 
-```{r}
+```{r, echo=FALSE}
 # read data
 d <- read_csv("./../../data/direct-modification/results_42_double-mod-FC-wFilers-noTarget_prereg_final.csv")
 ```
@@ -120,12 +120,12 @@ contrasts(d_main_cat$trial_type)
 contrasts(d_main_cat$syntax) <- contr.sum(2)
 contrasts(d_main_cat$syntax) 
 # fit logistic regression
-model <- brm(bf(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type || item),
+model <- brm(bf(response_num ~ syntax*trial_type + (1 + syntax*trial_type | submission_id) + 
+               (1 + syntax*trial_type | item),
                decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.96),
+             control = list(adapt_delta = 0.99),
              iter = 3000,
              cores = 4)
 ```
@@ -156,17 +156,34 @@ contrast_answers <- hypothesis(model, c(critical_subj, critical_pred, syntax_cri
 contrast_answers
 ```
 
+Separate model on critical conditions only for checking simple effect of syntax:
+```{r, results='hide'}
+d_main_cat_critical <- d_main_cat %>% filter(trial_type == "critical")
+
+model_critical <- brm(bf(response_num ~ syntax + (1 + syntax | submission_id) + 
+               (1 + syntax | item),
+               decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_cat_critical,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.96),
+             iter = 3000,
+             cores = 4)
+```
+```{r}
+summary(model_critical)
+```
+
 Exploratory model with main effect of size:
 ```{r, results="hide"}
 # big 1, small -1
 contrasts(d_main_cat$adj) <- contr.sum(2)
 
-model_size <- brm(bf(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj || submission_id) + 
-               (1 + syntax*trial_type*adj || item),
+model_size <- brm(bf(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj | submission_id) + 
+               (1 + syntax*trial_type*adj | item),
                decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.96),
+             control = list(adapt_delta = 0.99),
              iter = 3000,
              cores = 4)
 ```
@@ -246,12 +263,12 @@ Explore the between-subjects effect of the order of response options:
 # basic is the left option 1, sub is the left option -1
 contrasts(d_main_cat$optionLeft) <- contr.sum(2)
 
-model_option <- brm(bf(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type*optionLeft || item),
+model_option <- brm(bf(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type | submission_id) + 
+               (1 + syntax*trial_type*optionLeft | item),
                decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.96),
+             control = list(adapt_delta = 0.99),
              iter = 3000,
              cores = 4)
 ```

@@ -3,26 +3,16 @@ Direct Modification Forced Choice Prereg Final
 Polina Tsvilodub
 6/23/2021
 
-``` r
-# load libraries
-library(tidyverse)
-```
-
-    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+    ## ── Attaching packages ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 
     ## ✓ ggplot2 3.3.1     ✓ purrr   0.3.4
     ## ✓ tibble  3.0.1     ✓ dplyr   1.0.0
     ## ✓ tidyr   1.1.0     ✓ stringr 1.4.0
     ## ✓ readr   1.3.1     ✓ forcats 0.5.0
 
-    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
-
-``` r
-library(tidyboot)
-library(brms)
-```
 
     ## Loading required package: Rcpp
 
@@ -36,11 +26,6 @@ library(brms)
     ## The following object is masked from 'package:stats':
     ## 
     ##     ar
-
-``` r
-# read data
-d <- read_csv("./../../data/direct-modification/results_42_double-mod-FC-wFilers-noTarget_prereg_final.csv")
-```
 
     ## Parsed with column specification:
     ## cols(
@@ -287,12 +272,12 @@ contrasts(d_main_cat$trial_type)
 contrasts(d_main_cat$syntax) <- contr.sum(2)
 contrasts(d_main_cat$syntax) 
 # fit logistic regression
-model <- brm(bf(response_num ~ syntax*trial_type + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type || item),
+model <- brm(bf(response_num ~ syntax*trial_type + (1 + syntax*trial_type | submission_id) + 
+               (1 + syntax*trial_type | item),
                decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.96),
+             control = list(adapt_delta = 0.99),
              iter = 3000,
              cores = 4)
 ```
@@ -309,42 +294,66 @@ summary(model)
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax * trial_type + (1 + syntax * trial_type || submission_id) + (1 + syntax * trial_type || item) 
+    ## Formula: response_num ~ syntax * trial_type + (1 + syntax * trial_type | submission_id) + (1 + syntax * trial_type | item) 
     ##    Data: d_main_cat (Number of observations: 2400) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
-    ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               0.23      0.14     0.03     0.57 1.00     1558
-    ## sd(syntax1)                 0.07      0.06     0.00     0.24 1.00     3512
-    ## sd(trial_type1)             0.29      0.16     0.07     0.69 1.00     1570
-    ## sd(syntax1:trial_type1)     0.12      0.10     0.01     0.36 1.00     1836
-    ##                         Tail_ESS
-    ## sd(Intercept)               1748
-    ## sd(syntax1)                 2831
-    ## sd(trial_type1)             1564
-    ## sd(syntax1:trial_type1)     1979
+    ##                                      Estimate Est.Error l-95% CI u-95% CI Rhat
+    ## sd(Intercept)                            0.23      0.14     0.03     0.58 1.00
+    ## sd(syntax1)                              0.07      0.07     0.00     0.24 1.00
+    ## sd(trial_type1)                          0.31      0.16     0.07     0.72 1.00
+    ## sd(syntax1:trial_type1)                  0.13      0.10     0.01     0.38 1.00
+    ## cor(Intercept,syntax1)                   0.01      0.45    -0.80     0.82 1.00
+    ## cor(Intercept,trial_type1)              -0.11      0.40    -0.81     0.68 1.00
+    ## cor(syntax1,trial_type1)                 0.10      0.45    -0.76     0.86 1.00
+    ## cor(Intercept,syntax1:trial_type1)      -0.24      0.42    -0.90     0.66 1.00
+    ## cor(syntax1,syntax1:trial_type1)        -0.01      0.45    -0.82     0.82 1.00
+    ## cor(trial_type1,syntax1:trial_type1)    -0.01      0.43    -0.80     0.76 1.00
+    ##                                      Bulk_ESS Tail_ESS
+    ## sd(Intercept)                            1742     2197
+    ## sd(syntax1)                              3156     2909
+    ## sd(trial_type1)                          2052     1966
+    ## sd(syntax1:trial_type1)                  2437     2487
+    ## cor(Intercept,syntax1)                   7239     4210
+    ## cor(Intercept,trial_type1)               3090     4214
+    ## cor(syntax1,trial_type1)                 1904     3606
+    ## cor(Intercept,syntax1:trial_type1)       4838     3826
+    ## cor(syntax1,syntax1:trial_type1)         4422     4709
+    ## cor(trial_type1,syntax1:trial_type1)     4972     4812
     ## 
     ## ~submission_id (Number of levels: 150) 
-    ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               1.29      0.12     1.08     1.54 1.00     1853
-    ## sd(syntax1)                 0.45      0.09     0.28     0.63 1.00     1628
-    ## sd(trial_type1)             0.65      0.08     0.50     0.81 1.00     2315
-    ## sd(syntax1:trial_type1)     0.34      0.10     0.12     0.53 1.00     1364
-    ##                         Tail_ESS
-    ## sd(Intercept)               3224
-    ## sd(syntax1)                 2595
-    ## sd(trial_type1)             3943
-    ## sd(syntax1:trial_type1)     1403
+    ##                                      Estimate Est.Error l-95% CI u-95% CI Rhat
+    ## sd(Intercept)                            1.30      0.11     1.08     1.54 1.00
+    ## sd(syntax1)                              0.46      0.10     0.26     0.64 1.00
+    ## sd(trial_type1)                          0.65      0.08     0.49     0.82 1.00
+    ## sd(syntax1:trial_type1)                  0.30      0.12     0.04     0.50 1.00
+    ## cor(Intercept,syntax1)                  -0.36      0.19    -0.69     0.03 1.00
+    ## cor(Intercept,trial_type1)               0.19      0.16    -0.14     0.49 1.00
+    ## cor(syntax1,trial_type1)                 0.00      0.21    -0.42     0.41 1.00
+    ## cor(Intercept,syntax1:trial_type1)      -0.00      0.28    -0.55     0.53 1.00
+    ## cor(syntax1,syntax1:trial_type1)         0.18      0.33    -0.52     0.75 1.00
+    ## cor(trial_type1,syntax1:trial_type1)     0.35      0.28    -0.27     0.84 1.00
+    ##                                      Bulk_ESS Tail_ESS
+    ## sd(Intercept)                            1975     3342
+    ## sd(syntax1)                              1695     1845
+    ## sd(trial_type1)                          2288     3692
+    ## sd(syntax1:trial_type1)                   808      858
+    ## cor(Intercept,syntax1)                   3047     3179
+    ## cor(Intercept,trial_type1)               2394     3320
+    ## cor(syntax1,trial_type1)                  840     1696
+    ## cor(Intercept,syntax1:trial_type1)       3655     2833
+    ## cor(syntax1,syntax1:trial_type1)         1724     2079
+    ## cor(trial_type1,syntax1:trial_type1)     2443     2538
     ## 
     ## Population-Level Effects: 
     ##                     Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-    ## Intercept               0.05      0.16    -0.27     0.36 1.00     1623     2729
-    ## syntax1                 0.59      0.08     0.44     0.74 1.00     3648     3698
-    ## trial_type1            -0.09      0.14    -0.38     0.20 1.00     1958     2807
-    ## syntax1:trial_type1     0.26      0.08     0.09     0.43 1.00     3438     3284
+    ## Intercept               0.03      0.16    -0.27     0.34 1.00     1788     3107
+    ## syntax1                 0.59      0.08     0.44     0.74 1.00     3917     3834
+    ## trial_type1            -0.09      0.15    -0.39     0.21 1.00     3017     3470
+    ## syntax1:trial_type1     0.27      0.09     0.10     0.44 1.00     4027     3338
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -376,14 +385,14 @@ contrast_answers
 
     ## Hypothesis Tests for class b:
     ##             Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-    ## 1        critical_subj     0.80      0.24     0.33     1.29         NA
-    ## 2        critical_pred    -0.89      0.25    -1.37    -0.42         NA
-    ## 3      syntax_critical     1.69      0.23     1.31     2.08        Inf
-    ## 4          filler_subj     0.46      0.24    -0.01     0.94         NA
-    ## 5          filler_pred    -0.20      0.24    -0.69     0.28         NA
-    ## 6        syntax_filler     0.66      0.22     0.31     1.02        399
-    ## 7 subj_critical_filler     0.34      0.33    -0.33     1.00         NA
-    ## 8 pred_critical_filler    -0.69      0.33    -1.35    -0.03         NA
+    ## 1        critical_subj     0.79      0.23     0.34     1.26         NA
+    ## 2        critical_pred    -0.92      0.26    -1.43    -0.41         NA
+    ## 3      syntax_critical     1.71      0.24     1.32     2.10        Inf
+    ## 4          filler_subj     0.44      0.24    -0.04     0.92         NA
+    ## 5          filler_pred    -0.19      0.25    -0.69     0.32         NA
+    ## 6        syntax_filler     0.63      0.22     0.29     1.00     271.73
+    ## 7 subj_critical_filler     0.35      0.34    -0.32     1.04         NA
+    ## 8 pred_critical_filler    -0.73      0.35    -1.42     0.00         NA
     ##   Post.Prob Star
     ## 1        NA    *
     ## 2        NA    *
@@ -392,12 +401,75 @@ contrast_answers
     ## 5        NA     
     ## 6         1    *
     ## 7        NA     
-    ## 8        NA    *
+    ## 8        NA     
     ## ---
     ## 'CI': 90%-CI for one-sided and 95%-CI for two-sided hypotheses.
     ## '*': For one-sided hypotheses, the posterior probability exceeds 95%;
     ## for two-sided hypotheses, the value tested against lies outside the 95%-CI.
     ## Posterior probabilities of point hypotheses assume equal prior probabilities.
+
+Separate model on critical conditions only for checking simple effect of
+syntax:
+
+``` r
+d_main_cat_critical <- d_main_cat %>% filter(trial_type == "critical")
+
+model_critical <- brm(bf(response_num ~ syntax + (1 + syntax | submission_id) + 
+               (1 + syntax | item),
+               decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
+             data = d_main_cat_critical,
+             family = "bernoulli",
+             control = list(adapt_delta = 0.96),
+             iter = 3000,
+             cores = 4)
+```
+
+    ## Compiling the C++ model
+
+    ## Trying to compile a simple C file
+
+    ## Start sampling
+
+``` r
+summary(model_critical)
+```
+
+    ##  Family: bernoulli 
+    ##   Links: mu = logit 
+    ## Formula: response_num ~ syntax + (1 + syntax | submission_id) + (1 + syntax | item) 
+    ##    Data: d_main_cat_critical (Number of observations: 1200) 
+    ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
+    ##          total post-warmup samples = 6000
+    ## 
+    ## Group-Level Effects: 
+    ## ~item (Number of levels: 7) 
+    ##                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)              0.43      0.22     0.11     0.99 1.00     1260
+    ## sd(syntax1)                0.13      0.11     0.00     0.42 1.00     2583
+    ## cor(Intercept,syntax1)     0.07      0.57    -0.94     0.96 1.00     5215
+    ##                        Tail_ESS
+    ## sd(Intercept)              1671
+    ## sd(syntax1)                2479
+    ## cor(Intercept,syntax1)     3350
+    ## 
+    ## ~submission_id (Number of levels: 150) 
+    ##                        Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)              1.29      0.14     1.04     1.57 1.00     2092
+    ## sd(syntax1)                0.48      0.15     0.12     0.75 1.00      923
+    ## cor(Intercept,syntax1)    -0.16      0.29    -0.71     0.42 1.00     3107
+    ##                        Tail_ESS
+    ## sd(Intercept)              3566
+    ## sd(syntax1)                 840
+    ## cor(Intercept,syntax1)     2283
+    ## 
+    ## Population-Level Effects: 
+    ##           Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+    ## Intercept     0.11      0.22    -0.32     0.56 1.00     1905     3026
+    ## syntax1       0.32      0.11     0.11     0.53 1.00     4506     3494
+    ## 
+    ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
+    ## and Tail_ESS are effective sample size measures, and Rhat is the potential
+    ## scale reduction factor on split chains (at convergence, Rhat = 1).
 
 Exploratory model with main effect of size:
 
@@ -405,12 +477,12 @@ Exploratory model with main effect of size:
 # big 1, small -1
 contrasts(d_main_cat$adj) <- contr.sum(2)
 
-model_size <- brm(bf(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj || submission_id) + 
-               (1 + syntax*trial_type*adj || item),
+model_size <- brm(bf(response_num ~ syntax*trial_type*adj + (1 + syntax*trial_type*adj | submission_id) + 
+               (1 + syntax*trial_type*adj | item),
                decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.96),
+             control = list(adapt_delta = 0.99),
              iter = 3000,
              cores = 4)
 ```
@@ -427,71 +499,257 @@ summary(model_size)
 
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax * trial_type * adj + (1 + syntax * trial_type * adj || submission_id) + (1 + syntax * trial_type * adj || item) 
+    ## Formula: response_num ~ syntax * trial_type * adj + (1 + syntax * trial_type * adj | submission_id) + (1 + syntax * trial_type * adj | item) 
     ##    Data: d_main_cat (Number of observations: 2400) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                    0.24      0.15     0.03     0.60 1.00     1564
-    ## sd(syntax1)                      0.08      0.07     0.00     0.25 1.00     3354
-    ## sd(trial_type1)                  0.36      0.19     0.12     0.84 1.00     1904
-    ## sd(adj1)                         0.36      0.18     0.11     0.82 1.00     1854
-    ## sd(syntax1:trial_type1)          0.15      0.11     0.01     0.41 1.00     1988
-    ## sd(syntax1:adj1)                 0.11      0.10     0.00     0.35 1.00     2186
-    ## sd(trial_type1:adj1)             0.20      0.15     0.01     0.56 1.00     1308
-    ## sd(syntax1:trial_type1:adj1)     0.08      0.08     0.00     0.28 1.00     3088
-    ##                              Tail_ESS
-    ## sd(Intercept)                    1781
-    ## sd(syntax1)                      3771
-    ## sd(trial_type1)                  2802
-    ## sd(adj1)                         2249
-    ## sd(syntax1:trial_type1)          2563
-    ## sd(syntax1:adj1)                 3526
-    ## sd(trial_type1:adj1)             2537
-    ## sd(syntax1:trial_type1:adj1)     3405
+    ##                                                   Estimate Est.Error l-95% CI
+    ## sd(Intercept)                                         0.25      0.16     0.03
+    ## sd(syntax1)                                           0.08      0.07     0.00
+    ## sd(trial_type1)                                       0.37      0.18     0.12
+    ## sd(adj1)                                              0.36      0.18     0.12
+    ## sd(syntax1:trial_type1)                               0.16      0.11     0.01
+    ## sd(syntax1:adj1)                                      0.12      0.11     0.00
+    ## sd(trial_type1:adj1)                                  0.23      0.15     0.02
+    ## sd(syntax1:trial_type1:adj1)                          0.09      0.08     0.00
+    ## cor(Intercept,syntax1)                                0.01      0.33    -0.62
+    ## cor(Intercept,trial_type1)                           -0.05      0.31    -0.64
+    ## cor(syntax1,trial_type1)                              0.04      0.34    -0.62
+    ## cor(Intercept,adj1)                                   0.20      0.32    -0.44
+    ## cor(syntax1,adj1)                                    -0.01      0.33    -0.64
+    ## cor(trial_type1,adj1)                                -0.22      0.30    -0.73
+    ## cor(Intercept,syntax1:trial_type1)                   -0.15      0.32    -0.73
+    ## cor(syntax1,syntax1:trial_type1)                     -0.00      0.34    -0.64
+    ## cor(trial_type1,syntax1:trial_type1)                 -0.01      0.33    -0.62
+    ## cor(adj1,syntax1:trial_type1)                        -0.13      0.32    -0.72
+    ## cor(Intercept,syntax1:adj1)                          -0.01      0.32    -0.62
+    ## cor(syntax1,syntax1:adj1)                             0.02      0.34    -0.62
+    ## cor(trial_type1,syntax1:adj1)                         0.11      0.32    -0.54
+    ## cor(adj1,syntax1:adj1)                               -0.06      0.32    -0.66
+    ## cor(syntax1:trial_type1,syntax1:adj1)                 0.01      0.33    -0.63
+    ## cor(Intercept,trial_type1:adj1)                      -0.00      0.32    -0.62
+    ## cor(syntax1,trial_type1:adj1)                        -0.04      0.33    -0.68
+    ## cor(trial_type1,trial_type1:adj1)                    -0.24      0.31    -0.76
+    ## cor(adj1,trial_type1:adj1)                            0.15      0.31    -0.49
+    ## cor(syntax1:trial_type1,trial_type1:adj1)             0.03      0.32    -0.60
+    ## cor(syntax1:adj1,trial_type1:adj1)                   -0.12      0.33    -0.72
+    ## cor(Intercept,syntax1:trial_type1:adj1)              -0.04      0.34    -0.67
+    ## cor(syntax1,syntax1:trial_type1:adj1)                -0.00      0.33    -0.64
+    ## cor(trial_type1,syntax1:trial_type1:adj1)             0.03      0.33    -0.61
+    ## cor(adj1,syntax1:trial_type1:adj1)                   -0.01      0.34    -0.64
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:adj1)     0.00      0.34    -0.63
+    ## cor(syntax1:adj1,syntax1:trial_type1:adj1)            0.01      0.33    -0.63
+    ## cor(trial_type1:adj1,syntax1:trial_type1:adj1)       -0.02      0.34    -0.64
+    ##                                                   u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                                         0.64 1.00     1973
+    ## sd(syntax1)                                           0.27 1.00     4124
+    ## sd(trial_type1)                                       0.81 1.00     2512
+    ## sd(adj1)                                              0.81 1.00     2811
+    ## sd(syntax1:trial_type1)                               0.44 1.00     2086
+    ## sd(syntax1:adj1)                                      0.40 1.00     2822
+    ## sd(trial_type1:adj1)                                  0.59 1.00     2281
+    ## sd(syntax1:trial_type1:adj1)                          0.29 1.00     3992
+    ## cor(Intercept,syntax1)                                0.63 1.00    10951
+    ## cor(Intercept,trial_type1)                            0.54 1.00     4742
+    ## cor(syntax1,trial_type1)                              0.65 1.00     3339
+    ## cor(Intercept,adj1)                                   0.74 1.00     4388
+    ## cor(syntax1,adj1)                                     0.61 1.00     4121
+    ## cor(trial_type1,adj1)                                 0.40 1.00     5290
+    ## cor(Intercept,syntax1:trial_type1)                    0.49 1.00     8013
+    ## cor(syntax1,syntax1:trial_type1)                      0.64 1.00     6482
+    ## cor(trial_type1,syntax1:trial_type1)                  0.62 1.00     8338
+    ## cor(adj1,syntax1:trial_type1)                         0.51 1.00     6640
+    ## cor(Intercept,syntax1:adj1)                           0.61 1.00     8806
+    ## cor(syntax1,syntax1:adj1)                             0.66 1.00     6090
+    ## cor(trial_type1,syntax1:adj1)                         0.69 1.00     6996
+    ## cor(adj1,syntax1:adj1)                                0.58 1.00     6317
+    ## cor(syntax1:trial_type1,syntax1:adj1)                 0.62 1.00     5394
+    ## cor(Intercept,trial_type1:adj1)                       0.60 1.00     6932
+    ## cor(syntax1,trial_type1:adj1)                         0.60 1.00     5108
+    ## cor(trial_type1,trial_type1:adj1)                     0.44 1.00     5877
+    ## cor(adj1,trial_type1:adj1)                            0.71 1.00     6011
+    ## cor(syntax1:trial_type1,trial_type1:adj1)             0.64 1.00     4751
+    ## cor(syntax1:adj1,trial_type1:adj1)                    0.55 1.00     4608
+    ## cor(Intercept,syntax1:trial_type1:adj1)               0.62 1.00    10910
+    ## cor(syntax1,syntax1:trial_type1:adj1)                 0.63 1.00     8131
+    ## cor(trial_type1,syntax1:trial_type1:adj1)             0.65 1.00     8365
+    ## cor(adj1,syntax1:trial_type1:adj1)                    0.63 1.00     7735
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:adj1)     0.66 1.00     5477
+    ## cor(syntax1:adj1,syntax1:trial_type1:adj1)            0.63 1.00     4066
+    ## cor(trial_type1:adj1,syntax1:trial_type1:adj1)        0.65 1.00     4616
+    ##                                                   Tail_ESS
+    ## sd(Intercept)                                         1900
+    ## sd(syntax1)                                           3163
+    ## sd(trial_type1)                                       3063
+    ## sd(adj1)                                              3381
+    ## sd(syntax1:trial_type1)                               2329
+    ## sd(syntax1:adj1)                                      3127
+    ## sd(trial_type1:adj1)                                  2230
+    ## sd(syntax1:trial_type1:adj1)                          3309
+    ## cor(Intercept,syntax1)                                3977
+    ## cor(Intercept,trial_type1)                            4537
+    ## cor(syntax1,trial_type1)                              4135
+    ## cor(Intercept,adj1)                                   3946
+    ## cor(syntax1,adj1)                                     4704
+    ## cor(trial_type1,adj1)                                 5097
+    ## cor(Intercept,syntax1:trial_type1)                    4610
+    ## cor(syntax1,syntax1:trial_type1)                      4889
+    ## cor(trial_type1,syntax1:trial_type1)                  5423
+    ## cor(adj1,syntax1:trial_type1)                         5050
+    ## cor(Intercept,syntax1:adj1)                           5025
+    ## cor(syntax1,syntax1:adj1)                             4494
+    ## cor(trial_type1,syntax1:adj1)                         4651
+    ## cor(adj1,syntax1:adj1)                                5221
+    ## cor(syntax1:trial_type1,syntax1:adj1)                 5160
+    ## cor(Intercept,trial_type1:adj1)                       4323
+    ## cor(syntax1,trial_type1:adj1)                         4682
+    ## cor(trial_type1,trial_type1:adj1)                     4529
+    ## cor(adj1,trial_type1:adj1)                            5013
+    ## cor(syntax1:trial_type1,trial_type1:adj1)             5452
+    ## cor(syntax1:adj1,trial_type1:adj1)                    5200
+    ## cor(Intercept,syntax1:trial_type1:adj1)               3947
+    ## cor(syntax1,syntax1:trial_type1:adj1)                 4581
+    ## cor(trial_type1,syntax1:trial_type1:adj1)             4654
+    ## cor(adj1,syntax1:trial_type1:adj1)                    5144
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:adj1)     5018
+    ## cor(syntax1:adj1,syntax1:trial_type1:adj1)            5199
+    ## cor(trial_type1:adj1,syntax1:trial_type1:adj1)        5064
     ## 
     ## ~submission_id (Number of levels: 150) 
-    ##                              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)                    1.47      0.13     1.22     1.73 1.00     2046
-    ## sd(syntax1)                      0.56      0.09     0.39     0.75 1.00     1309
-    ## sd(trial_type1)                  0.75      0.09     0.58     0.95 1.00     2112
-    ## sd(adj1)                         0.48      0.09     0.29     0.66 1.00     1717
-    ## sd(syntax1:trial_type1)          0.45      0.10     0.25     0.64 1.00     2007
-    ## sd(syntax1:adj1)                 0.19      0.11     0.01     0.41 1.00     1511
-    ## sd(trial_type1:adj1)             0.33      0.11     0.08     0.54 1.00     1297
-    ## sd(syntax1:trial_type1:adj1)     0.20      0.11     0.01     0.42 1.00     1290
-    ##                              Tail_ESS
-    ## sd(Intercept)                    3272
-    ## sd(syntax1)                      2825
-    ## sd(trial_type1)                  3856
-    ## sd(adj1)                         2604
-    ## sd(syntax1:trial_type1)          2755
-    ## sd(syntax1:adj1)                 2807
-    ## sd(trial_type1:adj1)             1539
-    ## sd(syntax1:trial_type1:adj1)     2385
+    ##                                                   Estimate Est.Error l-95% CI
+    ## sd(Intercept)                                         1.46      0.13     1.23
+    ## sd(syntax1)                                           0.56      0.10     0.36
+    ## sd(trial_type1)                                       0.74      0.09     0.57
+    ## sd(adj1)                                              0.46      0.10     0.26
+    ## sd(syntax1:trial_type1)                               0.41      0.11     0.17
+    ## sd(syntax1:adj1)                                      0.16      0.10     0.01
+    ## sd(trial_type1:adj1)                                  0.31      0.12     0.05
+    ## sd(syntax1:trial_type1:adj1)                          0.16      0.10     0.01
+    ## cor(Intercept,syntax1)                               -0.30      0.16    -0.60
+    ## cor(Intercept,trial_type1)                            0.12      0.15    -0.17
+    ## cor(syntax1,trial_type1)                              0.00      0.19    -0.36
+    ## cor(Intercept,adj1)                                  -0.26      0.18    -0.60
+    ## cor(syntax1,adj1)                                     0.26      0.21    -0.17
+    ## cor(trial_type1,adj1)                                 0.14      0.20    -0.26
+    ## cor(Intercept,syntax1:trial_type1)                    0.00      0.20    -0.40
+    ## cor(syntax1,syntax1:trial_type1)                      0.11      0.23    -0.34
+    ## cor(trial_type1,syntax1:trial_type1)                  0.29      0.20    -0.12
+    ## cor(adj1,syntax1:trial_type1)                         0.09      0.24    -0.39
+    ## cor(Intercept,syntax1:adj1)                          -0.14      0.30    -0.68
+    ## cor(syntax1,syntax1:adj1)                             0.14      0.31    -0.52
+    ## cor(trial_type1,syntax1:adj1)                         0.17      0.29    -0.45
+    ## cor(adj1,syntax1:adj1)                                0.03      0.31    -0.57
+    ## cor(syntax1:trial_type1,syntax1:adj1)                 0.16      0.31    -0.48
+    ## cor(Intercept,trial_type1:adj1)                       0.08      0.24    -0.40
+    ## cor(syntax1,trial_type1:adj1)                         0.09      0.26    -0.43
+    ## cor(trial_type1,trial_type1:adj1)                    -0.30      0.24    -0.72
+    ## cor(adj1,trial_type1:adj1)                           -0.21      0.26    -0.68
+    ## cor(syntax1:trial_type1,trial_type1:adj1)            -0.14      0.27    -0.64
+    ## cor(syntax1:adj1,trial_type1:adj1)                   -0.07      0.32    -0.66
+    ## cor(Intercept,syntax1:trial_type1:adj1)              -0.00      0.30    -0.58
+    ## cor(syntax1,syntax1:trial_type1:adj1)                -0.07      0.31    -0.65
+    ## cor(trial_type1,syntax1:trial_type1:adj1)             0.04      0.29    -0.54
+    ## cor(adj1,syntax1:trial_type1:adj1)                   -0.07      0.32    -0.65
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:adj1)     0.01      0.31    -0.59
+    ## cor(syntax1:adj1,syntax1:trial_type1:adj1)            0.01      0.33    -0.62
+    ## cor(trial_type1:adj1,syntax1:trial_type1:adj1)       -0.20      0.33    -0.75
+    ##                                                   u-95% CI Rhat Bulk_ESS
+    ## sd(Intercept)                                         1.74 1.00     1648
+    ## sd(syntax1)                                           0.76 1.00     2014
+    ## sd(trial_type1)                                       0.93 1.00     2282
+    ## sd(adj1)                                              0.65 1.00     1902
+    ## sd(syntax1:trial_type1)                               0.61 1.01     1321
+    ## sd(syntax1:adj1)                                      0.38 1.00     1249
+    ## sd(trial_type1:adj1)                                  0.52 1.00     1293
+    ## sd(syntax1:trial_type1:adj1)                          0.39 1.00     1123
+    ## cor(Intercept,syntax1)                                0.04 1.00     4675
+    ## cor(Intercept,trial_type1)                            0.40 1.00     3462
+    ## cor(syntax1,trial_type1)                              0.37 1.00     1138
+    ## cor(Intercept,adj1)                                   0.12 1.00     3873
+    ## cor(syntax1,adj1)                                     0.64 1.00     2144
+    ## cor(trial_type1,adj1)                                 0.52 1.00     2954
+    ## cor(Intercept,syntax1:trial_type1)                    0.39 1.00     4788
+    ## cor(syntax1,syntax1:trial_type1)                      0.55 1.00     2873
+    ## cor(trial_type1,syntax1:trial_type1)                  0.66 1.00     3204
+    ## cor(adj1,syntax1:trial_type1)                         0.54 1.00     2395
+    ## cor(Intercept,syntax1:adj1)                           0.49 1.00     8348
+    ## cor(syntax1,syntax1:adj1)                             0.70 1.00     4709
+    ## cor(trial_type1,syntax1:adj1)                         0.69 1.00     6484
+    ## cor(adj1,syntax1:adj1)                                0.62 1.00     6194
+    ## cor(syntax1:trial_type1,syntax1:adj1)                 0.70 1.00     4735
+    ## cor(Intercept,trial_type1:adj1)                       0.52 1.00     6096
+    ## cor(syntax1,trial_type1:adj1)                         0.57 1.00     3629
+    ## cor(trial_type1,trial_type1:adj1)                     0.22 1.00     3927
+    ## cor(adj1,trial_type1:adj1)                            0.34 1.00     3890
+    ## cor(syntax1:trial_type1,trial_type1:adj1)             0.43 1.00     3223
+    ## cor(syntax1:adj1,trial_type1:adj1)                    0.56 1.00     2800
+    ## cor(Intercept,syntax1:trial_type1:adj1)               0.59 1.00     8368
+    ## cor(syntax1,syntax1:trial_type1:adj1)                 0.55 1.00     6697
+    ## cor(trial_type1,syntax1:trial_type1:adj1)             0.61 1.00     7221
+    ## cor(adj1,syntax1:trial_type1:adj1)                    0.57 1.00     5405
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:adj1)     0.62 1.00     5296
+    ## cor(syntax1:adj1,syntax1:trial_type1:adj1)            0.63 1.00     4042
+    ## cor(trial_type1:adj1,syntax1:trial_type1:adj1)        0.49 1.00     2796
+    ##                                                   Tail_ESS
+    ## sd(Intercept)                                         3590
+    ## sd(syntax1)                                           2655
+    ## sd(trial_type1)                                       3870
+    ## sd(adj1)                                              2546
+    ## sd(syntax1:trial_type1)                               1666
+    ## sd(syntax1:adj1)                                      2272
+    ## sd(trial_type1:adj1)                                  1329
+    ## sd(syntax1:trial_type1:adj1)                          2610
+    ## cor(Intercept,syntax1)                                4505
+    ## cor(Intercept,trial_type1)                            4463
+    ## cor(syntax1,trial_type1)                              1879
+    ## cor(Intercept,adj1)                                   4347
+    ## cor(syntax1,adj1)                                     3672
+    ## cor(trial_type1,adj1)                                 3741
+    ## cor(Intercept,syntax1:trial_type1)                    4220
+    ## cor(syntax1,syntax1:trial_type1)                      4030
+    ## cor(trial_type1,syntax1:trial_type1)                  3961
+    ## cor(adj1,syntax1:trial_type1)                         3835
+    ## cor(Intercept,syntax1:adj1)                           3309
+    ## cor(syntax1,syntax1:adj1)                             3774
+    ## cor(trial_type1,syntax1:adj1)                         4423
+    ## cor(adj1,syntax1:adj1)                                5032
+    ## cor(syntax1:trial_type1,syntax1:adj1)                 4950
+    ## cor(Intercept,trial_type1:adj1)                       4091
+    ## cor(syntax1,trial_type1:adj1)                         4001
+    ## cor(trial_type1,trial_type1:adj1)                     2959
+    ## cor(adj1,trial_type1:adj1)                            4070
+    ## cor(syntax1:trial_type1,trial_type1:adj1)             4006
+    ## cor(syntax1:adj1,trial_type1:adj1)                    4473
+    ## cor(Intercept,syntax1:trial_type1:adj1)               3726
+    ## cor(syntax1,syntax1:trial_type1:adj1)                 4059
+    ## cor(trial_type1,syntax1:trial_type1:adj1)             4195
+    ## cor(adj1,syntax1:trial_type1:adj1)                    4546
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:adj1)     4419
+    ## cor(syntax1:adj1,syntax1:trial_type1:adj1)            4501
+    ## cor(trial_type1:adj1,syntax1:trial_type1:adj1)        4006
     ## 
     ## Population-Level Effects: 
     ##                          Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## Intercept                    0.04      0.17    -0.29     0.38 1.00     2229
-    ## syntax1                      0.65      0.09     0.48     0.82 1.00     4479
-    ## trial_type1                 -0.11      0.17    -0.45     0.24 1.00     2956
-    ## adj1                         0.01      0.17    -0.31     0.36 1.00     3298
-    ## syntax1:trial_type1          0.29      0.10     0.10     0.48 1.00     4506
-    ## syntax1:adj1                -0.04      0.08    -0.20     0.12 1.00     5191
-    ## trial_type1:adj1             0.11      0.11    -0.10     0.34 1.00     4386
-    ## syntax1:trial_type1:adj1     0.05      0.07    -0.09     0.20 1.00     6310
+    ## Intercept                    0.03      0.17    -0.30     0.39 1.00     2385
+    ## syntax1                      0.64      0.09     0.47     0.83 1.00     4054
+    ## trial_type1                 -0.12      0.17    -0.48     0.22 1.00     3007
+    ## adj1                         0.01      0.17    -0.31     0.36 1.00     3326
+    ## syntax1:trial_type1          0.29      0.10     0.09     0.49 1.00     4639
+    ## syntax1:adj1                -0.06      0.09    -0.24     0.11 1.00     4777
+    ## trial_type1:adj1             0.12      0.11    -0.10     0.36 1.00     4408
+    ## syntax1:trial_type1:adj1     0.05      0.07    -0.10     0.19 1.00     5277
     ##                          Tail_ESS
-    ## Intercept                    3289
+    ## Intercept                    3184
     ## syntax1                      4355
-    ## trial_type1                  3694
-    ## adj1                         3244
-    ## syntax1:trial_type1          3301
-    ## syntax1:adj1                 3064
-    ## trial_type1:adj1             3259
-    ## syntax1:trial_type1:adj1     4384
+    ## trial_type1                  2997
+    ## adj1                         3722
+    ## syntax1:trial_type1          4435
+    ## syntax1:adj1                 3534
+    ## trial_type1:adj1             4053
+    ## syntax1:trial_type1:adj1     4184
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -539,29 +797,29 @@ contrast_answers_size
 
     ## Hypothesis Tests for class b:
     ##              Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-    ## 1         critical_subj     0.88      0.27     0.34     1.41         NA
-    ## 2         critical_pred    -1.01      0.28    -1.56    -0.47         NA
-    ## 3       syntax_critical     1.89      0.26     1.47     2.32        Inf
-    ## 4           filler_subj     0.51      0.27    -0.03     1.07         NA
-    ## 5           filler_pred    -0.21      0.27    -0.74     0.32         NA
-    ## 6         syntax_filler     0.72      0.25     0.33     1.12     351.94
-    ## 7  subj_critical_filler     0.37      0.40    -0.43     1.17         NA
-    ## 8  pred_critical_filler    -0.80      0.40    -1.57    -0.03         NA
-    ## 9          critical_big     0.06      0.32    -0.55     0.68         NA
-    ## 10       critical_small    -0.19      0.32    -0.81     0.43         NA
-    ## 11        size_critical     0.25      0.40    -0.54     1.08         NA
-    ## 12           filler_big     0.05      0.31    -0.58     0.68         NA
-    ## 13         filler_small     0.25      0.32    -0.38     0.89         NA
-    ## 14          size_filler    -0.20      0.40    -0.97     0.62         NA
-    ## 15            size_subj    -0.06      0.37    -0.77     0.70         NA
-    ## 16            size_pred     0.11      0.38    -0.61     0.89         NA
+    ## 1         critical_subj     0.85      0.28     0.32     1.40         NA
+    ## 2         critical_pred    -1.03      0.29    -1.59    -0.47         NA
+    ## 3       syntax_critical     1.87      0.28     1.44     2.34        Inf
+    ## 4           filler_subj     0.50      0.28    -0.03     1.07         NA
+    ## 5           filler_pred    -0.20      0.28    -0.75     0.38         NA
+    ## 6         syntax_filler     0.71      0.26     0.30     1.12     192.55
+    ## 7  subj_critical_filler     0.34      0.40    -0.46     1.13         NA
+    ## 8  pred_critical_filler    -0.82      0.40    -1.66    -0.04         NA
+    ## 9          critical_big     0.05      0.31    -0.57     0.67         NA
+    ## 10       critical_small    -0.23      0.34    -0.91     0.43         NA
+    ## 11        size_critical     0.27      0.42    -0.55     1.13         NA
+    ## 12           filler_big     0.04      0.32    -0.56     0.69         NA
+    ## 13         filler_small     0.26      0.31    -0.36     0.88         NA
+    ## 14          size_filler    -0.21      0.39    -0.96     0.58         NA
+    ## 15            size_subj    -0.09      0.37    -0.82     0.66         NA
+    ## 16            size_pred     0.15      0.39    -0.58     0.94         NA
     ##    Post.Prob Star
     ## 1         NA    *
     ## 2         NA    *
-    ## 3          1    *
+    ## 3       1.00    *
     ## 4         NA     
     ## 5         NA     
-    ## 6          1    *
+    ## 6       0.99    *
     ## 7         NA     
     ## 8         NA    *
     ## 9         NA     
@@ -664,12 +922,12 @@ Explore the between-subjects effect of the order of response options:
 # basic is the left option 1, sub is the left option -1
 contrasts(d_main_cat$optionLeft) <- contr.sum(2)
 
-model_option <- brm(bf(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type || submission_id) + 
-               (1 + syntax*trial_type*optionLeft || item),
+model_option <- brm(bf(response_num ~ syntax*trial_type*optionLeft + (1 + syntax*trial_type | submission_id) + 
+               (1 + syntax*trial_type*optionLeft | item),
                decomp = "QR"), # random effects by-item (flowers, dogs, buildings etc) 
              data = d_main_cat,
              family = "bernoulli",
-             control = list(adapt_delta = 0.96),
+             control = list(adapt_delta = 0.99),
              iter = 3000,
              cores = 4)
 ```
@@ -680,78 +938,211 @@ model_option <- brm(bf(response_num ~ syntax*trial_type*optionLeft + (1 + syntax
 
     ## Start sampling
 
-    ## Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta above 0.96 may help. See
-    ## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup
-
-    ## Warning: Examine the pairs() plot to diagnose sampling problems
-
 ``` r
 summary(model_option)
 ```
 
-    ## Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta
-    ## above 0.96 may help. See http://mc-stan.org/misc/warnings.html#divergent-
-    ## transitions-after-warmup
-
     ##  Family: bernoulli 
     ##   Links: mu = logit 
-    ## Formula: response_num ~ syntax * trial_type * optionLeft + (1 + syntax * trial_type || submission_id) + (1 + syntax * trial_type * optionLeft || item) 
+    ## Formula: response_num ~ syntax * trial_type * optionLeft + (1 + syntax * trial_type | submission_id) + (1 + syntax * trial_type * optionLeft | item) 
     ##    Data: d_main_cat (Number of observations: 2400) 
     ## Samples: 4 chains, each with iter = 3000; warmup = 1500; thin = 1;
     ##          total post-warmup samples = 6000
     ## 
     ## Group-Level Effects: 
     ## ~item (Number of levels: 7) 
-    ##                                     Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## sd(Intercept)                           0.23      0.14     0.03     0.57 1.00
-    ## sd(syntax1)                             0.07      0.07     0.00     0.23 1.00
-    ## sd(trial_type1)                         0.29      0.16     0.08     0.67 1.00
-    ## sd(optionLeft1)                         0.10      0.09     0.00     0.32 1.00
-    ## sd(syntax1:trial_type1)                 0.12      0.10     0.01     0.36 1.00
-    ## sd(syntax1:optionLeft1)                 0.08      0.07     0.00     0.26 1.00
-    ## sd(trial_type1:optionLeft1)             0.10      0.08     0.00     0.31 1.00
-    ## sd(syntax1:trial_type1:optionLeft1)     0.15      0.12     0.01     0.46 1.00
-    ##                                     Bulk_ESS Tail_ESS
-    ## sd(Intercept)                           1633     1750
-    ## sd(syntax1)                             3083     2876
-    ## sd(trial_type1)                         1721     2223
-    ## sd(optionLeft1)                         2653     3463
-    ## sd(syntax1:trial_type1)                 1782     2998
-    ## sd(syntax1:optionLeft1)                 2808     3535
-    ## sd(trial_type1:optionLeft1)             2495     2432
-    ## sd(syntax1:trial_type1:optionLeft1)     1529     2208
+    ##                                                              Estimate Est.Error
+    ## sd(Intercept)                                                    0.23      0.14
+    ## sd(syntax1)                                                      0.08      0.07
+    ## sd(trial_type1)                                                  0.32      0.18
+    ## sd(optionLeft1)                                                  0.11      0.09
+    ## sd(syntax1:trial_type1)                                          0.13      0.10
+    ## sd(syntax1:optionLeft1)                                          0.08      0.08
+    ## sd(trial_type1:optionLeft1)                                      0.10      0.09
+    ## sd(syntax1:trial_type1:optionLeft1)                              0.16      0.13
+    ## cor(Intercept,syntax1)                                           0.01      0.34
+    ## cor(Intercept,trial_type1)                                      -0.06      0.32
+    ## cor(syntax1,trial_type1)                                         0.06      0.33
+    ## cor(Intercept,optionLeft1)                                       0.04      0.33
+    ## cor(syntax1,optionLeft1)                                        -0.01      0.33
+    ## cor(trial_type1,optionLeft1)                                     0.00      0.33
+    ## cor(Intercept,syntax1:trial_type1)                              -0.13      0.33
+    ## cor(syntax1,syntax1:trial_type1)                                -0.01      0.33
+    ## cor(trial_type1,syntax1:trial_type1)                            -0.01      0.33
+    ## cor(optionLeft1,syntax1:trial_type1)                            -0.06      0.33
+    ## cor(Intercept,syntax1:optionLeft1)                              -0.02      0.33
+    ## cor(syntax1,syntax1:optionLeft1)                                 0.01      0.34
+    ## cor(trial_type1,syntax1:optionLeft1)                            -0.01      0.34
+    ## cor(optionLeft1,syntax1:optionLeft1)                            -0.01      0.33
+    ## cor(syntax1:trial_type1,syntax1:optionLeft1)                    -0.00      0.34
+    ## cor(Intercept,trial_type1:optionLeft1)                          -0.08      0.33
+    ## cor(syntax1,trial_type1:optionLeft1)                             0.01      0.34
+    ## cor(trial_type1,trial_type1:optionLeft1)                         0.02      0.33
+    ## cor(optionLeft1,trial_type1:optionLeft1)                         0.01      0.33
+    ## cor(syntax1:trial_type1,trial_type1:optionLeft1)                 0.01      0.34
+    ## cor(syntax1:optionLeft1,trial_type1:optionLeft1)                 0.03      0.34
+    ## cor(Intercept,syntax1:trial_type1:optionLeft1)                   0.08      0.33
+    ## cor(syntax1,syntax1:trial_type1:optionLeft1)                     0.03      0.34
+    ## cor(trial_type1,syntax1:trial_type1:optionLeft1)                 0.04      0.33
+    ## cor(optionLeft1,syntax1:trial_type1:optionLeft1)                -0.04      0.34
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:optionLeft1)         0.01      0.33
+    ## cor(syntax1:optionLeft1,syntax1:trial_type1:optionLeft1)        -0.02      0.33
+    ## cor(trial_type1:optionLeft1,syntax1:trial_type1:optionLeft1)    -0.03      0.33
+    ##                                                              l-95% CI u-95% CI
+    ## sd(Intercept)                                                    0.03     0.57
+    ## sd(syntax1)                                                      0.00     0.25
+    ## sd(trial_type1)                                                  0.08     0.79
+    ## sd(optionLeft1)                                                  0.00     0.35
+    ## sd(syntax1:trial_type1)                                          0.01     0.39
+    ## sd(syntax1:optionLeft1)                                          0.00     0.27
+    ## sd(trial_type1:optionLeft1)                                      0.00     0.34
+    ## sd(syntax1:trial_type1:optionLeft1)                              0.01     0.48
+    ## cor(Intercept,syntax1)                                          -0.63     0.64
+    ## cor(Intercept,trial_type1)                                      -0.66     0.56
+    ## cor(syntax1,trial_type1)                                        -0.57     0.66
+    ## cor(Intercept,optionLeft1)                                      -0.60     0.66
+    ## cor(syntax1,optionLeft1)                                        -0.64     0.63
+    ## cor(trial_type1,optionLeft1)                                    -0.64     0.64
+    ## cor(Intercept,syntax1:trial_type1)                              -0.73     0.53
+    ## cor(syntax1,syntax1:trial_type1)                                -0.64     0.63
+    ## cor(trial_type1,syntax1:trial_type1)                            -0.64     0.62
+    ## cor(optionLeft1,syntax1:trial_type1)                            -0.67     0.57
+    ## cor(Intercept,syntax1:optionLeft1)                              -0.64     0.60
+    ## cor(syntax1,syntax1:optionLeft1)                                -0.64     0.64
+    ## cor(trial_type1,syntax1:optionLeft1)                            -0.65     0.64
+    ## cor(optionLeft1,syntax1:optionLeft1)                            -0.63     0.62
+    ## cor(syntax1:trial_type1,syntax1:optionLeft1)                    -0.64     0.64
+    ## cor(Intercept,trial_type1:optionLeft1)                          -0.69     0.56
+    ## cor(syntax1,trial_type1:optionLeft1)                            -0.62     0.64
+    ## cor(trial_type1,trial_type1:optionLeft1)                        -0.62     0.64
+    ## cor(optionLeft1,trial_type1:optionLeft1)                        -0.63     0.65
+    ## cor(syntax1:trial_type1,trial_type1:optionLeft1)                -0.63     0.65
+    ## cor(syntax1:optionLeft1,trial_type1:optionLeft1)                -0.63     0.66
+    ## cor(Intercept,syntax1:trial_type1:optionLeft1)                  -0.55     0.68
+    ## cor(syntax1,syntax1:trial_type1:optionLeft1)                    -0.61     0.66
+    ## cor(trial_type1,syntax1:trial_type1:optionLeft1)                -0.59     0.65
+    ## cor(optionLeft1,syntax1:trial_type1:optionLeft1)                -0.65     0.61
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:optionLeft1)        -0.63     0.64
+    ## cor(syntax1:optionLeft1,syntax1:trial_type1:optionLeft1)        -0.64     0.63
+    ## cor(trial_type1:optionLeft1,syntax1:trial_type1:optionLeft1)    -0.66     0.60
+    ##                                                              Rhat Bulk_ESS
+    ## sd(Intercept)                                                1.00     1992
+    ## sd(syntax1)                                                  1.00     3742
+    ## sd(trial_type1)                                              1.00     2306
+    ## sd(optionLeft1)                                              1.00     2869
+    ## sd(syntax1:trial_type1)                                      1.00     2286
+    ## sd(syntax1:optionLeft1)                                      1.00     3319
+    ## sd(trial_type1:optionLeft1)                                  1.00     3281
+    ## sd(syntax1:trial_type1:optionLeft1)                          1.00     2412
+    ## cor(Intercept,syntax1)                                       1.00     9882
+    ## cor(Intercept,trial_type1)                                   1.00     4744
+    ## cor(syntax1,trial_type1)                                     1.00     3551
+    ## cor(Intercept,optionLeft1)                                   1.00     9267
+    ## cor(syntax1,optionLeft1)                                     1.00     6904
+    ## cor(trial_type1,optionLeft1)                                 1.00     7662
+    ## cor(Intercept,syntax1:trial_type1)                           1.00     7033
+    ## cor(syntax1,syntax1:trial_type1)                             1.00     6273
+    ## cor(trial_type1,syntax1:trial_type1)                         1.00     6952
+    ## cor(optionLeft1,syntax1:trial_type1)                         1.00     4552
+    ## cor(Intercept,syntax1:optionLeft1)                           1.00    10064
+    ## cor(syntax1,syntax1:optionLeft1)                             1.00     8211
+    ## cor(trial_type1,syntax1:optionLeft1)                         1.00     7817
+    ## cor(optionLeft1,syntax1:optionLeft1)                         1.00     4995
+    ## cor(syntax1:trial_type1,syntax1:optionLeft1)                 1.00     4664
+    ## cor(Intercept,trial_type1:optionLeft1)                       1.00     8572
+    ## cor(syntax1,trial_type1:optionLeft1)                         1.00     6696
+    ## cor(trial_type1,trial_type1:optionLeft1)                     1.00     7371
+    ## cor(optionLeft1,trial_type1:optionLeft1)                     1.00     5390
+    ## cor(syntax1:trial_type1,trial_type1:optionLeft1)             1.00     4721
+    ## cor(syntax1:optionLeft1,trial_type1:optionLeft1)             1.00     4311
+    ## cor(Intercept,syntax1:trial_type1:optionLeft1)               1.00     6601
+    ## cor(syntax1,syntax1:trial_type1:optionLeft1)                 1.00     5656
+    ## cor(trial_type1,syntax1:trial_type1:optionLeft1)             1.00     6785
+    ## cor(optionLeft1,syntax1:trial_type1:optionLeft1)             1.00     5004
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:optionLeft1)     1.00     4667
+    ## cor(syntax1:optionLeft1,syntax1:trial_type1:optionLeft1)     1.00     4192
+    ## cor(trial_type1:optionLeft1,syntax1:trial_type1:optionLeft1) 1.00     3942
+    ##                                                              Tail_ESS
+    ## sd(Intercept)                                                    1839
+    ## sd(syntax1)                                                      3587
+    ## sd(trial_type1)                                                  2741
+    ## sd(optionLeft1)                                                  3298
+    ## sd(syntax1:trial_type1)                                          2557
+    ## sd(syntax1:optionLeft1)                                          2986
+    ## sd(trial_type1:optionLeft1)                                      3183
+    ## sd(syntax1:trial_type1:optionLeft1)                              3114
+    ## cor(Intercept,syntax1)                                           4324
+    ## cor(Intercept,trial_type1)                                       4571
+    ## cor(syntax1,trial_type1)                                         4116
+    ## cor(Intercept,optionLeft1)                                       4584
+    ## cor(syntax1,optionLeft1)                                         4941
+    ## cor(trial_type1,optionLeft1)                                     5032
+    ## cor(Intercept,syntax1:trial_type1)                               4509
+    ## cor(syntax1,syntax1:trial_type1)                                 4496
+    ## cor(trial_type1,syntax1:trial_type1)                             5015
+    ## cor(optionLeft1,syntax1:trial_type1)                             4608
+    ## cor(Intercept,syntax1:optionLeft1)                               4173
+    ## cor(syntax1,syntax1:optionLeft1)                                 4675
+    ## cor(trial_type1,syntax1:optionLeft1)                             4970
+    ## cor(optionLeft1,syntax1:optionLeft1)                             4701
+    ## cor(syntax1:trial_type1,syntax1:optionLeft1)                     4703
+    ## cor(Intercept,trial_type1:optionLeft1)                           4743
+    ## cor(syntax1,trial_type1:optionLeft1)                             4842
+    ## cor(trial_type1,trial_type1:optionLeft1)                         4078
+    ## cor(optionLeft1,trial_type1:optionLeft1)                         5101
+    ## cor(syntax1:trial_type1,trial_type1:optionLeft1)                 4819
+    ## cor(syntax1:optionLeft1,trial_type1:optionLeft1)                 4675
+    ## cor(Intercept,syntax1:trial_type1:optionLeft1)                   4600
+    ## cor(syntax1,syntax1:trial_type1:optionLeft1)                     4047
+    ## cor(trial_type1,syntax1:trial_type1:optionLeft1)                 4614
+    ## cor(optionLeft1,syntax1:trial_type1:optionLeft1)                 5154
+    ## cor(syntax1:trial_type1,syntax1:trial_type1:optionLeft1)         4970
+    ## cor(syntax1:optionLeft1,syntax1:trial_type1:optionLeft1)         5159
+    ## cor(trial_type1:optionLeft1,syntax1:trial_type1:optionLeft1)     4557
     ## 
     ## ~submission_id (Number of levels: 150) 
-    ##                         Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-    ## sd(Intercept)               1.32      0.12     1.10     1.57 1.00     1876
-    ## sd(syntax1)                 0.46      0.09     0.28     0.62 1.00     1963
-    ## sd(trial_type1)             0.65      0.08     0.50     0.82 1.00     2223
-    ## sd(syntax1:trial_type1)     0.36      0.10     0.13     0.54 1.01     1093
-    ##                         Tail_ESS
-    ## sd(Intercept)               3325
-    ## sd(syntax1)                 2216
-    ## sd(trial_type1)             2564
-    ## sd(syntax1:trial_type1)      940
+    ##                                      Estimate Est.Error l-95% CI u-95% CI Rhat
+    ## sd(Intercept)                            1.34      0.12     1.12     1.58 1.00
+    ## sd(syntax1)                              0.48      0.10     0.29     0.67 1.00
+    ## sd(trial_type1)                          0.66      0.09     0.49     0.83 1.00
+    ## sd(syntax1:trial_type1)                  0.32      0.12     0.06     0.52 1.00
+    ## cor(Intercept,syntax1)                  -0.38      0.18    -0.70    -0.00 1.00
+    ## cor(Intercept,trial_type1)               0.21      0.16    -0.11     0.50 1.00
+    ## cor(syntax1,trial_type1)                 0.05      0.22    -0.36     0.47 1.00
+    ## cor(Intercept,syntax1:trial_type1)      -0.00      0.27    -0.54     0.54 1.00
+    ## cor(syntax1,syntax1:trial_type1)         0.21      0.30    -0.46     0.75 1.00
+    ## cor(trial_type1,syntax1:trial_type1)     0.34      0.27    -0.23     0.82 1.00
+    ##                                      Bulk_ESS Tail_ESS
+    ## sd(Intercept)                            1992     3940
+    ## sd(syntax1)                              2065     2607
+    ## sd(trial_type1)                          2410     3800
+    ## sd(syntax1:trial_type1)                   950     1064
+    ## cor(Intercept,syntax1)                   3084     3697
+    ## cor(Intercept,trial_type1)               2828     3672
+    ## cor(syntax1,trial_type1)                  991     1440
+    ## cor(Intercept,syntax1:trial_type1)       3541     2676
+    ## cor(syntax1,syntax1:trial_type1)         2298     2849
+    ## cor(trial_type1,syntax1:trial_type1)     2999     2853
     ## 
     ## Population-Level Effects: 
     ##                                 Estimate Est.Error l-95% CI u-95% CI Rhat
-    ## Intercept                           0.04      0.16    -0.27     0.36 1.01
-    ## syntax1                             0.59      0.08     0.44     0.74 1.00
-    ## trial_type1                        -0.08      0.15    -0.37     0.21 1.00
-    ## optionLeft1                        -0.07      0.13    -0.32     0.19 1.00
-    ## syntax1:trial_type1                 0.26      0.09     0.10     0.43 1.00
-    ## syntax1:optionLeft1                -0.09      0.08    -0.24     0.07 1.00
-    ## trial_type1:optionLeft1             0.13      0.09    -0.05     0.31 1.00
-    ## syntax1:trial_type1:optionLeft1     0.02      0.10    -0.17     0.22 1.00
+    ## Intercept                           0.03      0.16    -0.27     0.35 1.00
+    ## syntax1                             0.59      0.08     0.43     0.76 1.00
+    ## trial_type1                        -0.08      0.16    -0.41     0.24 1.00
+    ## optionLeft1                        -0.07      0.13    -0.33     0.20 1.00
+    ## syntax1:trial_type1                 0.28      0.09     0.11     0.46 1.00
+    ## syntax1:optionLeft1                -0.09      0.08    -0.25     0.07 1.00
+    ## trial_type1:optionLeft1             0.13      0.09    -0.06     0.31 1.00
+    ## syntax1:trial_type1:optionLeft1     0.01      0.10    -0.18     0.21 1.00
     ##                                 Bulk_ESS Tail_ESS
-    ## Intercept                           2025     2242
-    ## syntax1                             3945     3952
-    ## trial_type1                         1989     2380
-    ## optionLeft1                         1897     2788
-    ## syntax1:trial_type1                 3995     3787
-    ## syntax1:optionLeft1                 4457     3996
-    ## trial_type1:optionLeft1             3689     3875
-    ## syntax1:trial_type1:optionLeft1     2949     2923
+    ## Intercept                           1734     3196
+    ## syntax1                             3537     3624
+    ## trial_type1                         2850     2771
+    ## optionLeft1                         1673     3023
+    ## syntax1:trial_type1                 3732     3813
+    ## syntax1:optionLeft1                 3850     3839
+    ## trial_type1:optionLeft1             4001     4351
+    ## syntax1:trial_type1:optionLeft1     4218     3680
     ## 
     ## Samples were drawn using sampling(NUTS). For each parameter, Bulk_ESS
     ## and Tail_ESS are effective sample size measures, and Rhat is the potential
@@ -788,16 +1179,16 @@ contrast_answers_option
 
     ## Hypothesis Tests for class b:
     ##              Hypothesis Estimate Est.Error CI.Lower CI.Upper Evid.Ratio
-    ## 1  critical_optionBasic     0.02      0.28    -0.52     0.58         NA
-    ## 2    critical_optionSub    -0.10      0.27    -0.63     0.42         NA
-    ## 3       option_critical     0.11      0.32    -0.51     0.73         NA
-    ## 4    filler_optionBasic    -0.08      0.27    -0.65     0.47         NA
-    ## 5      filler_optionSub     0.32      0.27    -0.21     0.85         NA
-    ## 6         option_filler    -0.40      0.31    -1.01     0.23         NA
-    ## 7           option_subj    -0.32      0.30    -0.91     0.28         NA
-    ## 8           option_pred     0.03      0.30    -0.56     0.64         NA
-    ## 9  option_subj_critical    -0.03      0.41    -0.83     0.78         NA
-    ## 10 option_pred_critical     0.25      0.41    -0.56     1.10         NA
+    ## 1  critical_optionBasic     0.00      0.29    -0.57     0.60         NA
+    ## 2    critical_optionSub    -0.12      0.29    -0.68     0.47         NA
+    ## 3       option_critical     0.12      0.35    -0.56     0.80         NA
+    ## 4    filler_optionBasic    -0.08      0.27    -0.62     0.46         NA
+    ## 5      filler_optionSub     0.30      0.26    -0.22     0.84         NA
+    ## 6         option_filler    -0.38      0.31    -0.98     0.23         NA
+    ## 7           option_subj    -0.31      0.29    -0.89     0.25         NA
+    ## 8           option_pred     0.05      0.34    -0.62     0.70         NA
+    ## 9  option_subj_critical    -0.03      0.42    -0.85     0.80         NA
+    ## 10 option_pred_critical     0.27      0.45    -0.59     1.16         NA
     ##    Post.Prob Star
     ## 1         NA     
     ## 2         NA     
